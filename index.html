@@ -17,7 +17,22 @@
     .log-entry { border-left: 2px solid #a855f7; padding-left: 8px; margin-bottom: 6px; }
   </style>
 </head>
-<body class="min-h-screen p-6">
+<body class="min-h-screen p-6 pt-14">
+
+  <!-- 顶部滚动交易活动 -->
+  <div class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur border-b border-slate-700/50 overflow-hidden" style="height:36px">
+    <div id="tickerTrack" class="flex items-center gap-8 whitespace-nowrap" style="animation: ticker 30s linear infinite; will-change: transform;">
+      <span id="tickerContent" class="flex items-center gap-8 text-xs text-gray-400">加载中...</span>
+      <span id="tickerContent2" class="flex items-center gap-8 text-xs text-gray-400" aria-hidden="true"></span>
+    </div>
+  </div>
+  <style>
+    @keyframes ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    #tickerTrack { height: 36px; }
+  </style>
 
   <!-- Header -->
   <div class="max-w-6xl mx-auto">
@@ -570,7 +585,73 @@
     window.addEventListener('load', () => {
       loadTokenList();
       autoConnect();
+      loadTicker();
+      setInterval(loadTicker, 30000);
     });
+
+    async function loadTicker() {
+      try {
+        const p = new ethers.JsonRpcProvider('https://rpc.tempo.xyz');
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, p);
+        const count = Number(await launch.getLaunchCount());
+        if (count === 0) return;
+
+        const items = [];
+        // 取最新 5 个代币的买卖事件
+        const buyFilter = launch.filters.TokenBought();
+        const sellFilter = launch.filters.TokenSold();
+        const latestBlock = await p.getBlockNumber();
+        const fromBlock = Math.max(0, latestBlock - 5000);
+
+        const [buyEvents, sellEvents] = await Promise.all([
+          launch.queryFilter(buyFilter, fromBlock, latestBlock),
+          launch.queryFilter(sellFilter, fromBlock, latestBlock)
+        ]);
+
+        const allEvents = [...buyEvents, ...sellEvents]
+          .sort((a, b) => b.blockNumber - a.blockNumber)
+          .slice(0, 20);
+
+        // 获取代币符号缓存
+        const symbolCache = {};
+        for (const ev of allEvents) {
+          const addr = ev.args[0];
+          if (!symbolCache[addr]) {
+            try {
+              const t = new ethers.Contract(addr, ['function symbol() view returns (string)'], p);
+              symbolCache[addr] = await t.symbol();
+            } catch(e) { symbolCache[addr] = addr.slice(0,6); }
+          }
+        }
+
+        for (const ev of allEvents) {
+          const isBuy = ev.fragment.name === 'TokenBought';
+          const addr = ev.args[1]; // buyer/seller
+          const short = addr.slice(0,6) + '...' + addr.slice(-4);
+          const usdc = Number(ethers.formatUnits(ev.args[2], 6)).toFixed(2);
+          const sym = symbolCache[ev.args[0]] || '???';
+          const color = isBuy ? 'text-green-400' : 'text-red-400';
+          const action = isBuy ? '买入' : '卖出';
+          items.push(`<span class="flex items-center gap-1.5"><span class="${color} font-semibold">${action}</span><span class="text-white font-mono">${short}</span><span class="text-gray-500">以</span><span class="text-cyan-400">${usdc} USDC</span><span class="text-gray-500">交易</span><span class="text-purple-400 font-bold">${sym}</span><span class="text-gray-600 mx-2">•</span></span>`);
+        }
+
+        if (items.length === 0) {
+          items.push('<span class="text-gray-500">暂无交易活动，快来创建第一个代币！</span>');
+        }
+
+        const html = items.join('');
+        document.getElementById('tickerContent').innerHTML = html;
+        document.getElementById('tickerContent2').innerHTML = html;
+
+        // 动态调整速度
+        const totalWidth = document.getElementById('tickerContent').scrollWidth;
+        const duration = Math.max(20, totalWidth / 80);
+        document.getElementById('tickerTrack').style.animation = `ticker ${duration}s linear infinite`;
+
+      } catch(e) {
+        console.error('ticker error', e);
+      }
+    }
 
     // 监听账户切换
     if (window.ethereum) {
