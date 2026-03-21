@@ -88,6 +88,20 @@ contract TempoUSDCLaunch {
     }
 
     // ── 创建代币 ──
+    function createLaunch(
+        string calldata name,
+        string calldata symbol,
+        string calldata meta
+    ) external returns (address) {
+        TempoMemeToken token = new TempoMemeToken(name, symbol, address(this));
+        address t = address(token);
+        launches[t] = Launch({ creator: msg.sender, raised: 0, sold: 0, graduated: false });
+        isLaunch[t] = true;
+        allLaunches.push(t);
+        emit LaunchCreated(t, msg.sender, name, symbol, meta);
+        return t;
+    }
+
     function createToken(
         string calldata name,
         string calldata symbol,
