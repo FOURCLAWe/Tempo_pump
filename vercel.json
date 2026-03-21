@@ -1,7 +1,8 @@
 {
   "version": 2,
   "builds": [
-    { "src": "**/*.html", "use": "@vercel/static" }
+    { "src": "**/*.html", "use": "@vercel/static" },
+    { "src": "assets/**", "use": "@vercel/static" }
   ],
   "rewrites": [
     { "source": "/token", "destination": "/token.html" },
