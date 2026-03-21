@@ -220,8 +220,8 @@
           }
         }
 
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
         userAddress = await signer.getAddress();
 
         document.getElementById("connectBtn").innerHTML =
