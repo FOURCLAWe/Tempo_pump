@@ -57,7 +57,7 @@ contract TempoUSDCLaunch {
     mapping(address => bool) public isLaunch;
     address[] public allLaunches;
 
-    event LaunchCreated(address indexed token, address indexed creator, string name, string symbol);
+    event LaunchCreated(address indexed token, address indexed creator, string name, string symbol, string meta);
     event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut);
     event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut);
     event Graduated(address indexed token);
@@ -67,13 +67,18 @@ contract TempoUSDCLaunch {
 
     constructor(address _usdc) { USDC = IERC20(_usdc); owner = msg.sender; }
 
-    function createLaunch(string calldata _name, string calldata _symbol) external returns (address) {
+    // meta: JSON 字符串，包含 description/image/twitter/website
+    function createLaunch(
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _meta
+    ) external returns (address) {
         TempoMemeToken token = new TempoMemeToken(_name, _symbol, address(this));
         address a = address(token);
         launches[a] = Launch(msg.sender, 0, 0, false);
         isLaunch[a] = true;
         allLaunches.push(a);
-        emit LaunchCreated(a, msg.sender, _name, _symbol);
+        emit LaunchCreated(a, msg.sender, _name, _symbol, _meta);
         return a;
     }
 

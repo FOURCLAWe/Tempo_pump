@@ -71,9 +71,26 @@
                    class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
           </div>
           <div>
-            <label class="block text-xs text-gray-400 mb-1.5">合约地址（已部署）</label>
-            <input id="contractAddr" placeholder="0x..." 
-                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-mono">
+            <label class="block text-xs text-gray-400 mb-1.5">代币描述</label>
+            <textarea id="description" placeholder="介绍一下你的代币..." rows="3"
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1.5">头像 URL（可选）</label>
+            <input id="image" placeholder="https://..." 
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5">推特（可选）</label>
+              <input id="twitter" placeholder="@handle" 
+                     class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5">网站（可选）</label>
+              <input id="website" placeholder="https://..." 
+                     class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+            </div>
           </div>
           <button onclick="createLaunch()" 
                   class="w-full btn-primary py-3.5 rounded-xl font-bold text-sm hover:brightness-110 transition">
@@ -208,10 +225,10 @@
   <script>
     let provider, signer, userAddress;
     const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
-    const LAUNCH_CONTRACT = "0x7bA8B67c6FEbA94611B727f7872fcacf6eb6fF2E";
+    const LAUNCH_CONTRACT = "0x9571aFb3Fe4a2b6C47D441c7b37f50Ef3A71023F";
     
     const LAUNCH_ABI = [
-      "function createLaunch(string name, string symbol) returns (address)",
+      "function createLaunch(string name, string symbol, string meta) returns (address)",
       "function buy(address tokenAddr, uint256 usdcAmount)",
       "function sell(address tokenAddr, uint256 tokenAmount)",
       "function getPrice(address tokenAddr) view returns (uint256)",
@@ -220,7 +237,7 @@
       "function launches(address) view returns (address creator, uint256 raised, uint256 sold, bool graduated)",
       "function getLaunchCount() view returns (uint256)",
       "function allLaunches(uint256) view returns (address)",
-      "event LaunchCreated(address indexed token, address indexed creator, string name)",
+      "event LaunchCreated(address indexed token, address indexed creator, string name, string symbol, string meta)",
       "event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut)",
       "event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut)",
       "event LaunchGraduated(address indexed token)"
@@ -298,12 +315,17 @@
     async function createLaunch() {
       const name = document.getElementById("name").value;
       const symbol = document.getElementById("symbol").value;
+      const description = document.getElementById("description").value;
+      const image = document.getElementById("image").value;
+      const twitter = document.getElementById("twitter").value;
+      const website = document.getElementById("website").value;
       if (!name || !symbol) return log("❌ 请填写代币名称和符号", "red");
       if (!userAddress) return log("❌ 请先连接钱包", "red");
       try {
+        const meta = JSON.stringify({ description, image, twitter, website });
         log(`🚀 正在创建发射: ${name} (${symbol})...`);
         const contract = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
-        const tx = await contract.createLaunch(name, symbol);
+        const tx = await contract.createLaunch(name, symbol, meta);
         log(`⏳ 交易已发送: ${tx.hash}`);
         const receipt = await tx.wait();
         // 从事件中获取代币地址
@@ -440,8 +462,15 @@
             ]);
             const raised = Number(ethers.formatUnits(info[1], 6));
             const pct = Math.min((raised / 12000) * 100, 100).toFixed(1);
-            const priceFormatted = (Number(price) / 1e12).toFixed(6);
-            cards.push({ tokenAddr, name, symbol, raised, pct, priceFormatted, graduated: info[3] });
+            const priceFormatted = (Number(price) / 1e6).toFixed(8);
+            // 从事件获取 meta
+            let meta = {};
+            try {
+              const filter = launch.filters.LaunchCreated(tokenAddr);
+              const evts = await launch.queryFilter(filter, 0, "latest");
+              if (evts.length > 0 && evts[0].args.meta) meta = JSON.parse(evts[0].args.meta);
+            } catch(e) {}
+            cards.push({ tokenAddr, name, symbol, raised, pct, priceFormatted, graduated: info[3], meta });
           } catch(e) {}
         }
 
@@ -453,8 +482,11 @@
              class="card rounded-2xl p-5 hover:border-purple-500/60 border border-slate-700/50 transition-all duration-200 cursor-pointer block group">
             <!-- 顶部：图标 + 名称 + 状态 -->
             <div class="flex items-center gap-3 mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center font-black text-base flex-shrink-0 group-hover:scale-105 transition-transform">
-                ${c.symbol.slice(0,2).toUpperCase()}
+              <div class="w-12 h-12 rounded-2xl flex-shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+                ${c.meta && c.meta.image
+                  ? `<img src="${c.meta.image}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\'w-full h-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center font-black text-base\'>${c.symbol.slice(0,2).toUpperCase()}</div>'">`
+                  : `<div class="w-full h-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center font-black text-base">${c.symbol.slice(0,2).toUpperCase()}</div>`
+                }
               </div>
               <div class="flex-1 min-w-0">
                 <div class="font-bold text-white truncate">${c.name}</div>
