@@ -657,7 +657,7 @@
     let allCards = [];
     let currentSort = "latest";
 
-    const LAUNCH_CONTRACT = "0x9571aFb3Fe4a2b6C47D441c7b37f50Ef3A71023F";
+    const LAUNCH_CONTRACT = "0x641a724618dcf75F27367Ba4e67A2501ba0A21A3";
     const TEMPO_CHAIN = {
       chainId: "0x1079",
       chainName: "Tempo Mainnet",
@@ -833,7 +833,7 @@
               symbol,
               raised,
               priceFormatted: priceValue.toFixed(8),
-              progress: Math.min((raised / 12000) * 100, 100).toFixed(1),
+              progress: Math.min((Number(ethers.formatUnits(info[2], 18)) / 800000000) * 100, 100).toFixed(1),
               creatorShort: info[0].slice(0, 4) + "..." + info[0].slice(-6),
               marketCapValue,
               marketCapLabel: "$" + marketCapValue.toLocaleString(undefined, { maximumFractionDigits: 0 }),

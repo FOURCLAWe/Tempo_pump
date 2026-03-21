@@ -5,3 +5,8 @@ cache/
 artifacts/
 typechain-types/
 .vercel
+calc_curve.js
+contracts/compiled.json
+contracts/deployed.json
+index.html.bak
+规则说明.md

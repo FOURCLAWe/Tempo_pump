@@ -684,7 +684,7 @@
 
   <script>
     const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
-    const LAUNCH_CONTRACT = "0x9571aFb3Fe4a2b6C47D441c7b37f50Ef3A71023F";
+    const LAUNCH_CONTRACT = "0x641a724618dcf75F27367Ba4e67A2501ba0A21A3";
     const LAUNCH_ABI = [
       "function buy(address tokenAddr, uint256 usdcAmount)",
       "function sell(address tokenAddr, uint256 tokenAmount)",
@@ -855,7 +855,8 @@
 
         const priceValue = Number(price) / 1e6;
         const raised = Number(ethers.formatUnits(info[1], 6));
-        const pct = Math.min((raised / 12000) * 100, 100).toFixed(1);
+        const sold = Number(ethers.formatUnits(info[2], 18));
+        const pct = Math.min((sold / 800000000) * 100, 100).toFixed(1);
         const totalSupplyValue = Number(ethers.formatUnits(totalSupply, 18));
         const marketCap = priceValue * totalSupplyValue;
 
