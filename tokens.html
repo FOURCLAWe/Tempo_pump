@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tempo Pump</title>
+  <title>Tokens - Tempo Pump</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,526 +23,135 @@
       --green-line: rgba(141,255,85,0.18);
       --shadow: 0 18px 40px rgba(0,0,0,0.28);
     }
-
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: "Manrope", sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(141,255,85,0.05), transparent 24%),
-        linear-gradient(180deg, #070807 0%, #0a0b0a 100%);
+      background: radial-gradient(circle at top left, rgba(141,255,85,0.05), transparent 24%), linear-gradient(180deg, #070807 0%, #0a0b0a 100%);
     }
-
     h1, h2, h3 { font-family: "Space Grotesk", sans-serif; letter-spacing: -0.03em; }
-
-    .app {
-      display: grid;
-      grid-template-columns: 208px minmax(0, 1fr);
-      min-height: 100vh;
-    }
-
+    .app { display: grid; grid-template-columns: 208px minmax(0, 1fr); min-height: 100vh; }
     .sidebar {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      padding: 18px 14px;
-      background: rgba(10,11,10,0.95);
-      border-right: 1px solid var(--line);
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      backdrop-filter: blur(12px);
+      position: sticky; top: 0; height: 100vh; padding: 18px 14px; background: rgba(10,11,10,0.95);
+      border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px;
     }
-
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 8px 14px;
-      font-family: "Space Grotesk", sans-serif;
-      font-size: 24px;
-      font-weight: 700;
+      display: flex; align-items: center; gap: 10px; padding: 8px 8px 14px; font-family: "Space Grotesk", sans-serif;
+      font-size: 24px; font-weight: 700;
     }
-
     .brand-mark {
-      width: 28px;
-      height: 28px;
-      border-radius: 9px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #acff84, #84ea4e);
-      color: #071005;
-      box-shadow: 0 10px 18px rgba(141,255,85,0.2);
+      width: 28px; height: 28px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #acff84, #84ea4e); color: #071005;
     }
-
-    .nav {
-      display: grid;
-      gap: 6px;
-    }
-
+    .nav { display: grid; gap: 6px; }
     .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-height: 46px;
-      padding: 0 12px;
-      border-radius: 12px;
+      display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 12px; border-radius: 12px;
       color: #d9dfd5;
-      transition: background 160ms ease, color 160ms ease;
     }
-
-    .nav-item:hover { background: rgba(255,255,255,0.04); }
     .nav-item.active { background: rgba(255,255,255,0.05); color: var(--green); }
-
+    .nav-item:hover { background: rgba(255,255,255,0.04); }
     .nav-icon { width: 18px; text-align: center; }
     .nav-label { font-size: 15px; font-weight: 600; }
-
     .sidebar-foot {
-      margin-top: auto;
-      padding: 12px;
-      border-radius: 14px;
-      background: var(--panel);
-      border: 1px solid var(--line);
+      margin-top: auto; padding: 12px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line);
     }
-
-    .sidebar-link {
-      margin-top: 10px;
-      min-height: 40px;
-      width: 100%;
-      padding: 0 12px;
-      border-radius: 12px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
     .wallet-btn {
-      width: 100%;
-      min-height: 44px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #acff84, #84ea4e);
-      color: #081006;
-      font-size: 14px;
-      font-weight: 900;
-      cursor: pointer;
+      width: 100%; min-height: 44px; border: none; border-radius: 12px; background: linear-gradient(135deg, #acff84, #84ea4e);
+      color: #081006; font-size: 14px; font-weight: 900; cursor: pointer;
     }
-
     .network-badge {
-      display: none;
-      margin-top: 10px;
-      min-height: 34px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      background: var(--green-soft);
-      border: 1px solid var(--green-line);
-      color: #c3ffab;
-      font-size: 12px;
-      font-weight: 700;
+      display: none; margin-top: 10px; min-height: 34px; align-items: center; justify-content: center; border-radius: 10px;
+      background: var(--green-soft); border: 1px solid var(--green-line); color: #c3ffab; font-size: 12px; font-weight: 700;
     }
-
     .network-badge.show { display: flex; }
-
     .main { min-width: 0; }
-
     .ticker-bar {
-      position: sticky;
-      top: 0;
-      z-index: 12;
-      min-height: 42px;
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      background: rgba(9,10,9,0.95);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(14px);
+      position: sticky; top: 0; z-index: 12; min-height: 42px; display: flex; align-items: center; overflow: hidden;
+      background: rgba(9,10,9,0.95); border-bottom: 1px solid var(--line);
     }
-
-    #tickerTrack {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: max-content;
-      padding: 0 14px;
-      white-space: nowrap;
-    }
-
+    #tickerTrack { display: flex; align-items: center; gap: 12px; min-width: max-content; padding: 0 14px; white-space: nowrap; }
     .ticker-chip {
-      display: inline-flex;
-      align-items: center;
-      min-height: 24px;
-      padding: 0 9px;
-      border-radius: 8px;
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      color: #edf2e9;
-      font-size: 11px;
-      font-weight: 700;
+      display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: 8px; background: var(--panel-2);
+      border: 1px solid var(--line); color: #edf2e9; font-size: 11px; font-weight: 700;
     }
-
     .ticker-chip.buy { color: #dfffd0; border-color: rgba(141,255,85,0.18); }
     .ticker-chip.sell { color: #f3f0cf; }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 16px 20px 0;
-    }
-
-    .topbar-title {
-      font-size: 14px;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px 0; }
     .pill {
-      min-height: 40px;
-      padding: 0 14px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
+      min-height: 40px; padding: 0 14px; border-radius: 999px; display: inline-flex; align-items: center; background: var(--panel);
+      border: 1px solid var(--line); color: var(--text); font-size: 13px; font-weight: 700;
     }
-
     .page { padding: 18px 20px 28px; }
-    .section { margin-bottom: 18px; }
-
     .panel {
-      background: linear-gradient(180deg, var(--panel), #151615);
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, var(--panel), #151615); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
     }
-
-    .hero {
-      padding: 24px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .hero-kicker {
-      color: var(--green);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-
-    .hero-title {
-      margin: 12px 0 10px;
-      font-size: 48px;
-      line-height: 0.96;
-    }
-
-    .hero-copy {
-      max-width: 620px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.8;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
-
-    .hero-btn, .ghost-btn, .sort-btn, .search-btn {
-      min-height: 44px;
-      padding: 0 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .hero-btn {
-      border: none;
-      background: linear-gradient(135deg, #acff84, #84ea4e);
-      color: #081006;
-    }
-
-    .ghost-btn, .sort-btn, .search-btn {
-      border: 1px solid var(--line);
-      background: var(--panel-2);
-      color: var(--text);
-    }
-
-    .hero-side {
-      display: grid;
-      gap: 12px;
-    }
-
-    .hero-card {
-      padding: 16px;
-      border-radius: 14px;
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-    }
-
-    .hero-card-label {
-      color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 800;
-    }
-
-    .hero-card-value {
-      margin-top: 10px;
-      font-size: 28px;
-      font-family: "Space Grotesk", sans-serif;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .toolbar-left, .toolbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .search-wrap {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 96px;
-      width: min(480px, 100%);
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      background: var(--panel);
-    }
-
-    .search-input {
-      min-height: 46px;
-      border: none;
-      background: transparent;
-      color: var(--text);
-      padding: 0 14px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    .search-btn {
-      border: none;
-      border-left: 1px solid var(--line);
-      border-radius: 0;
-    }
-
+    .token-panel { padding: 18px; }
     .section-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
     }
-
-    .section-title {
-      font-size: 28px;
-      font-weight: 700;
+    .section-title { font-size: 30px; font-weight: 700; }
+    .section-copy { color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 16px;
     }
-
-    .section-copy {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
+    .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .search-wrap {
+      display: grid; grid-template-columns: minmax(0, 1fr) 96px; width: min(520px, 100%); border-radius: 14px; overflow: hidden;
+      border: 1px solid var(--line); background: var(--panel);
     }
-
-    .token-panel {
-      padding: 18px;
+    .search-input {
+      min-height: 46px; border: none; background: transparent; color: var(--text); padding: 0 14px; font-size: 14px; outline: none;
     }
-
-    .token-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
+    .search-btn, .sort-btn {
+      min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2);
+      color: var(--text); font-size: 14px; font-weight: 800; cursor: pointer;
     }
-
+    .search-btn {
+      border: none; border-left: 1px solid var(--line); border-radius: 0;
+    }
+    .token-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
     .token-card {
-      display: block;
-      padding: 12px;
-      border-radius: 12px;
-      background: var(--bg-soft);
-      border: 1px solid var(--line);
+      display: block; padding: 12px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--line);
       transition: transform 160ms ease, border-color 160ms ease;
     }
-
-    .token-card:hover {
-      transform: translateY(-1px);
-      border-color: var(--green-line);
-    }
-
-    .token-body {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
+    .token-card:hover { transform: translateY(-1px); border-color: var(--green-line); }
+    .token-body { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .token-media {
-      width: 100%;
-      height: 132px;
-      border-radius: 12px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #20231f, #121412);
-      border: 1px solid var(--line);
-      color: var(--green);
-      font-size: 28px;
-      font-weight: 900;
+      width: 100%; height: 132px; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #20231f, #121412); border: 1px solid var(--line); color: var(--green); font-size: 28px; font-weight: 900;
     }
-
-    .token-title-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      align-items: flex-start;
-    }
-
-    .token-title {
-      font-size: 16px;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-
-    .token-sub {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .token-meta-list {
-      display: grid;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .metric-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      min-height: 34px;
-      padding: 0 10px;
-      align-items: center;
-      border-radius: 8px;
-      background: var(--panel);
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .metric-row span:last-child {
-      color: var(--text);
-      font-weight: 700;
-    }
-
+    .token-title-row { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+    .token-title { font-size: 16px; font-weight: 800; line-height: 1.2; }
+    .token-sub { margin-top: 3px; color: var(--muted); font-size: 12px; font-weight: 700; }
     .rank-pill {
-      display: inline-flex;
-      align-items: center;
-      min-height: 24px;
-      padding: 0 8px;
-      border-radius: 999px;
-      background: var(--green-soft);
-      border: 1px solid var(--green-line);
-      color: var(--green);
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
+      display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 999px; background: var(--green-soft);
+      border: 1px solid var(--green-line); color: var(--green); font-size: 12px; font-weight: 800; white-space: nowrap;
     }
-
-    .token-progress {
-      margin-top: 10px;
+    .token-meta-list { display: grid; gap: 6px; margin-top: 8px; }
+    .metric-row {
+      display: flex; justify-content: space-between; gap: 8px; min-height: 34px; padding: 0 10px; align-items: center; border-radius: 8px;
+      background: var(--panel); color: var(--muted); font-size: 13px;
     }
-
+    .metric-row span:last-child { color: var(--text); font-weight: 700; }
+    .token-progress { margin-top: 10px; }
     .progress-track {
-      height: 10px;
-      border-radius: 999px;
-      background: #0a0b0a;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.05);
+      height: 10px; border-radius: 999px; background: #0a0b0a; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);
     }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #78db44, #aaff7d);
-    }
-
+    .progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #78db44, #aaff7d); }
     .token-progress-meta {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin-top: 6px;
-      color: var(--green);
-      font-size: 11px;
-      font-weight: 800;
+      display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; color: var(--green); font-size: 11px; font-weight: 800;
     }
-
     .empty-state {
-      min-height: 220px;
-      border-radius: 14px;
-      border: 1px dashed var(--line);
-      background: var(--bg-soft);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-size: 14px;
+      min-height: 220px; border-radius: 14px; border: 1px dashed var(--line); background: var(--bg-soft); display: flex; align-items: center;
+      justify-content: center; color: var(--muted); font-size: 14px;
     }
-
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    }
-
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
     @media (max-width: 1100px) {
       .app { grid-template-columns: 1fr; }
-      .sidebar {
-        position: static;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--line);
-      }
-      .hero { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
     }
-
     @media (max-width: 760px) {
       .page, .topbar { padding-left: 14px; padding-right: 14px; }
       .toolbar { align-items: stretch; }
@@ -551,7 +160,6 @@
       .search-btn { border-left: none; border-top: 1px solid var(--line); }
       .token-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .token-media { height: 150px; }
-      .hero-title { font-size: 38px; }
     }
     @media (max-width: 560px) {
       .token-grid { grid-template-columns: 1fr; }
@@ -568,11 +176,11 @@
       </div>
 
       <nav class="nav">
-        <a href="/" class="nav-item active">
+        <a href="/" class="nav-item">
           <span class="nav-icon">⌂</span>
           <span class="nav-label">Home</span>
         </a>
-        <a href="/tokens.html" class="nav-item">
+        <a href="/tokens.html" class="nav-item active">
           <span class="nav-icon">▦</span>
           <span class="nav-label">Tokens</span>
         </a>
@@ -585,7 +193,6 @@
       <div class="sidebar-foot">
         <button onclick="connectWallet()" id="connectBtn" class="wallet-btn">Connect Wallet</button>
         <div id="networkBadge" class="network-badge">Tempo Mainnet</div>
-        <a class="sidebar-link" href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer">𝕏 Official X</a>
       </div>
     </aside>
 
@@ -598,52 +205,32 @@
       </div>
 
       <div class="topbar">
-        <div class="topbar-title">Home</div>
-        <div class="topbar-right">
+        <div class="pill">Tokens</div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
           <div class="pill" id="walletPreview">Wallet not connected</div>
         </div>
       </div>
 
       <div class="page">
-        <section id="home-panel" class="section panel hero">
-          <div>
-            <div class="hero-kicker">Tempo Pump</div>
-            <h1 class="hero-title">Home</h1>
-            <div class="hero-actions">
-              <button onclick="window.location.href='/create.html'" class="hero-btn">Create Token</button>
-              <button onclick="window.location.href='/tokens.html'" class="ghost-btn">View All Tokens</button>
-            </div>
-          </div>
-          <div class="hero-side">
-            <div class="hero-card">
-              <div class="hero-card-label">Settlement Token</div>
-              <div class="hero-card-value">USDC</div>
-            </div>
-            <div class="hero-card">
-              <div class="hero-card-label">Graduation Target</div>
-              <div class="hero-card-value">12,000</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="section toolbar">
-          <div class="toolbar-left">
-            <div class="search-wrap">
-              <input id="marketSearch" class="search-input" placeholder="Search by name, symbol, or address" oninput="filterTokenList()">
-              <button class="search-btn" onclick="filterTokenList()">Search</button>
-            </div>
-          </div>
-          <div class="toolbar-right">
-            <button class="sort-btn" id="sortLatestBtn" onclick="setSort('latest')">Latest</button>
-            <button class="sort-btn" id="sortMarketBtn" onclick="setSort('marketcap')">Market Cap</button>
-          </div>
-        </section>
-
-        <section class="section panel token-panel">
+        <section class="panel token-panel">
           <div class="section-head">
             <div class="section-title">Created Tokens</div>
             <button onclick="loadTokenList()" class="sort-btn">Refresh</button>
           </div>
+
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <div class="search-wrap">
+                <input id="marketSearch" class="search-input" placeholder="Search by name, symbol, or address" oninput="filterTokenList()">
+                <button class="search-btn" onclick="filterTokenList()">Search</button>
+              </div>
+            </div>
+            <div class="toolbar-right">
+              <button class="sort-btn" id="sortLatestBtn" onclick="setSort('latest')">Latest</button>
+              <button class="sort-btn" id="sortMarketBtn" onclick="setSort('marketcap')">Market Cap</button>
+            </div>
+          </div>
+
           <div id="tokenList" class="token-grid">
             <div class="empty-state">No tokens yet.</div>
           </div>
@@ -656,7 +243,6 @@
     let provider, signer, userAddress;
     let allCards = [];
     let currentSort = "latest";
-
     const LAUNCH_CONTRACT = "0x9571aFb3Fe4a2b6C47D441c7b37f50Ef3A71023F";
     const TEMPO_CHAIN = {
       chainId: "0x1079",
@@ -665,7 +251,6 @@
       rpcUrls: ["https://rpc.tempo.xyz"],
       blockExplorerUrls: ["https://explore.mainnet.tempo.xyz"]
     };
-
     const LAUNCH_ABI = [
       "function getLaunchCount() view returns (uint256)",
       "function allLaunches(uint256) view returns (address)",
@@ -728,11 +313,8 @@
 
     function sortCards(cards) {
       const cloned = [...cards];
-      if (currentSort === "marketcap") {
-        cloned.sort((a, b) => b.marketCapValue - a.marketCapValue);
-      } else {
-        cloned.sort((a, b) => b.createdBlock - a.createdBlock);
-      }
+      if (currentSort === "marketcap") cloned.sort((a, b) => b.marketCapValue - a.marketCapValue);
+      else cloned.sort((a, b) => b.createdBlock - a.createdBlock);
       return cloned;
     }
 
@@ -742,7 +324,6 @@
         tokenListEl.innerHTML = "<div class='empty-state'>No matching tokens found.</div>";
         return;
       }
-
       tokenListEl.innerHTML = cards.map((c) => `
         <a href="/token.html?token=${c.tokenAddr}" class="token-card">
           <div class="token-body">
@@ -787,7 +368,7 @@
           c.tokenAddr.toLowerCase().includes(q)
         );
       }
-      renderTokenList(sortCards(cards).slice(0, 6));
+      renderTokenList(sortCards(cards));
     }
 
     async function loadTokenList() {
@@ -800,10 +381,8 @@
           tokenListEl.innerHTML = "<div class='empty-state'>No tokens yet.</div>";
           return;
         }
-
         tokenListEl.innerHTML = "<div class='empty-state'>Loading on-chain data...</div>";
         const cards = [];
-
         for (let i = 0; i < count; i++) {
           try {
             const tokenAddr = await launch.allLaunches(i);
@@ -812,7 +391,6 @@
               "function symbol() view returns (string)",
               "function totalSupply() view returns (uint256)"
             ], p);
-
             const [name, symbol, info, price, totalSupply] = await Promise.all([
               token.name(),
               token.symbol(),
@@ -820,7 +398,6 @@
               launch.getPrice(tokenAddr),
               token.totalSupply()
             ]);
-
             const eventMeta = await findLaunchMeta(launch, p, tokenAddr);
             const localMeta = getLocalMeta(tokenAddr);
             const meta = eventMeta || localMeta || {};
@@ -845,7 +422,6 @@
             console.error(e);
           }
         }
-
         allCards = cards;
         filterTokenList();
       } catch (e) {
@@ -863,7 +439,6 @@
           launch.queryFilter(launch.filters.TokenBought(), fromBlock, latestBlock),
           launch.queryFilter(launch.filters.TokenSold(), fromBlock, latestBlock)
         ]);
-
         const allEvents = [...buyEvents, ...sellEvents]
           .sort((a, b) => b.blockNumber - a.blockNumber)
           .slice(0, 8);

@@ -6,23 +6,24 @@
   <title>Token - Tempo Pump</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
-      --bg: #0f1115;
-      --panel: rgba(22, 24, 31, 0.84);
-      --line: rgba(255, 255, 255, 0.09);
-      --text: #f4efe4;
-      --muted: #b6aa96;
-      --accent: #ff6b2c;
-      --accent-2: #ffd166;
-      --accent-3: #49c6b4;
-      --danger: #ff6f61;
-      --success: #76d39b;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+      --bg: #090909;
+      --bg-soft: #111211;
+      --panel: #171917;
+      --panel-2: #1d1f1d;
+      --line: rgba(255,255,255,0.07);
+      --text: #f2f5ef;
+      --muted: #879082;
+      --green: #8dff55;
+      --green-soft: rgba(141,255,85,0.12);
+      --green-line: rgba(141,255,85,0.18);
+      --red: #ff8f80;
+      --shadow: 0 18px 40px rgba(0,0,0,0.28);
     }
 
     * { box-sizing: border-box; }
@@ -30,235 +31,171 @@
     body {
       margin: 0;
       min-height: 100vh;
-      color: var(--text);
       font-family: "Manrope", sans-serif;
+      color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255, 107, 44, 0.22), transparent 26%),
-        radial-gradient(circle at 84% 16%, rgba(73, 198, 180, 0.17), transparent 22%),
-        radial-gradient(circle at bottom right, rgba(255, 209, 102, 0.12), transparent 20%),
-        linear-gradient(180deg, #101217 0%, #0a0c10 100%);
-      overflow-x: hidden;
+        radial-gradient(circle at top left, rgba(141,255,85,0.05), transparent 24%),
+        linear-gradient(180deg, #070807 0%, #0a0b0a 100%);
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 34px 34px;
-      mask-image: radial-gradient(circle at center, black 38%, transparent 90%);
-      pointer-events: none;
-    }
+    h1, h2, h3 { font-family: "Space Grotesk", sans-serif; letter-spacing: -0.03em; }
 
-    h1, h2, h3 {
-      font-family: "Space Grotesk", sans-serif;
-      letter-spacing: -0.03em;
-    }
-
-    .shell {
-      position: relative;
-      z-index: 1;
-      width: min(1140px, calc(100% - 32px));
+    .page {
+      width: min(1480px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 28px 0 52px;
-    }
-
-    .glass {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      border-radius: 28px;
+      padding: 18px 0 28px;
     }
 
     .topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 18px;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
-    .link-btn, .primary-btn, .ghost-btn {
+    .topbar-left, .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .pill, .link-btn {
+      min-height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 14px 18px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
+      background: var(--panel);
+      border: 1px solid var(--line);
       color: var(--text);
-      font-size: 14px;
-      font-weight: 800;
+      font-size: 13px;
+      font-weight: 700;
       text-decoration: none;
-      cursor: pointer;
-      transition: transform 160ms ease, border-color 160ms ease;
     }
 
-    .primary-btn {
-      background: linear-gradient(135deg, var(--accent), #ff8c42);
-      color: #17191d;
-      border: none;
-      box-shadow: 0 14px 30px rgba(255, 107, 44, 0.24);
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 16px;
+      align-items: start;
     }
 
-    .link-btn:hover, .primary-btn:hover, .ghost-btn:hover {
-      transform: translateY(-1px);
+    .panel {
+      background: linear-gradient(180deg, var(--panel), #151615);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
     }
 
-    .hero {
-      padding: 26px;
-      margin-bottom: 18px;
+    .token-hero {
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .token-hero-top {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .token-icon {
+      width: 86px;
+      height: 86px;
+      border-radius: 18px;
       overflow: hidden;
-      position: relative;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      right: -80px;
-      top: -90px;
-      width: 220px;
-      height: 220px;
-      background: radial-gradient(circle, rgba(255, 209, 102, 0.34), transparent 65%);
-      pointer-events: none;
-    }
-
-    .hero-head {
-      display: flex;
-      align-items: flex-start;
-      gap: 18px;
-    }
-
-    .token-orb {
-      width: 88px;
-      height: 88px;
-      border-radius: 28px;
-      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, var(--accent-2), var(--accent));
-      color: #15171b;
-      font-size: 30px;
+      background: linear-gradient(135deg, #acff84, #84ea4e);
+      color: #071005;
+      font-size: 28px;
       font-weight: 900;
-      box-shadow: 0 14px 28px rgba(255, 107, 44, 0.2);
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .hero-title {
-      font-size: clamp(34px, 6vw, 60px);
-      line-height: 0.95;
-      margin: 0 0 10px;
+    .token-name {
+      font-size: 40px;
+      line-height: 0.96;
+      margin: 0 0 6px;
     }
 
-    .token-meta {
+    .token-subline {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.7;
     }
 
-    .hero-price {
-      margin-left: auto;
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+    .price-box {
+      text-align: right;
       min-width: 210px;
-      padding: 18px;
-      border-radius: 24px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
     }
 
-    .hero-price .label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: rgba(255,255,255,0.45);
-    }
-
-    .hero-price .value {
-      margin-top: 12px;
+    .price-main {
       font-family: "Space Grotesk", sans-serif;
       font-size: 34px;
       font-weight: 700;
-      color: #ffe3a0;
+      line-height: 1;
     }
 
-    .hero-row {
-      display: grid;
-      grid-template-columns: 1fr 260px;
-      gap: 18px;
-      margin-top: 22px;
-    }
-
-    .progress-shell, .status-shell {
-      padding: 18px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .progress-track {
-      height: 14px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      box-shadow: 0 0 24px rgba(255, 107, 44, 0.35);
-      transition: width 0.45s ease;
-    }
-
-    .status-shell {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      width: fit-content;
-      font-size: 12px;
+    .price-sub {
+      margin-top: 8px;
+      color: var(--green);
+      font-size: 14px;
       font-weight: 800;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .stat-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
+      font-weight: 800;
     }
 
-    .badge-live { background: rgba(255, 209, 102, 0.14); color: var(--accent-2); }
-    .badge-ok { background: rgba(118, 211, 155, 0.16); color: var(--success); }
+    .stat-value {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 800;
+    }
 
-    .content-grid {
+    .left-stack, .right-stack {
       display: grid;
-      grid-template-columns: 0.92fr 1.08fr;
-      gap: 18px;
-      margin-bottom: 18px;
+      gap: 14px;
     }
 
-    .trade-stack, .chart-stack {
-      display: grid;
-      gap: 18px;
-    }
-
-    .card {
-      padding: 22px;
+    .chart-panel, .table-panel, .trade-panel {
+      padding: 16px;
     }
 
     .section-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
     }
 
     .section-title {
@@ -269,216 +206,479 @@
     .section-copy {
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
-    .field {
+    .chart-shell {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+    }
+
+    .chart-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 52px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chart-tool {
+      min-height: 30px;
+      padding: 0 8px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .chart-tool.active {
+      color: var(--green);
+      border-color: rgba(141,255,85,0.16);
+      background: rgba(141,255,85,0.06);
+    }
+
+    .ohlc-bar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 40px;
+      padding: 0 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .ohlc-bar strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .ohlc-bar .up { color: var(--green); }
+    .ohlc-bar .down { color: var(--red); }
+
+    .chart-canvas-wrap {
+      position: relative;
+      height: 360px;
+      padding: 10px 12px 12px;
+    }
+
+    #priceChart {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .tabs {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 14px;
     }
 
+    .tab-btn {
+      min-height: 46px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: var(--green-soft);
+      border-color: var(--green-line);
+      color: var(--green);
+    }
+
+    .field-stack { display: grid; gap: 12px; }
+
     .field label {
-      font-size: 12px;
+      display: block;
+      margin-bottom: 8px;
+      color: #96a391;
+      font-size: 11px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: rgba(255,255,255,0.45);
       font-weight: 800;
     }
 
     .input {
       width: 100%;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--bg-soft);
       color: var(--text);
-      border-radius: 18px;
-      padding: 15px 16px;
+      padding: 13px 14px;
       font-size: 14px;
       outline: none;
-      transition: border-color 160ms ease, transform 160ms ease;
     }
 
-    .input:focus {
-      border-color: rgba(255, 107, 44, 0.7);
-      transform: translateY(-1px);
-    }
-
-    .metric-box {
+    .preset-row {
       display: grid;
-      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .preset-btn {
+      min-height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .metric-list {
+      display: grid;
+      gap: 8px;
     }
 
     .metric-row {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
+      gap: 10px;
+      min-height: 38px;
+      padding: 0 12px;
+      align-items: center;
+      border-radius: 10px;
+      background: var(--bg-soft);
       color: var(--muted);
       font-size: 13px;
     }
 
     .metric-row span:last-child {
       color: var(--text);
-      font-weight: 800;
+      font-weight: 700;
     }
 
-    .chart-frame {
-      padding: 14px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-
-    #priceChart {
+    .trade-action {
       width: 100%;
-      min-height: 260px;
+      min-height: 48px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
     }
 
-    .log-shell {
-      min-height: 120px;
-      max-height: 240px;
-      overflow: auto;
-      padding-right: 4px;
+    .trade-action.buy {
+      background: linear-gradient(135deg, #acff84, #84ea4e);
+      color: #081006;
     }
 
-    .log-shell::-webkit-scrollbar { width: 8px; }
-    .log-shell::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.12);
+    .trade-action.sell {
+      background: var(--bg-soft);
+      color: #f0f2ef;
+      border: 1px solid var(--line);
+    }
+
+    .progress-wrap {
+      padding: 14px;
+      border-radius: 14px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+    }
+
+    .progress-track {
+      height: 10px;
       border-radius: 999px;
+      background: #0a0b0a;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-top: 10px;
     }
 
-    .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #78db44, #aaff7d);
+      transition: width 0.45s ease;
     }
 
-    @media (max-width: 980px) {
-      .content-grid, .hero-row { grid-template-columns: 1fr; }
+    .table-wrap {
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--bg-soft);
     }
 
-    @media (max-width: 720px) {
-      .shell { width: min(100% - 18px, 100%); }
-      .topbar, .hero-head, .section-head { flex-direction: column; align-items: stretch; }
-      .hero-price { margin-left: 0; min-width: 0; width: 100%; }
-      .glass { border-radius: 22px; }
-      .token-orb { width: 72px; height: 72px; border-radius: 24px; }
-      .hero-title { font-size: 38px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .buy-text { color: var(--green); font-weight: 800; }
+    .sell-text { color: var(--red); font-weight: 800; }
+
+    .empty-state {
+      min-height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 14px;
+      background: var(--bg-soft);
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+    }
+
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 1fr; }
+      .right-stack { order: -1; }
+    }
+
+    @media (max-width: 860px) {
+      .token-hero-top {
+        grid-template-columns: 72px 1fr;
+      }
+      .price-box {
+        grid-column: 1 / -1;
+        text-align: left;
+      }
+      .stats-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: calc(100% - 16px);
+        padding-top: 12px;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .stats-row, .preset-row {
+        grid-template-columns: 1fr;
+      }
+      .token-name {
+        font-size: 30px;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="shell">
+  <main class="page">
     <div class="topbar">
-      <a href="/" class="link-btn">← 返回首页</a>
-      <button onclick="connectWallet()" id="connectBtn" class="primary-btn">连接钱包</button>
+      <div class="topbar-left">
+        <a href="/tokens.html" class="link-btn">← Back to Tokens</a>
+      </div>
+      <div class="topbar-right">
+        <button onclick="connectWallet()" id="connectBtn" class="pill" style="cursor:pointer;">Connect Wallet</button>
+      </div>
     </div>
 
-    <section class="hero glass">
-      <div class="hero-head">
-        <div id="tokenIcon" class="token-orb">?</div>
-        <div class="min-w-0 flex-1">
-          <div class="badge badge-live mb-3">Token Panel</div>
-          <h1 id="tokenName" class="hero-title">加载中...</h1>
-          <div id="tokenSymbol" class="text-lg text-amber-100 font-bold mb-2"></div>
-          <div id="tokenAddr" class="token-meta mono"></div>
+    <section class="panel token-hero">
+      <div class="token-hero-top">
+        <div id="tokenIcon" class="token-icon">?</div>
+        <div>
+          <h1 id="tokenName" class="token-name">Loading...</h1>
+          <div class="token-subline">
+            <span id="tokenSymbol">-</span>
+            <span id="tokenAddr" class="mono"></span>
+            <span id="creatorAddr" class="mono"></span>
+          </div>
         </div>
-        <div class="hero-price">
-          <div class="label">Current Price</div>
-          <div id="tokenPrice" class="value">-.--</div>
-          <div class="token-meta mt-2">当前曲线价格，单位 USDC</div>
+        <div class="price-box">
+          <div id="tokenPrice" class="price-main">-.--</div>
+          <div id="priceChange" class="price-sub">Live Price</div>
         </div>
       </div>
 
-      <div class="hero-row">
-        <div class="progress-shell">
-          <div class="flex justify-between text-sm mb-3">
-            <span class="text-stone-400">募集进度</span>
-            <span id="progressPct" class="text-amber-200 font-bold">0%</span>
-          </div>
-          <div class="progress-track mb-3">
-            <div id="progressFill" class="progress-fill" style="width:0%"></div>
-          </div>
-          <div class="flex justify-between text-xs text-stone-500">
-            <span id="raisedAmt">$0 募集</span>
-            <span>目标 12,000 USDC</span>
-          </div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">Market Cap</div>
+          <div id="marketCap" class="stat-value">-</div>
         </div>
-        <div class="status-shell">
-          <div class="text-xs uppercase tracking-[0.18em] text-stone-500">Status</div>
-          <div id="graduatedBadge" class="hidden badge badge-ok">已毕业</div>
-          <div class="text-sm text-stone-400">达到目标后仅切换为毕业状态，当前仓库里没有真正创建 LP 的链上逻辑。</div>
+        <div class="stat-box">
+          <div class="stat-label">Raised</div>
+          <div id="raisedAmtTop" class="stat-value">$0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Holders</div>
+          <div id="holdersCount" class="stat-value">-</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Status</div>
+          <div id="graduatedStatus" class="stat-value">Live</div>
         </div>
       </div>
     </section>
 
-    <section class="content-grid">
-      <div class="trade-stack">
-        <div class="card glass">
+    <section class="layout">
+      <div class="left-stack">
+        <section class="panel chart-panel">
           <div class="section-head">
-            <div>
-              <div class="section-title">Buy</div>
-              <div class="section-copy">输入 USDC 数量，前端会调用链上估算函数。</div>
+            <div class="section-title">Price Chart</div>
+            <div id="chartPrice" class="pill">-.--</div>
+          </div>
+          <div class="chart-shell">
+            <div class="chart-toolbar">
+              <div class="toolbar-group">
+                <button id="interval-1m" type="button" class="chart-tool active" onclick="setChartInterval('1m')">1m</button>
+                <button id="interval-5m" type="button" class="chart-tool" onclick="setChartInterval('5m')">5m</button>
+                <button id="interval-15m" type="button" class="chart-tool" onclick="setChartInterval('15m')">15m</button>
+                <button id="interval-1h" type="button" class="chart-tool" onclick="setChartInterval('1h')">1h</button>
+                <button id="interval-4h" type="button" class="chart-tool" onclick="setChartInterval('4h')">4h</button>
+              </div>
+              <div class="toolbar-group">
+                <span class="chart-tool active" style="cursor:default;">Price</span>
+                <span class="chart-tool" style="cursor:default;">Volume</span>
+              </div>
             </div>
-            <div class="badge badge-ok">Buy Flow</div>
+            <div id="ohlcBar" class="ohlc-bar">
+              <span>O <strong>-</strong></span>
+              <span>H <strong>-</strong></span>
+              <span>L <strong>-</strong></span>
+              <span>C <strong>-</strong></span>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="priceChart"></canvas>
+            </div>
           </div>
-          <div class="field">
-            <label for="buyAmount">USDC 数量</label>
-            <input id="buyAmount" type="number" placeholder="100" value="100" oninput="updateBuyEstimate()" class="input">
-          </div>
-          <div class="metric-box">
-            <div class="metric-row"><span>预计获得</span><span id="buyEstimate">-.--</span></div>
-            <div class="metric-row"><span>手续费</span><span id="buyFee">-.--</span></div>
-          </div>
-          <button onclick="buyTokens()" class="primary-btn w-full mt-4">买入代币</button>
-        </div>
+        </section>
 
-        <div class="card glass">
+        <section class="panel table-panel">
           <div class="section-head">
-            <div>
-              <div class="section-title">Sell</div>
-              <div class="section-copy">先授权代币，再调用卖出交易。</div>
-            </div>
-            <div class="badge badge-live">Sell Flow</div>
+            <div class="section-title">Activity</div>
           </div>
-          <div class="field">
-            <label for="sellAmount">代币数量</label>
-            <input id="sellAmount" type="number" placeholder="1000000" oninput="updateSellEstimate()" class="input">
+          <div id="activityTableWrap" class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Wallet</th>
+                  <th>Side</th>
+                  <th>USDC</th>
+                  <th>Tokens</th>
+                  <th>Block</th>
+                </tr>
+              </thead>
+              <tbody id="activityTableBody">
+                <tr><td colspan="5">Loading...</td></tr>
+              </tbody>
+            </table>
           </div>
-          <div class="metric-box">
-            <div class="metric-row"><span>预计获得</span><span id="sellEstimate">-.-- USDC</span></div>
-            <div class="metric-row"><span>手续费</span><span id="sellFee">-.--</span></div>
+        </section>
+
+        <section class="panel table-panel">
+          <div class="section-head">
+            <div class="section-title">Holders</div>
           </div>
-          <button onclick="sellTokens()" class="ghost-btn w-full mt-4" style="border-color: rgba(255, 111, 97, 0.18); color: #ffd6d2;">卖出代币</button>
-        </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Address</th>
+                  <th>Balance</th>
+                  <th>Share</th>
+                </tr>
+              </thead>
+              <tbody id="holdersTableBody">
+                <tr><td colspan="3">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
 
-      <div class="chart-stack">
-        <div class="card glass">
+      <aside class="right-stack">
+        <section class="panel trade-panel">
           <div class="section-head">
-            <div>
-              <div class="section-title">Price Curve</div>
-              <div class="section-copy">页面每 10 秒刷新一次链上价格并追加到图表里。</div>
-            </div>
-            <div id="chartPrice" class="text-sm text-amber-200 font-bold"></div>
+            <div class="section-title">Trade</div>
           </div>
-          <div class="chart-frame">
-            <canvas id="priceChart" height="120"></canvas>
-          </div>
-        </div>
 
-        <div class="card glass">
-          <div class="section-head">
-            <div>
-              <div class="section-title">Operation Feed</div>
-              <div class="section-copy">钱包连接、approve 和买卖交易状态会实时显示。</div>
-            </div>
-            <button onclick="document.getElementById('logArea').innerHTML=''" class="ghost-btn">清空</button>
+          <div class="tabs">
+            <button id="buyTab" class="tab-btn active" onclick="setTradeMode('buy')">Buy</button>
+            <button id="sellTab" class="tab-btn" onclick="setTradeMode('sell')">Sell</button>
           </div>
-          <div id="logArea" class="log-shell text-sm"></div>
-        </div>
-      </div>
+
+          <div class="field-stack">
+            <div class="metric-list">
+              <div class="metric-row"><span>Your Balance</span><span id="walletTokenBalance">-</span></div>
+            </div>
+
+            <div class="field">
+              <label id="amountLabel" for="tradeAmount">Buy Amount (USDC)</label>
+              <input id="tradeAmount" class="input" type="number" value="100" oninput="updateTradeEstimate()">
+            </div>
+
+            <div id="buyPresetRow" class="preset-row">
+              <button class="preset-btn" onclick="setPreset(10)">10</button>
+              <button class="preset-btn" onclick="setPreset(100)">100</button>
+              <button class="preset-btn" onclick="setPreset(500)">500</button>
+            </div>
+
+            <div id="sellPercentRow" class="preset-row" style="display:none;">
+              <button class="preset-btn" onclick="setSellPercent(25)">25%</button>
+              <button class="preset-btn" onclick="setSellPercent(50)">50%</button>
+              <button class="preset-btn" onclick="setSellPercent(100)">100%</button>
+            </div>
+
+            <div class="metric-list">
+              <div class="metric-row"><span>Current Price</span><span id="currentPrice">-.--</span></div>
+              <div class="metric-row"><span id="estimateLabel">You Receive</span><span id="tradeEstimate">-.--</span></div>
+              <div class="metric-row"><span>Fee</span><span id="tradeFee">-.--</span></div>
+            </div>
+
+            <button id="tradeActionBtn" onclick="submitTrade()" class="trade-action buy">Buy</button>
+          </div>
+        </section>
+
+        <section class="panel trade-panel">
+          <div class="section-head">
+            <div class="section-title">Progress</div>
+            <div id="graduatedBadge" class="pill" style="display:none;">Graduated</div>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="metric-row"><span>Raised</span><span id="raisedAmt">$0 Raised</span></div>
+            <div class="progress-track">
+              <div id="progressFill" class="progress-fill" style="width:0%"></div>
+            </div>
+            <div class="metric-row" style="margin-top:10px;"><span>Target</span><span>$12,000</span></div>
+          </div>
+        </section>
+      </aside>
     </section>
   </main>
 
@@ -491,7 +691,10 @@
       "function getPrice(address tokenAddr) view returns (uint256)",
       "function estimateBuy(address tokenAddr, uint256 usdcAmount) view returns (uint256 tokensOut, uint256 fee)",
       "function estimateSell(address tokenAddr, uint256 tokenAmount) view returns (uint256 usdcOut, uint256 fee)",
-      "function launches(address) view returns (address creator, uint256 raised, uint256 sold, bool graduated)"
+      "function launches(address) view returns (address creator, uint256 raised, uint256 sold, bool graduated)",
+      "event LaunchCreated(address indexed token, address indexed creator, string name, string symbol, string meta)",
+      "event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut)",
+      "event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut)"
     ];
     const USDC_ABI = [
       "function approve(address spender, uint256 amount) returns (bool)",
@@ -502,21 +705,26 @@
       "function symbol() view returns (string)",
       "function approve(address spender, uint256 amount) returns (bool)",
       "function allowance(address owner, address spender) view returns (uint256)",
-      "function balanceOf(address) view returns (uint256)"
+      "function balanceOf(address) view returns (uint256)",
+      "function totalSupply() view returns (uint256)",
+      "event Transfer(address indexed from, address indexed to, uint256 value)"
     ];
 
     const TEMPO_CHAIN = {
       chainId: "0x1079",
-      chainName: "Tempo",
-      nativeCurrency: { name: "pathUSD", symbol: "pathUSD", decimals: 18 },
+      chainName: "Tempo Mainnet",
+      nativeCurrency: { name: "USD", symbol: "USD", decimals: 18 },
       rpcUrls: ["https://rpc.tempo.xyz"],
-      blockExplorerUrls: ["https://explorer.tempo.xyz"]
+      blockExplorerUrls: ["https://explore.mainnet.tempo.xyz"]
     };
 
     let provider, signer, userAddress, priceChart;
+    let tradeMode = "buy";
+    let chartInterval = "1m";
+    let latestTrades = [];
     const params = new URLSearchParams(window.location.search);
     const tokenAddress = params.get("token");
-    const priceHistory = [];
+    const blockCache = new Map();
 
     function initChart() {
       const ctx = document.getElementById("priceChart").getContext("2d");
@@ -525,65 +733,53 @@
         data: {
           labels: [],
           datasets: [{
-            label: "价格 (USDC)",
+            label: "Price (USDC)",
             data: [],
-            borderColor: "#ff8c42",
-            backgroundColor: "rgba(255,140,66,0.12)",
+            borderColor: "#8dff55",
+            backgroundColor: "rgba(141,255,85,0.12)",
             borderWidth: 2,
-            pointRadius: 2,
+            pointRadius: 3,
             pointHoverRadius: 5,
+            pointBackgroundColor: "#8dff55",
             fill: true,
-            tension: 0.35
+            tension: 0.18
           }]
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           animation: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (ctx) => ctx.parsed.y.toFixed(8) + " USDC"
-              }
-            }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: {
-              ticks: { color: "#8b8277", font: { size: 10 } },
-              grid: { color: "rgba(255,255,255,0.05)" }
+              ticks: { color: "#879082", font: { size: 10 } },
+              grid: { color: "rgba(255,255,255,0.04)" }
             },
             y: {
               ticks: {
-                color: "#8b8277",
+                color: "#879082",
                 font: { size: 10 },
-                callback: (v) => Number(v).toFixed(6)
+                callback: (v) => Number(v).toFixed(8)
               },
-              grid: { color: "rgba(255,255,255,0.05)" }
+              grid: { color: "rgba(255,255,255,0.04)" }
             }
           }
         }
       });
     }
 
-    function updateChart(price) {
-      const now = new Date().toLocaleTimeString();
-      priceHistory.push({ t: now, p: price });
-      if (priceHistory.length > 30) priceHistory.shift();
-      priceChart.data.labels = priceHistory.map((x) => x.t);
-      priceChart.data.datasets[0].data = priceHistory.map((x) => x.p);
-      priceChart.update();
-      document.getElementById("chartPrice").textContent = price.toFixed(8) + " USDC";
-    }
-
     async function init() {
       if (!tokenAddress) {
-        document.getElementById("tokenName").textContent = "未指定代币";
+        document.getElementById("tokenName").textContent = "Token not specified";
         return;
       }
-      document.getElementById("tokenAddr").textContent = tokenAddress;
       provider = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
       initChart();
-      await loadTokenInfo();
+      await Promise.all([
+        loadTokenInfo(),
+        loadActivity(),
+        loadHolders()
+      ]);
       setInterval(loadTokenInfo, 10000);
       await autoConnect();
     }
@@ -591,9 +787,43 @@
     async function autoConnect() {
       if (!window.ethereum) return;
       try {
-        const accounts = await window.ethereum.request({ method: "eth_accounts" });
-        if (accounts.length > 0) await connectWallet();
+        await connectWallet(false);
       } catch (e) {}
+    }
+
+    function setTradeMode(mode) {
+      tradeMode = mode;
+      document.getElementById("buyTab").classList.toggle("active", mode === "buy");
+      document.getElementById("sellTab").classList.toggle("active", mode === "sell");
+      document.getElementById("amountLabel").textContent = mode === "buy" ? "Buy Amount (USDC)" : "Sell Amount (Tokens)";
+      document.getElementById("estimateLabel").textContent = mode === "buy" ? "You Receive" : "You Receive";
+      document.getElementById("buyPresetRow").style.display = mode === "buy" ? "grid" : "none";
+      document.getElementById("sellPercentRow").style.display = mode === "sell" ? "grid" : "none";
+      const btn = document.getElementById("tradeActionBtn");
+      btn.textContent = mode === "buy" ? "Buy" : "Sell";
+      btn.className = `trade-action ${mode}`;
+      document.getElementById("tradeAmount").value = mode === "buy" ? "100" : "";
+      updateTradeEstimate();
+    }
+
+    function setPreset(value) {
+      document.getElementById("tradeAmount").value = value;
+      updateTradeEstimate();
+    }
+
+    async function setSellPercent(percent) {
+      if (tradeMode !== "sell") return;
+      if (!userAddress) return;
+      try {
+        const token = new ethers.Contract(tokenAddress, TOKEN_ABI, provider);
+        const balance = await token.balanceOf(userAddress);
+        const balanceFloat = Number(ethers.formatUnits(balance, 18));
+        const value = balanceFloat * (percent / 100);
+        document.getElementById("tradeAmount").value = value > 0 ? value.toFixed(6).replace(/\.?0+$/, "") : "0";
+        updateTradeEstimate();
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     async function loadTokenInfo() {
@@ -601,150 +831,409 @@
         const token = new ethers.Contract(tokenAddress, TOKEN_ABI, provider);
         const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, provider);
 
-        const [name, symbol, info, price] = await Promise.all([
+        const [name, symbol, info, price, totalSupply] = await Promise.all([
           token.name(),
           token.symbol(),
           launch.launches(tokenAddress),
-          launch.getPrice(tokenAddress)
+          launch.getPrice(tokenAddress),
+          token.totalSupply()
         ]);
+
+        const eventMeta = await findLaunchMeta(launch, provider, tokenAddress);
+        const localMeta = getLocalMeta(tokenAddress);
+        const meta = eventMeta || localMeta || {};
 
         document.getElementById("tokenName").textContent = name;
         document.getElementById("tokenSymbol").textContent = symbol;
-        document.getElementById("tokenIcon").textContent = symbol.slice(0, 2).toUpperCase();
-        document.title = `${name} - Tempo Pump`;
+        document.getElementById("tokenAddr").textContent = tokenAddress;
+        document.getElementById("creatorAddr").textContent = info[0] ? `Creator ${info[0].slice(0, 6)}...${info[0].slice(-4)}` : "";
+        if (meta.image) {
+          document.getElementById("tokenIcon").innerHTML = `<img src="${meta.image}" class="w-full h-full object-cover" onerror="this.parentElement.textContent='${symbol.slice(0,2).toUpperCase()}'">`;
+        } else {
+          document.getElementById("tokenIcon").textContent = symbol.slice(0, 2).toUpperCase();
+        }
 
-        const priceFormatted = (Number(price) / 1e6).toFixed(8);
-        document.getElementById("tokenPrice").textContent = priceFormatted;
-        updateChart(Number(price) / 1e6);
-
+        const priceValue = Number(price) / 1e6;
         const raised = Number(ethers.formatUnits(info[1], 6));
         const pct = Math.min((raised / 12000) * 100, 100).toFixed(1);
+        const totalSupplyValue = Number(ethers.formatUnits(totalSupply, 18));
+        const marketCap = priceValue * totalSupplyValue;
+
+        document.getElementById("tokenPrice").textContent = priceValue.toFixed(8) + " USDC";
+        document.getElementById("currentPrice").textContent = priceValue.toFixed(8) + " USDC";
+        document.getElementById("priceChange").textContent = info[3] ? "Graduated" : "Live Price";
+        document.getElementById("marketCap").textContent = "$" + marketCap.toLocaleString(undefined, { maximumFractionDigits: 0 });
+        document.getElementById("raisedAmtTop").textContent = "$" + raised.toFixed(2);
+        document.getElementById("raisedAmt").textContent = "$" + raised.toFixed(2) + " Raised";
         document.getElementById("progressFill").style.width = pct + "%";
         document.getElementById("progressPct").textContent = pct + "%";
-        document.getElementById("raisedAmt").textContent = `$${raised.toFixed(2)} 募集`;
+        document.getElementById("graduatedStatus").textContent = info[3] ? "Graduated" : "Live";
+        document.getElementById("graduatedBadge").style.display = info[3] ? "inline-flex" : "none";
 
-        if (info[3]) document.getElementById("graduatedBadge").classList.remove("hidden");
+        await updateWalletTokenBalance();
+        await updateTradeEstimate();
       } catch (e) {
-        log("加载失败: " + e.message, "red");
+        console.error(e);
       }
     }
 
-    async function connectWallet() {
-      if (!window.ethereum) return log("请安装 MetaMask", "red");
+    async function updateWalletTokenBalance() {
+      const el = document.getElementById("walletTokenBalance");
+      if (!el) return;
+      if (!userAddress) {
+        el.textContent = "Wallet not connected";
+        return;
+      }
       try {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        try {
-          await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: TEMPO_CHAIN.chainId }] });
-        } catch (e) {
-          if (e.code === 4902) {
-            await window.ethereum.request({ method: "wallet_addEthereumChain", params: [TEMPO_CHAIN] });
+        const token = new ethers.Contract(tokenAddress, TOKEN_ABI, provider);
+        const balance = await token.balanceOf(userAddress);
+        el.textContent = Number(ethers.formatUnits(balance, 18)).toLocaleString(undefined, { maximumFractionDigits: 4 });
+      } catch (e) {
+        el.textContent = "-";
+      }
+    }
+
+    async function loadActivity() {
+      try {
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, provider);
+        const latestBlock = await provider.getBlockNumber();
+        const fromBlock = Math.max(0, latestBlock - 8000);
+        const [buyEvents, sellEvents] = await Promise.all([
+          launch.queryFilter(launch.filters.TokenBought(tokenAddress), fromBlock, latestBlock),
+          launch.queryFilter(launch.filters.TokenSold(tokenAddress), fromBlock, latestBlock)
+        ]);
+
+        const enriched = await Promise.all(
+          [...buyEvents, ...sellEvents]
+            .sort((a, b) => b.blockNumber - a.blockNumber)
+            .slice(0, 120)
+            .map(async (ev) => {
+              const isBuy = ev.fragment.name === "TokenBought";
+              const wallet = ev.args[1];
+              const usdc = isBuy
+                ? Number(ethers.formatUnits(ev.args[2], 6))
+                : Number(ethers.formatUnits(ev.args[3], 6));
+              const tokenAmt = isBuy
+                ? Number(ethers.formatUnits(ev.args[3], 18))
+                : Number(ethers.formatUnits(ev.args[2], 18));
+              const block = await getBlockCached(ev.blockNumber);
+              return {
+                wallet,
+                isBuy,
+                usdc,
+                tokenAmt,
+                blockNumber: ev.blockNumber,
+                timestamp: Number(block.timestamp),
+                price: tokenAmt > 0 ? usdc / tokenAmt : 0
+              };
+            })
+        );
+
+        latestTrades = enriched;
+        updateTradeChart(enriched);
+
+        const rows = enriched.slice(0, 20).map((item) => `
+              <tr>
+                <td class="mono">${item.wallet.slice(0, 6)}...${item.wallet.slice(-4)}</td>
+                <td class="${item.isBuy ? "buy-text" : "sell-text"}">${item.isBuy ? "Buy" : "Sell"}</td>
+                <td>${item.usdc.toFixed(2)}</td>
+                <td>${item.tokenAmt.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                <td>${item.blockNumber}</td>
+              </tr>
+            `);
+
+        document.getElementById("activityTableBody").innerHTML = rows.length
+          ? rows.join("")
+          : '<tr><td colspan="5">No live activity yet</td></tr>';
+      } catch (e) {
+        console.error(e);
+        document.getElementById("activityTableBody").innerHTML = '<tr><td colspan="5">Failed to load activity</td></tr>';
+        document.getElementById("ohlcBar").innerHTML = '<span>No chart data</span>';
+      }
+    }
+
+    async function getBlockCached(blockNumber) {
+      if (!blockCache.has(blockNumber)) {
+        blockCache.set(blockNumber, await provider.getBlock(blockNumber));
+      }
+      return blockCache.get(blockNumber);
+    }
+
+    function setChartInterval(interval) {
+      chartInterval = interval;
+      ["1m", "5m", "15m", "1h", "4h"].forEach((key) => {
+        document.getElementById(`interval-${key}`)?.classList.toggle("active", key === interval);
+      });
+      updateTradeChart(latestTrades);
+    }
+
+    function aggregateTradesByInterval(trades, interval) {
+      const intervalSecondsMap = {
+        "1m": 60,
+        "5m": 300,
+        "15m": 900,
+        "1h": 3600,
+        "4h": 14400
+      };
+      const intervalSeconds = intervalSecondsMap[interval] || 60;
+      const validTrades = [...trades]
+        .filter((t) => Number.isFinite(t.price) && t.price > 0 && Number.isFinite(t.timestamp))
+        .sort((a, b) => a.timestamp - b.timestamp);
+
+      if (!validTrades.length) return [];
+
+      const buckets = new Map();
+      for (const trade of validTrades) {
+        const bucketStart = Math.floor(trade.timestamp / intervalSeconds) * intervalSeconds;
+        if (!buckets.has(bucketStart)) {
+          buckets.set(bucketStart, []);
+        }
+        buckets.get(bucketStart).push(trade);
+      }
+
+      return [...buckets.entries()]
+        .sort((a, b) => a[0] - b[0])
+        .map(([bucketStart, items]) => {
+          const prices = items.map((item) => item.price);
+          return {
+            timestamp: bucketStart,
+            open: prices[0],
+            high: Math.max(...prices),
+            low: Math.min(...prices),
+            close: prices[prices.length - 1],
+            volume: items.reduce((sum, item) => sum + item.usdc, 0)
+          };
+        });
+    }
+
+    function updateTradeChart(trades) {
+      const grouped = aggregateTradesByInterval(trades, chartInterval).slice(-60);
+
+      if (!grouped.length) {
+        document.getElementById("ohlcBar").innerHTML = "<span>No chart data</span>";
+        document.getElementById("chartPrice").textContent = "-.--";
+        priceChart.data.labels = [];
+        priceChart.data.datasets[0].data = [];
+        priceChart.update();
+        return;
+      }
+
+      const labels = grouped.map((item) =>
+        new Date(item.timestamp * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      );
+      const values = grouped.map((item) => item.close);
+      priceChart.data.labels = labels;
+      priceChart.data.datasets[0].data = values;
+      priceChart.update();
+
+      const open = grouped[0].open;
+      const high = Math.max(...grouped.map((item) => item.high));
+      const low = Math.min(...grouped.map((item) => item.low));
+      const close = grouped[grouped.length - 1].close;
+      const delta = close - open;
+      const deltaPct = open ? (delta / open) * 100 : 0;
+
+      document.getElementById("chartPrice").textContent = close.toFixed(8) + " USDC";
+      document.getElementById("ohlcBar").innerHTML = `
+        <span>O <strong>${open.toFixed(8)}</strong></span>
+        <span>H <strong>${high.toFixed(8)}</strong></span>
+        <span>L <strong>${low.toFixed(8)}</strong></span>
+        <span>C <strong>${close.toFixed(8)}</strong></span>
+        <span class="${delta >= 0 ? "up" : "down"}">${delta >= 0 ? "+" : ""}${delta.toFixed(8)} (${deltaPct.toFixed(2)}%)</span>
+      `;
+    }
+
+    async function loadHolders() {
+      try {
+        const token = new ethers.Contract(tokenAddress, TOKEN_ABI, provider);
+        const latestBlock = await provider.getBlockNumber();
+        const chunkSize = 100000;
+        const addressSet = new Set();
+
+        for (let toBlock = latestBlock; toBlock >= 0; toBlock -= chunkSize) {
+          const fromBlock = Math.max(0, toBlock - chunkSize + 1);
+          const events = await token.queryFilter(token.filters.Transfer(), fromBlock, toBlock);
+          for (const ev of events) {
+            if (ev.args[0] && ev.args[0] !== ethers.ZeroAddress) addressSet.add(ev.args[0].toLowerCase());
+            if (ev.args[1] && ev.args[1] !== ethers.ZeroAddress) addressSet.add(ev.args[1].toLowerCase());
+          }
+          if (fromBlock === 0 || addressSet.size > 300) break;
+        }
+
+        const totalSupply = await token.totalSupply();
+        const totalSupplyValue = Number(ethers.formatUnits(totalSupply, 18));
+        const holders = [];
+
+        for (const addr of addressSet) {
+          try {
+            const bal = await token.balanceOf(addr);
+            if (bal > 0n) {
+              const value = Number(ethers.formatUnits(bal, 18));
+              holders.push({
+                address: addr,
+                value,
+                pct: totalSupplyValue ? (value / totalSupplyValue) * 100 : 0
+              });
+            }
+          } catch (e) {}
+        }
+
+        holders.sort((a, b) => b.value - a.value);
+        document.getElementById("holdersCount").textContent = holders.length.toString();
+        document.getElementById("holdersTableBody").innerHTML = holders.length
+          ? holders.slice(0, 20).map((h) => `
+              <tr>
+                <td class="mono">${h.address.slice(0, 6)}...${h.address.slice(-4)}</td>
+                <td>${h.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+                <td>${h.pct.toFixed(4)}%</td>
+              </tr>
+            `).join("")
+          : '<tr><td colspan="3">No holder data yet</td></tr>';
+      } catch (e) {
+        console.error(e);
+        document.getElementById("holdersTableBody").innerHTML = '<tr><td colspan="3">Failed to load holders</td></tr>';
+      }
+    }
+
+    async function updateTradeEstimate() {
+      const amount = document.getElementById("tradeAmount").value;
+      if (!amount || !tokenAddress) return;
+      try {
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, provider);
+        if (tradeMode === "buy") {
+          const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, ethers.parseUnits(amount, 6));
+          document.getElementById("tradeEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " tokens";
+          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+        } else {
+          const [usdcOut, fee] = await launch.estimateSell(tokenAddress, ethers.parseUnits(amount || "0", 18));
+          document.getElementById("tradeEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " USDC";
+          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+        }
+      } catch (e) {}
+    }
+
+    async function connectWallet(requestAccess = true) {
+      if (!window.ethereum) return;
+      try {
+        const accounts = await window.ethereum.request({
+          method: requestAccess ? "eth_requestAccounts" : "eth_accounts"
+        });
+        if (!accounts.length) return;
+        const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
+        if (currentChainId !== TEMPO_CHAIN.chainId) {
+          try {
+            await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: TEMPO_CHAIN.chainId }] });
+          } catch (e) {
+            if (e.code === 4902) {
+              await window.ethereum.request({ method: "wallet_addEthereumChain", params: [TEMPO_CHAIN] });
+            } else {
+              throw e;
+            }
           }
         }
         provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
         userAddress = await signer.getAddress();
         document.getElementById("connectBtn").textContent = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
-        log("钱包已连接: " + userAddress, "green");
+        await updateWalletTokenBalance();
         await loadTokenInfo();
+        await updateTradeEstimate();
       } catch (e) {
-        log("连接失败: " + e.message, "red");
+        console.error(e);
       }
     }
 
+    async function submitTrade() {
+      if (tradeMode === "buy") return buyTokens();
+      return sellTokens();
+    }
+
     async function buyTokens() {
-      if (!signer) return log("请先连接钱包", "red");
-      const amount = document.getElementById("buyAmount").value;
-      if (!amount || amount <= 0) return log("请输入数量", "red");
+      if (!signer) return;
+      const amount = document.getElementById("tradeAmount").value;
+      if (!amount || amount <= 0) return;
       try {
         const usdcAmount = ethers.parseUnits(amount.toString(), 6);
         const usdc = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
         const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
         const allowance = await usdc.allowance(userAddress, LAUNCH_CONTRACT);
         if (allowance < usdcAmount) {
-          log("正在 approve USDC...");
           await (await usdc.approve(LAUNCH_CONTRACT, usdcAmount)).wait();
-          log("Approve 成功", "green");
         }
-        log(`买入 ${amount} USDC...`);
         const tx = await launch.buy(tokenAddress, usdcAmount);
-        log("交易: " + tx.hash);
         await tx.wait();
-        log("买入成功", "green");
-        await loadTokenInfo();
+        await updateWalletTokenBalance();
+        await Promise.all([loadTokenInfo(), loadActivity(), loadHolders()]);
       } catch (e) {
-        log("失败: " + e.message, "red");
+        console.error(e);
       }
     }
 
     async function sellTokens() {
-      if (!signer) return log("请先连接钱包", "red");
-      const amount = document.getElementById("sellAmount").value;
-      if (!amount || amount <= 0) return log("请输入数量", "red");
+      if (!signer) return;
+      const amount = document.getElementById("tradeAmount").value;
+      if (!amount || amount <= 0) return;
       try {
         const tokenAmount = ethers.parseUnits(amount.toString(), 18);
         const token = new ethers.Contract(tokenAddress, TOKEN_ABI, signer);
         const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
         const allowance = await token.allowance(userAddress, LAUNCH_CONTRACT);
         if (allowance < tokenAmount) {
-          log("正在 approve 代币...");
           await (await token.approve(LAUNCH_CONTRACT, tokenAmount)).wait();
-          log("Approve 成功", "green");
         }
-        log(`卖出 ${amount} 代币...`);
         const tx = await launch.sell(tokenAddress, tokenAmount);
-        log("交易: " + tx.hash);
         await tx.wait();
-        log("卖出成功", "green");
-        await loadTokenInfo();
+        await updateWalletTokenBalance();
+        await Promise.all([loadTokenInfo(), loadActivity(), loadHolders()]);
       } catch (e) {
-        log("失败: " + e.message, "red");
+        console.error(e);
       }
     }
 
-    async function updateBuyEstimate() {
-      const amount = document.getElementById("buyAmount").value;
-      if (!amount || !tokenAddress) return;
+    function getLocalMeta(tokenAddr) {
       try {
-        const p = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
-        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, p);
-        const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, ethers.parseUnits(amount, 6));
-        document.getElementById("buyEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " 代币";
-        document.getElementById("buyFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
-      } catch (e) {}
+        const raw = localStorage.getItem(`tempo_meta_${tokenAddr.toLowerCase()}`);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
     }
 
-    async function updateSellEstimate() {
-      const amount = document.getElementById("sellAmount").value;
-      if (!amount || !tokenAddress) return;
+    async function findLaunchMeta(launch, provider, tokenAddr) {
       try {
-        const p = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
-        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, p);
-        const [usdcOut, fee] = await launch.estimateSell(tokenAddress, ethers.parseUnits(amount, 18));
-        document.getElementById("sellEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " USDC";
-        document.getElementById("sellFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
-      } catch (e) {}
-    }
-
-    function log(msg, color = "gray") {
-      const el = document.getElementById("logArea");
-      const colorMap = {
-        gray: "color:#d6cdc0;",
-        green: "color:#8be0ad;",
-        red: "color:#ff9e94;"
-      };
-      el.innerHTML += `<div style="margin-bottom:10px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);${colorMap[color] || colorMap.gray}"><span style="color:#8b8277">[${new Date().toLocaleTimeString()}]</span> ${msg}</div>`;
-      el.scrollTop = el.scrollHeight;
+        const latestBlock = await provider.getBlockNumber();
+        const chunkSize = 100000;
+        const filter = launch.filters.LaunchCreated(tokenAddr);
+        for (let toBlock = latestBlock; toBlock >= 0; toBlock -= chunkSize) {
+          const fromBlock = Math.max(0, toBlock - chunkSize + 1);
+          const events = await launch.queryFilter(filter, fromBlock, toBlock);
+          if (events.length > 0) {
+            const metaText = events[events.length - 1].args.meta;
+            if (!metaText) return null;
+            try {
+              return JSON.parse(metaText);
+            } catch (e) {
+              return null;
+            }
+          }
+          if (fromBlock === 0) break;
+        }
+      } catch (e) {
+        console.error("findLaunchMeta error", e);
+      }
+      return null;
     }
 
     init();
 
     if (window.ethereum) {
       window.ethereum.on("accountsChanged", (accounts) => {
-        if (accounts.length > 0) connectWallet();
+        if (accounts.length > 0) connectWallet(false);
         else {
           userAddress = null;
           signer = null;
-          document.getElementById("connectBtn").textContent = "连接钱包";
+          document.getElementById("connectBtn").textContent = "Connect Wallet";
+          document.getElementById("walletTokenBalance").textContent = "Wallet not connected";
         }
       });
       window.ethereum.on("chainChanged", () => window.location.reload());
