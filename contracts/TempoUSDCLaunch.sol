@@ -242,6 +242,25 @@ contract TempoUSDCLaunch {
         require(USDC.transfer(owner, f), "transfer failed");
     }
 
+    // ── 毕业后提取剩余代币（迁移外盘用）──
+    function withdrawGraduatedTokens(address t, address to) external onlyOwner {
+        require(isLaunch[t], "not a launch");
+        require(launches[t].graduated, "not graduated");
+        uint256 bal = TempoMemeToken(t).balanceOf(address(this));
+        require(bal > 0, "no tokens");
+        require(TempoMemeToken(t).transfer(to, bal), "transfer failed");
+    }
+
+    // ── 毕业后提取募资 USDC（迁移外盘用）──
+    function withdrawGraduatedUSDC(address t, address to) external onlyOwner {
+        require(isLaunch[t], "not a launch");
+        require(launches[t].graduated, "not graduated");
+        uint256 raised = launches[t].raised;
+        require(raised > 0, "no usdc");
+        launches[t].raised = 0;
+        require(USDC.transfer(to, raised), "transfer failed");
+    }
+
     // ── 转移 owner ──
     function transferOwnership(address newOwner) external onlyOwner {
         require(newOwner != address(0));
