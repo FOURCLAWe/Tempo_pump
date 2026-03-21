@@ -348,11 +348,8 @@
 
     .hero {
       padding: 30px;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 20px;
-      align-items: center;
-      min-height: 300px;
+      display: block;
+      min-height: 280px;
       background:
         radial-gradient(circle at top right, rgba(232,191,82,0.16), transparent 34%),
         radial-gradient(circle at left center, rgba(151,255,93,0.08), transparent 28%);
@@ -431,38 +428,6 @@
       border: 1px solid rgba(255,255,255,0.07);
       background: linear-gradient(180deg, rgba(28,30,28,0.96), rgba(17,18,17,0.98));
       color: var(--text);
-    }
-
-    .hero-side {
-      display: grid;
-      gap: 12px;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hero-card {
-      padding: 18px;
-      border-radius: 18px;
-      background:
-        linear-gradient(180deg, rgba(31,34,30,0.92), rgba(15,16,15,0.98));
-      border: 1px solid rgba(255,255,255,0.07);
-      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-
-    .hero-card-label {
-      color: var(--muted);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 800;
-    }
-
-    .hero-card-value {
-      margin-top: 10px;
-      font-size: 30px;
-      font-family: "Space Grotesk", sans-serif;
-      font-weight: 700;
-      line-height: 1;
     }
 
     .toolbar {
@@ -724,12 +689,6 @@
       box-shadow: 0 18px 32px rgba(232,191,82,0.18);
     }
 
-    .hero-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(232,191,82,0.16);
-      animation: softPulse 2.2s ease-in-out infinite;
-    }
-
     .search-input:focus { box-shadow: none; }
 
     @media (prefers-reduced-motion: reduce) {
@@ -748,8 +707,7 @@
         border-right: none;
         border-bottom: 1px solid var(--line);
       }
-      .hero { grid-template-columns: 1fr; }
-      .hero-side { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .hero { min-height: 0; }
     }
 
     @media (max-width: 760px) {
@@ -762,7 +720,6 @@
       .token-media { height: 150px; }
       .hero-title { font-size: 42px; }
       .hero { padding: 24px 18px; }
-      .hero-side { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .token-grid { grid-template-columns: 1fr; }
@@ -829,20 +786,6 @@
             <div class="hero-actions">
               <button onclick="window.location.href='/create'" class="hero-btn">Create Token</button>
               <button onclick="window.location.href='/tokens'" class="ghost-btn">View All Tokens</button>
-            </div>
-          </div>
-          <div class="hero-side">
-            <div class="hero-card">
-              <div class="hero-card-label">Settlement Token</div>
-              <div class="hero-card-value">USDC</div>
-            </div>
-            <div class="hero-card">
-              <div class="hero-card-label">Curve Sale Cap</div>
-              <div class="hero-card-value">80%</div>
-            </div>
-            <div class="hero-card">
-              <div class="hero-card-label">Graduation Goal</div>
-              <div class="hero-card-value">12K</div>
             </div>
           </div>
         </section>
