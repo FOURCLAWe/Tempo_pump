@@ -3,142 +3,484 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Token - Tempo Launch</title>
+  <title>Token - Tempo Pump</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
-    body { background: linear-gradient(135deg, #0f172a, #1e2937); color: white; }
-    .card { background: rgba(30, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
-    .progress-bar { height: 8px; background: #1e2937; border-radius: 999px; overflow: hidden; }
-    .progress-fill { height: 100%; background: linear-gradient(to right, #a855f7, #22d3ee); border-radius: 999px; transition: width 0.5s ease; }
+    :root {
+      --bg: #0f1115;
+      --panel: rgba(22, 24, 31, 0.84);
+      --line: rgba(255, 255, 255, 0.09);
+      --text: #f4efe4;
+      --muted: #b6aa96;
+      --accent: #ff6b2c;
+      --accent-2: #ffd166;
+      --accent-3: #49c6b4;
+      --danger: #ff6f61;
+      --success: #76d39b;
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Manrope", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 107, 44, 0.22), transparent 26%),
+        radial-gradient(circle at 84% 16%, rgba(73, 198, 180, 0.17), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(255, 209, 102, 0.12), transparent 20%),
+        linear-gradient(180deg, #101217 0%, #0a0c10 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: radial-gradient(circle at center, black 38%, transparent 90%);
+      pointer-events: none;
+    }
+
+    h1, h2, h3 {
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: -0.03em;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1140px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 52px;
+    }
+
+    .glass {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      border-radius: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .link-btn, .primary-btn, .ghost-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, var(--accent), #ff8c42);
+      color: #17191d;
+      border: none;
+      box-shadow: 0 14px 30px rgba(255, 107, 44, 0.24);
+    }
+
+    .link-btn:hover, .primary-btn:hover, .ghost-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .hero {
+      padding: 26px;
+      margin-bottom: 18px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -90px;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(255, 209, 102, 0.34), transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .token-orb {
+      width: 88px;
+      height: 88px;
+      border-radius: 28px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      color: #15171b;
+      font-size: 30px;
+      font-weight: 900;
+      box-shadow: 0 14px 28px rgba(255, 107, 44, 0.2);
+    }
+
+    .hero-title {
+      font-size: clamp(34px, 6vw, 60px);
+      line-height: 0.95;
+      margin: 0 0 10px;
+    }
+
+    .token-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .hero-price {
+      margin-left: auto;
+      min-width: 210px;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .hero-price .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .hero-price .value {
+      margin-top: 12px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 34px;
+      font-weight: 700;
+      color: #ffe3a0;
+    }
+
+    .hero-row {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .progress-shell, .status-shell {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .progress-track {
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 24px rgba(255, 107, 44, 0.35);
+      transition: width 0.45s ease;
+    }
+
+    .status-shell {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      width: fit-content;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .badge-live { background: rgba(255, 209, 102, 0.14); color: var(--accent-2); }
+    .badge-ok { background: rgba(118, 211, 155, 0.16); color: var(--success); }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .trade-stack, .chart-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .section-copy {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.45);
+      font-weight: 800;
+    }
+
+    .input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 15px 16px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 160ms ease, transform 160ms ease;
+    }
+
+    .input:focus {
+      border-color: rgba(255, 107, 44, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .metric-box {
+      display: grid;
+      gap: 10px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric-row span:last-child {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .chart-frame {
+      padding: 14px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    #priceChart {
+      width: 100%;
+      min-height: 260px;
+    }
+
+    .log-shell {
+      min-height: 120px;
+      max-height: 240px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .log-shell::-webkit-scrollbar { width: 8px; }
+    .log-shell::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    @media (max-width: 980px) {
+      .content-grid, .hero-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 18px, 100%); }
+      .topbar, .hero-head, .section-head { flex-direction: column; align-items: stretch; }
+      .hero-price { margin-left: 0; min-width: 0; width: 100%; }
+      .glass { border-radius: 22px; }
+      .token-orb { width: 72px; height: 72px; border-radius: 24px; }
+      .hero-title { font-size: 38px; }
+    }
   </style>
 </head>
-<body class="min-h-screen p-6">
-  <div class="max-w-4xl mx-auto">
-
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-8">
-      <a href="/" class="text-purple-400 hover:text-purple-300 flex items-center gap-2 text-sm">
-        ← 返回首页
-      </a>
-      <button onclick="connectWallet()" id="connectBtn"
-              class="bg-gradient-to-r from-purple-500 to-cyan-500 px-5 py-2 rounded-2xl text-sm font-semibold">
-        连接钱包
-      </button>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <a href="/" class="link-btn">← 返回首页</a>
+      <button onclick="connectWallet()" id="connectBtn" class="primary-btn">连接钱包</button>
     </div>
 
-    <!-- 代币信息 -->
-    <div class="card rounded-3xl p-8 mb-6">
-      <div class="flex items-center gap-5 mb-6">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-2xl font-black" id="tokenIcon">?</div>
-        <div>
-          <h1 class="text-3xl font-black" id="tokenName">加载中...</h1>
-          <p class="text-gray-400 text-sm" id="tokenSymbol"></p>
-          <p class="text-xs text-gray-600 font-mono mt-1" id="tokenAddr"></p>
+    <section class="hero glass">
+      <div class="hero-head">
+        <div id="tokenIcon" class="token-orb">?</div>
+        <div class="min-w-0 flex-1">
+          <div class="badge badge-live mb-3">Token Panel</div>
+          <h1 id="tokenName" class="hero-title">加载中...</h1>
+          <div id="tokenSymbol" class="text-lg text-amber-100 font-bold mb-2"></div>
+          <div id="tokenAddr" class="token-meta mono"></div>
         </div>
-        <div class="ml-auto text-right">
-          <div class="text-2xl font-bold text-cyan-400" id="tokenPrice">-.--</div>
-          <div class="text-xs text-gray-400">当前价格 (USDC)</div>
+        <div class="hero-price">
+          <div class="label">Current Price</div>
+          <div id="tokenPrice" class="value">-.--</div>
+          <div class="token-meta mt-2">当前曲线价格，单位 USDC</div>
         </div>
       </div>
 
-      <!-- 募集进度 -->
-      <div class="mb-2 flex justify-between text-sm">
-        <span class="text-gray-400">募集进度</span>
-        <span id="progressPct" class="text-purple-400">0%</span>
-      </div>
-      <div class="progress-bar mb-2">
-        <div class="progress-fill" id="progressFill" style="width:0%"></div>
-      </div>
-      <div class="flex justify-between text-xs text-gray-500">
-        <span id="raisedAmt">$0 募集</span>
-        <span>目标 $12,000 USDC</span>
-      </div>
-
-      <!-- 状态 -->
-      <div id="graduatedBadge" class="hidden mt-4 bg-green-500/20 text-green-400 px-4 py-2 rounded-xl text-sm text-center">
-        🎓 此项目已毕业！
-      </div>
-    </div>
-
-    <!-- 买卖区 -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-      <!-- 买入 -->
-      <div class="card rounded-3xl p-6">
-        <h2 class="text-lg font-bold mb-4 text-green-400">💰 买入</h2>
-        <div class="space-y-3">
-          <div>
-            <label class="text-xs text-gray-400 mb-1 block">USDC 数量</label>
-            <input id="buyAmount" type="number" placeholder="100" value="100"
-                   oninput="updateBuyEstimate()"
-                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+      <div class="hero-row">
+        <div class="progress-shell">
+          <div class="flex justify-between text-sm mb-3">
+            <span class="text-stone-400">募集进度</span>
+            <span id="progressPct" class="text-amber-200 font-bold">0%</span>
           </div>
-          <div class="bg-slate-900 rounded-xl p-3 text-xs space-y-1">
-            <div class="flex justify-between">
-              <span class="text-gray-400">预计获得</span>
-              <span class="text-green-400" id="buyEstimate">-.--</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">手续费 (1%)</span>
-              <span class="text-yellow-400" id="buyFee">-.--</span>
-            </div>
+          <div class="progress-track mb-3">
+            <div id="progressFill" class="progress-fill" style="width:0%"></div>
           </div>
-          <button onclick="buyTokens()"
-                  class="w-full bg-green-500 hover:bg-green-600 py-3 rounded-xl font-bold text-sm transition">
-            买入代币
-          </button>
+          <div class="flex justify-between text-xs text-stone-500">
+            <span id="raisedAmt">$0 募集</span>
+            <span>目标 12,000 USDC</span>
+          </div>
+        </div>
+        <div class="status-shell">
+          <div class="text-xs uppercase tracking-[0.18em] text-stone-500">Status</div>
+          <div id="graduatedBadge" class="hidden badge badge-ok">已毕业</div>
+          <div class="text-sm text-stone-400">达到目标后仅切换为毕业状态，当前仓库里没有真正创建 LP 的链上逻辑。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <div class="trade-stack">
+        <div class="card glass">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Buy</div>
+              <div class="section-copy">输入 USDC 数量，前端会调用链上估算函数。</div>
+            </div>
+            <div class="badge badge-ok">Buy Flow</div>
+          </div>
+          <div class="field">
+            <label for="buyAmount">USDC 数量</label>
+            <input id="buyAmount" type="number" placeholder="100" value="100" oninput="updateBuyEstimate()" class="input">
+          </div>
+          <div class="metric-box">
+            <div class="metric-row"><span>预计获得</span><span id="buyEstimate">-.--</span></div>
+            <div class="metric-row"><span>手续费</span><span id="buyFee">-.--</span></div>
+          </div>
+          <button onclick="buyTokens()" class="primary-btn w-full mt-4">买入代币</button>
+        </div>
+
+        <div class="card glass">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Sell</div>
+              <div class="section-copy">先授权代币，再调用卖出交易。</div>
+            </div>
+            <div class="badge badge-live">Sell Flow</div>
+          </div>
+          <div class="field">
+            <label for="sellAmount">代币数量</label>
+            <input id="sellAmount" type="number" placeholder="1000000" oninput="updateSellEstimate()" class="input">
+          </div>
+          <div class="metric-box">
+            <div class="metric-row"><span>预计获得</span><span id="sellEstimate">-.-- USDC</span></div>
+            <div class="metric-row"><span>手续费</span><span id="sellFee">-.--</span></div>
+          </div>
+          <button onclick="sellTokens()" class="ghost-btn w-full mt-4" style="border-color: rgba(255, 111, 97, 0.18); color: #ffd6d2;">卖出代币</button>
         </div>
       </div>
 
-      <!-- 卖出 -->
-      <div class="card rounded-3xl p-6">
-        <h2 class="text-lg font-bold mb-4 text-red-400">💸 卖出</h2>
-        <div class="space-y-3">
-          <div>
-            <label class="text-xs text-gray-400 mb-1 block">代币数量</label>
-            <input id="sellAmount" type="number" placeholder="1000000"
-                   oninput="updateSellEstimate()"
-                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
-          </div>
-          <div class="bg-slate-900 rounded-xl p-3 text-xs space-y-1">
-            <div class="flex justify-between">
-              <span class="text-gray-400">预计获得</span>
-              <span class="text-green-400" id="sellEstimate">-.-- USDC</span>
+      <div class="chart-stack">
+        <div class="card glass">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Price Curve</div>
+              <div class="section-copy">页面每 10 秒刷新一次链上价格并追加到图表里。</div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">手续费 (1%)</span>
-              <span class="text-yellow-400" id="sellFee">-.--</span>
-            </div>
+            <div id="chartPrice" class="text-sm text-amber-200 font-bold"></div>
           </div>
-          <button onclick="sellTokens()"
-                  class="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-bold text-sm transition">
-            卖出代币
-          </button>
+          <div class="chart-frame">
+            <canvas id="priceChart" height="120"></canvas>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <div class="section-head">
+            <div>
+              <div class="section-title">Operation Feed</div>
+              <div class="section-copy">钱包连接、approve 和买卖交易状态会实时显示。</div>
+            </div>
+            <button onclick="document.getElementById('logArea').innerHTML=''" class="ghost-btn">清空</button>
+          </div>
+          <div id="logArea" class="log-shell text-sm"></div>
         </div>
       </div>
-    </div>
-
-    <!-- 价格图表 -->
-    <div class="card rounded-3xl p-6 mb-6">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-sm font-semibold">📈 价格走势</h3>
-        <span class="text-xs text-gray-500" id="chartPrice"></span>
-      </div>
-      <canvas id="priceChart" height="120"></canvas>
-    </div>
-
-    <!-- 日志 -->
-    <div class="card rounded-3xl p-6">
-      <div class="flex justify-between mb-3">
-        <h3 class="text-sm font-semibold">操作日志</h3>
-        <button onclick="document.getElementById('logArea').innerHTML=''" class="text-xs text-gray-500">清空</button>
-      </div>
-      <div id="logArea" class="text-xs font-mono min-h-[100px] max-h-[200px] overflow-auto"></div>
-    </div>
-
-  </div>
+    </section>
+  </main>
 
   <script>
     const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
@@ -177,21 +519,21 @@
     const priceHistory = [];
 
     function initChart() {
-      const ctx = document.getElementById('priceChart').getContext('2d');
+      const ctx = document.getElementById("priceChart").getContext("2d");
       priceChart = new Chart(ctx, {
-        type: 'line',
+        type: "line",
         data: {
           labels: [],
           datasets: [{
-            label: '价格 (USDC)',
+            label: "价格 (USDC)",
             data: [],
-            borderColor: '#a855f7',
-            backgroundColor: 'rgba(168,85,247,0.08)',
+            borderColor: "#ff8c42",
+            backgroundColor: "rgba(255,140,66,0.12)",
             borderWidth: 2,
             pointRadius: 2,
             pointHoverRadius: 5,
             fill: true,
-            tension: 0.4
+            tension: 0.35
           }]
         },
         options: {
@@ -201,13 +543,23 @@
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: ctx => ctx.parsed.y.toFixed(8) + ' USDC'
+                label: (ctx) => ctx.parsed.y.toFixed(8) + " USDC"
               }
             }
           },
           scales: {
-            x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            y: { ticks: { color: '#6b7280', font: { size: 10 }, callback: v => v.toFixed(6) }, grid: { color: 'rgba(255,255,255,0.05)' } }
+            x: {
+              ticks: { color: "#8b8277", font: { size: 10 } },
+              grid: { color: "rgba(255,255,255,0.05)" }
+            },
+            y: {
+              ticks: {
+                color: "#8b8277",
+                font: { size: 10 },
+                callback: (v) => Number(v).toFixed(6)
+              },
+              grid: { color: "rgba(255,255,255,0.05)" }
+            }
           }
         }
       });
@@ -217,10 +569,10 @@
       const now = new Date().toLocaleTimeString();
       priceHistory.push({ t: now, p: price });
       if (priceHistory.length > 30) priceHistory.shift();
-      priceChart.data.labels = priceHistory.map(x => x.t);
-      priceChart.data.datasets[0].data = priceHistory.map(x => x.p);
+      priceChart.data.labels = priceHistory.map((x) => x.t);
+      priceChart.data.datasets[0].data = priceHistory.map((x) => x.p);
       priceChart.update();
-      document.getElementById('chartPrice').textContent = price.toFixed(8) + ' USDC';
+      document.getElementById("chartPrice").textContent = price.toFixed(8) + " USDC";
     }
 
     async function init() {
@@ -233,16 +585,15 @@
       initChart();
       await loadTokenInfo();
       setInterval(loadTokenInfo, 10000);
-      // 自动重连钱包
       await autoConnect();
     }
 
     async function autoConnect() {
       if (!window.ethereum) return;
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        const accounts = await window.ethereum.request({ method: "eth_accounts" });
         if (accounts.length > 0) await connectWallet();
-      } catch(e) {}
+      } catch (e) {}
     }
 
     async function loadTokenInfo() {
@@ -259,8 +610,8 @@
 
         document.getElementById("tokenName").textContent = name;
         document.getElementById("tokenSymbol").textContent = symbol;
-        document.getElementById("tokenIcon").textContent = symbol.slice(0,2);
-        document.title = `${name} - Tempo Launch`;
+        document.getElementById("tokenIcon").textContent = symbol.slice(0, 2).toUpperCase();
+        document.title = `${name} - Tempo Pump`;
 
         const priceFormatted = (Number(price) / 1e6).toFixed(8);
         document.getElementById("tokenPrice").textContent = priceFormatted;
@@ -272,10 +623,8 @@
         document.getElementById("progressPct").textContent = pct + "%";
         document.getElementById("raisedAmt").textContent = `$${raised.toFixed(2)} 募集`;
 
-        if (info[3]) {
-          document.getElementById("graduatedBadge").classList.remove("hidden");
-        }
-      } catch(e) {
+        if (info[3]) document.getElementById("graduatedBadge").classList.remove("hidden");
+      } catch (e) {
         log("加载失败: " + e.message, "red");
       }
     }
@@ -286,62 +635,70 @@
         await window.ethereum.request({ method: "eth_requestAccounts" });
         try {
           await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: TEMPO_CHAIN.chainId }] });
-        } catch(e) {
-          if (e.code === 4902) await window.ethereum.request({ method: "wallet_addEthereumChain", params: [TEMPO_CHAIN] });
+        } catch (e) {
+          if (e.code === 4902) {
+            await window.ethereum.request({ method: "wallet_addEthereumChain", params: [TEMPO_CHAIN] });
+          }
         }
         provider = new ethers.BrowserProvider(window.ethereum);
         signer = await provider.getSigner();
         userAddress = await signer.getAddress();
-        document.getElementById("connectBtn").textContent = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
-        log("✅ 钱包已连接: " + userAddress, "green");
+        document.getElementById("connectBtn").textContent = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+        log("钱包已连接: " + userAddress, "green");
         await loadTokenInfo();
-      } catch(e) { log("连接失败: " + e.message, "red"); }
+      } catch (e) {
+        log("连接失败: " + e.message, "red");
+      }
     }
 
     async function buyTokens() {
-      if (!signer) return log("❌ 请先连接钱包", "red");
+      if (!signer) return log("请先连接钱包", "red");
       const amount = document.getElementById("buyAmount").value;
-      if (!amount || amount <= 0) return log("❌ 请输入数量", "red");
+      if (!amount || amount <= 0) return log("请输入数量", "red");
       try {
         const usdcAmount = ethers.parseUnits(amount.toString(), 6);
         const usdc = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
         const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
         const allowance = await usdc.allowance(userAddress, LAUNCH_CONTRACT);
         if (allowance < usdcAmount) {
-          log("🔓 正在 approve USDC...");
+          log("正在 approve USDC...");
           await (await usdc.approve(LAUNCH_CONTRACT, usdcAmount)).wait();
-          log("✅ Approve 成功", "green");
+          log("Approve 成功", "green");
         }
-        log(`💰 买入 ${amount} USDC...`);
+        log(`买入 ${amount} USDC...`);
         const tx = await launch.buy(tokenAddress, usdcAmount);
-        log("⏳ 交易: " + tx.hash);
+        log("交易: " + tx.hash);
         await tx.wait();
-        log("✅ 买入成功！", "green");
+        log("买入成功", "green");
         await loadTokenInfo();
-      } catch(e) { log("❌ " + e.message, "red"); }
+      } catch (e) {
+        log("失败: " + e.message, "red");
+      }
     }
 
     async function sellTokens() {
-      if (!signer) return log("❌ 请先连接钱包", "red");
+      if (!signer) return log("请先连接钱包", "red");
       const amount = document.getElementById("sellAmount").value;
-      if (!amount || amount <= 0) return log("❌ 请输入数量", "red");
+      if (!amount || amount <= 0) return log("请输入数量", "red");
       try {
         const tokenAmount = ethers.parseUnits(amount.toString(), 18);
         const token = new ethers.Contract(tokenAddress, TOKEN_ABI, signer);
         const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
         const allowance = await token.allowance(userAddress, LAUNCH_CONTRACT);
         if (allowance < tokenAmount) {
-          log("🔓 正在 approve 代币...");
+          log("正在 approve 代币...");
           await (await token.approve(LAUNCH_CONTRACT, tokenAmount)).wait();
-          log("✅ Approve 成功", "green");
+          log("Approve 成功", "green");
         }
-        log(`💸 卖出 ${amount} 代币...`);
+        log(`卖出 ${amount} 代币...`);
         const tx = await launch.sell(tokenAddress, tokenAmount);
-        log("⏳ 交易: " + tx.hash);
+        log("交易: " + tx.hash);
         await tx.wait();
-        log("✅ 卖出成功！", "green");
+        log("卖出成功", "green");
         await loadTokenInfo();
-      } catch(e) { log("❌ " + e.message, "red"); }
+      } catch (e) {
+        log("失败: " + e.message, "red");
+      }
     }
 
     async function updateBuyEstimate() {
@@ -353,7 +710,7 @@
         const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, ethers.parseUnits(amount, 6));
         document.getElementById("buyEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " 代币";
         document.getElementById("buyFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
-      } catch(e) {}
+      } catch (e) {}
     }
 
     async function updateSellEstimate() {
@@ -365,28 +722,32 @@
         const [usdcOut, fee] = await launch.estimateSell(tokenAddress, ethers.parseUnits(amount, 18));
         document.getElementById("sellEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " USDC";
         document.getElementById("sellFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
-      } catch(e) {}
+      } catch (e) {}
     }
 
     function log(msg, color = "gray") {
       const el = document.getElementById("logArea");
-      const colorMap = { gray: "text-gray-400", green: "text-green-400", red: "text-red-400" };
-      el.innerHTML += `<div class="${colorMap[color] || 'text-gray-400'} mb-1">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+      const colorMap = {
+        gray: "color:#d6cdc0;",
+        green: "color:#8be0ad;",
+        red: "color:#ff9e94;"
+      };
+      el.innerHTML += `<div style="margin-bottom:10px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);${colorMap[color] || colorMap.gray}"><span style="color:#8b8277">[${new Date().toLocaleTimeString()}]</span> ${msg}</div>`;
       el.scrollTop = el.scrollHeight;
     }
 
     init();
 
-    // 监听账户切换
     if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts) => {
+      window.ethereum.on("accountsChanged", (accounts) => {
         if (accounts.length > 0) connectWallet();
         else {
-          userAddress = null; signer = null;
-          document.getElementById('connectBtn').textContent = '连接钱包';
+          userAddress = null;
+          signer = null;
+          document.getElementById("connectBtn").textContent = "连接钱包";
         }
       });
-      window.ethereum.on('chainChanged', () => window.location.reload());
+      window.ethereum.on("chainChanged", () => window.location.reload());
     }
   </script>
 </body>
