@@ -248,6 +248,15 @@
       blockExplorerUrls: ["https://explorer.tempo.xyz"]
     };
 
+    // 自动重连
+    async function autoConnect() {
+      if (!window.ethereum) return;
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) await connectWallet();
+      } catch(e) {}
+    }
+
     async function connectWallet() {
       if (!window.ethereum) return log("请安装 MetaMask 或其他 EVM 钱包", "red");
       try {
@@ -491,11 +500,23 @@
       }
     }
 
-    // 页面加载时自动获取代币列表
+    // 页面加载时自动获取代币列表 + 自动重连钱包
     window.addEventListener('load', () => {
-      const p = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
       loadTokenList();
+      autoConnect();
     });
+
+    // 监听账户切换
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length > 0) connectWallet();
+        else {
+          userAddress = null; signer = null;
+          document.getElementById('connectBtn').textContent = '连接钱包';
+        }
+      });
+      window.ethereum.on('chainChanged', () => window.location.reload());
+    }
 
     function getCurrentSimPrice() {
       if (simulatedRaised === 0) return 1e12;
