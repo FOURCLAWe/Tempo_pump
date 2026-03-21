@@ -76,9 +76,20 @@
                    class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm resize-none"></textarea>
           </div>
           <div>
-            <label class="block text-xs text-gray-400 mb-1.5">头像 URL（可选）</label>
-            <input id="image" placeholder="https://..." 
-                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+            <label class="block text-xs text-gray-400 mb-1.5">代币头像（可选）</label>
+            <div class="flex items-center gap-3">
+              <div id="imagePreview" class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-xl font-black flex-shrink-0 overflow-hidden">
+                🪙
+              </div>
+              <div class="flex-1">
+                <label class="block w-full cursor-pointer bg-slate-800 border border-slate-700 border-dashed rounded-xl px-4 py-3 text-sm text-center text-gray-400 hover:border-purple-500 transition">
+                  📁 点击上传图片
+                  <input type="file" id="imageFile" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                </label>
+                <input id="image" placeholder="或粘贴图片 URL" 
+                       class="w-full mt-2 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs" oninput="previewImageUrl()">
+              </div>
+            </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -272,6 +283,29 @@
         const accounts = await window.ethereum.request({ method: 'eth_accounts' });
         if (accounts.length > 0) await connectWallet();
       } catch(e) {}
+    }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const base64 = ev.target.result;
+        document.getElementById('image').value = base64;
+        const preview = document.getElementById('imagePreview');
+        preview.innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewImageUrl() {
+      const url = document.getElementById('image').value;
+      const preview = document.getElementById('imagePreview');
+      if (url && (url.startsWith('http') || url.startsWith('data:'))) {
+        preview.innerHTML = `<img src="${url}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='🪙'">`;
+      } else {
+        preview.innerHTML = '🪙';
+      }
     }
 
     async function connectWallet() {
