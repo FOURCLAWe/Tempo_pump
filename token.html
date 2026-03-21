@@ -6,6 +6,7 @@
   <title>Token - Tempo Launch</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     body { background: linear-gradient(135deg, #0f172a, #1e2937); color: white; }
     .card { background: rgba(30, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
@@ -119,6 +120,15 @@
       </div>
     </div>
 
+    <!-- 价格图表 -->
+    <div class="card rounded-3xl p-6 mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-sm font-semibold">📈 价格走势</h3>
+        <span class="text-xs text-gray-500" id="chartPrice"></span>
+      </div>
+      <canvas id="priceChart" height="120"></canvas>
+    </div>
+
     <!-- 日志 -->
     <div class="card rounded-3xl p-6">
       <div class="flex justify-between mb-3">
@@ -161,9 +171,57 @@
       blockExplorerUrls: ["https://explorer.tempo.xyz"]
     };
 
-    let provider, signer, userAddress;
+    let provider, signer, userAddress, priceChart;
     const params = new URLSearchParams(window.location.search);
     const tokenAddress = params.get("token");
+    const priceHistory = [];
+
+    function initChart() {
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: '价格 (USDC)',
+            data: [],
+            borderColor: '#a855f7',
+            backgroundColor: 'rgba(168,85,247,0.08)',
+            borderWidth: 2,
+            pointRadius: 2,
+            pointHoverRadius: 5,
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ctx.parsed.y.toFixed(8) + ' USDC'
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { color: '#6b7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            y: { ticks: { color: '#6b7280', font: { size: 10 }, callback: v => v.toFixed(6) }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          }
+        }
+      });
+    }
+
+    function updateChart(price) {
+      const now = new Date().toLocaleTimeString();
+      priceHistory.push({ t: now, p: price });
+      if (priceHistory.length > 30) priceHistory.shift();
+      priceChart.data.labels = priceHistory.map(x => x.t);
+      priceChart.data.datasets[0].data = priceHistory.map(x => x.p);
+      priceChart.update();
+      document.getElementById('chartPrice').textContent = price.toFixed(8) + ' USDC';
+    }
 
     async function init() {
       if (!tokenAddress) {
@@ -172,6 +230,7 @@
       }
       document.getElementById("tokenAddr").textContent = tokenAddress;
       provider = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
+      initChart();
       await loadTokenInfo();
       setInterval(loadTokenInfo, 10000);
     }
@@ -193,8 +252,9 @@
         document.getElementById("tokenIcon").textContent = symbol.slice(0,2);
         document.title = `${name} - Tempo Launch`;
 
-        const priceFormatted = (Number(price) / 1e12).toFixed(6);
+        const priceFormatted = (Number(price) / 1e6).toFixed(8);
         document.getElementById("tokenPrice").textContent = priceFormatted;
+        updateChart(Number(price) / 1e6);
 
         const raised = Number(ethers.formatUnits(info.raised, 6));
         const pct = Math.min((raised / 12000) * 100, 100).toFixed(1);
