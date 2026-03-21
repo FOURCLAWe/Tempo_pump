@@ -14,23 +14,36 @@ contract TempoMemeToken {
     uint256 public constant totalSupply = 1_000_000_000 * 1e18;
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
+
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
+
     constructor(string memory _name, string memory _symbol, address _to) {
-        name = _name; symbol = _symbol;
+        name = _name;
+        symbol = _symbol;
         balanceOf[_to] = totalSupply;
         emit Transfer(address(0), _to, totalSupply);
     }
+
     function transfer(address to, uint256 v) external returns (bool) {
-        balanceOf[msg.sender] -= v; balanceOf[to] += v;
-        emit Transfer(msg.sender, to, v); return true;
+        balanceOf[msg.sender] -= v;
+        balanceOf[to] += v;
+        emit Transfer(msg.sender, to, v);
+        return true;
     }
+
     function approve(address s, uint256 v) external returns (bool) {
-        allowance[msg.sender][s] = v; emit Approval(msg.sender, s, v); return true;
+        allowance[msg.sender][s] = v;
+        emit Approval(msg.sender, s, v);
+        return true;
     }
+
     function transferFrom(address from, address to, uint256 v) external returns (bool) {
-        allowance[from][msg.sender] -= v; balanceOf[from] -= v; balanceOf[to] += v;
-        emit Transfer(from, to, v); return true;
+        allowance[from][msg.sender] -= v;
+        balanceOf[from] -= v;
+        balanceOf[to] += v;
+        emit Transfer(from, to, v);
+        return true;
     }
 }
 
@@ -40,230 +53,172 @@ contract TempoUSDCLaunch {
     uint256 public totalFees;
     bool private _lock;
 
-    // ── 手续费 1% ──
-    uint256 constant FEE     = 100;
-    uint256 constant FEE_D   = 10000;
-
-    // ── xy=k 虚拟流动性池参数 ──
-    // 初始市值 $3,600 | 毕业市值 $62,500 | 募资目标 $12,000 | 售出 80%
-    uint256 constant VIRTUAL_USDC  = 3_789_473_684;          // 3789.47 USDC (1e6精度)
-    uint256 constant VIRTUAL_TOKEN = 1_052_631_579 * 1e18;   // 虚拟代币池 (1e18精度)
-    uint256 constant TOTAL_SUPPLY  = 1_000_000_000 * 1e18;   // 实际总供应 10亿
-    uint256 constant GRAD_SOLD     = 800_000_000   * 1e18;   // 毕业阈值：售出 8亿（80%）
-    uint256 constant TARGET_USDC   = 12_000        * 1e6;    // 毕业募资目标 12,000 USDC
-    uint256 constant DEX_RESERVE   = 200_000_000   * 1e18;   // 迁移外盘 2亿（20%）
+    uint256 constant FEE = 100;
+    uint256 constant FEE_D = 10000;
+    uint256 constant SALE_CAP = 800_000_000 * 1e18;
+    uint256 constant WAD = 1e18;
+    uint256 constant PRICE_SCALE = 1e30;
+    uint256 constant INIT_P = 3e12;
+    uint256 constant PRICE_DELTA = 62e12;
 
     struct Launch {
         address creator;
-        uint256 raised;      // 实际募资 USDC (1e6精度)
-        uint256 sold;        // 已售出代币 (1e18精度)
-        bool    graduated;
+        uint256 raised;
+        uint256 sold;
+        bool graduated;
     }
 
     mapping(address => Launch) public launches;
-    mapping(address => bool)   public isLaunch;
+    mapping(address => bool) public isLaunch;
     address[] public allLaunches;
 
     event LaunchCreated(address indexed token, address indexed creator, string name, string symbol, string meta);
     event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut);
     event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut);
-    event Graduated(address indexed token, uint256 raised, uint256 dexTokens);
+    event Graduated(address indexed token);
+    event LaunchUsdcWithdrawn(address indexed token, address indexed to, uint256 amount);
+    event LaunchTokensWithdrawn(address indexed token, address indexed to, uint256 amount);
 
-    modifier onlyOwner() { require(msg.sender == owner); _; }
-    modifier nonReentrant() { require(!_lock); _lock = true; _; _lock = false; }
+    modifier nonReentrant() {
+        require(!_lock);
+        _lock = true;
+        _;
+        _lock = false;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
+    modifier onlyLaunchAdmin(address t) {
+        require(msg.sender == owner || msg.sender == launches[t].creator);
+        _;
+    }
 
     constructor(address _usdc) {
+        USDC = IERC20(_usdc);
         owner = msg.sender;
-        USDC  = IERC20(_usdc);
     }
 
-    // ── 当前价格：(VIRTUAL_USDC + raised) / (VIRTUAL_TOKEN - sold) ──
-    // 返回值单位：USDC(1e6) per token(1e18)
-    function getPrice(address t) public view returns (uint256) {
-        Launch storage l = launches[t];
-        uint256 usdcPool  = VIRTUAL_USDC + l.raised;
-        uint256 tokenPool = VIRTUAL_TOKEN - l.sold;
-        require(tokenPool > 0, "pool empty");
-        return usdcPool * 1e18 / tokenPool;
-    }
-
-    // ── 创建代币 ──
-    function createLaunch(
-        string calldata name,
-        string calldata symbol,
-        string calldata meta
-    ) external returns (address) {
-        TempoMemeToken token = new TempoMemeToken(name, symbol, address(this));
+    function _createLaunch(
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _meta
+    ) internal returns (address) {
+        TempoMemeToken token = new TempoMemeToken(_name, _symbol, address(this));
         address t = address(token);
-        launches[t] = Launch({ creator: msg.sender, raised: 0, sold: 0, graduated: false });
+        launches[t] = Launch({creator: msg.sender, raised: 0, sold: 0, graduated: false});
         isLaunch[t] = true;
         allLaunches.push(t);
-        emit LaunchCreated(t, msg.sender, name, symbol, meta);
+        emit LaunchCreated(t, msg.sender, _name, _symbol, _meta);
         return t;
+    }
+
+    function createLaunch(
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _meta
+    ) external returns (address) {
+        return _createLaunch(_name, _symbol, _meta);
     }
 
     function createToken(
-        string calldata name,
-        string calldata symbol,
-        string calldata meta
+        string calldata _name,
+        string calldata _symbol,
+        string calldata _meta
     ) external returns (address) {
-        TempoMemeToken token = new TempoMemeToken(name, symbol, address(this));
-        address t = address(token);
-        launches[t] = Launch({ creator: msg.sender, raised: 0, sold: 0, graduated: false });
-        isLaunch[t] = true;
-        allLaunches.push(t);
-        emit LaunchCreated(t, msg.sender, name, symbol, meta);
-        return t;
+        return _createLaunch(_name, _symbol, _meta);
     }
 
-    // ── 买入：输入 USDC，获得代币 ──
-    // xy=k: token_out = token_pool - k/(usdc_pool + net)
+    function getPrice(address t) public view returns (uint256) {
+        uint256 sold = launches[t].sold;
+        if (sold > SALE_CAP) sold = SALE_CAP;
+        uint256 r = (sold * WAD) / SALE_CAP;
+        return INIT_P + (PRICE_DELTA * r * r) / WAD / WAD;
+    }
+
     function buy(address t, uint256 usdcAmt) external nonReentrant {
-        require(isLaunch[t], "not a launch");
+        require(isLaunch[t]);
         Launch storage l = launches[t];
-        require(!l.graduated, "graduated");
+        require(!l.graduated);
 
         uint256 fee = usdcAmt * FEE / FEE_D;
         uint256 net = usdcAmt - fee;
-        require(net > 0, "too small");
+        uint256 out = net * PRICE_SCALE / getPrice(t);
 
-        // xy=k 计算
-        uint256 usdcPool  = VIRTUAL_USDC + l.raised;
-        uint256 tokenPool = VIRTUAL_TOKEN - l.sold;
-        uint256 k         = usdcPool * tokenPool;  // 注意：大数，需防溢出
-        uint256 newUsdcPool  = usdcPool + net;
-        uint256 newTokenPool = k / newUsdcPool;
-        uint256 tokensOut    = tokenPool - newTokenPool;
-
-        require(tokensOut > 0, "zero out");
-        require(l.sold + tokensOut <= GRAD_SOLD, "exceeds curve cap");
-
-        // 转入 USDC
-        require(USDC.transferFrom(msg.sender, address(this), usdcAmt), "usdc transfer failed");
-        // 转出代币
-        require(TempoMemeToken(t).transfer(msg.sender, tokensOut), "token transfer failed");
+        require(out > 0);
+        require(l.sold + out <= SALE_CAP);
+        require(USDC.transferFrom(msg.sender, address(this), usdcAmt));
+        require(TempoMemeToken(t).transfer(msg.sender, out));
 
         l.raised += net;
-        l.sold   += tokensOut;
+        l.sold += out;
         totalFees += fee;
 
-        emit TokenBought(t, msg.sender, usdcAmt, tokensOut);
+        emit TokenBought(t, msg.sender, usdcAmt, out);
 
-        // 毕业检查
-        if (l.sold >= GRAD_SOLD && !l.graduated) {
+        if (l.sold >= SALE_CAP) {
             l.graduated = true;
-            emit Graduated(t, l.raised, DEX_RESERVE);
+            emit Graduated(t);
         }
     }
 
-    // ── 卖出：输入代币，获得 USDC ──
-    // xy=k: usdc_out = usdc_pool - k/(token_pool + tokens_in)
     function sell(address t, uint256 tokenAmt) external nonReentrant {
-        require(isLaunch[t], "not a launch");
+        require(isLaunch[t]);
         Launch storage l = launches[t];
-        require(!l.graduated, "graduated");
-        require(l.raised > 0, "no liquidity");
+        require(!l.graduated);
+        require(l.raised > 0);
 
-        uint256 usdcPool  = VIRTUAL_USDC + l.raised;
-        uint256 tokenPool = VIRTUAL_TOKEN - l.sold;
-        uint256 k         = usdcPool * tokenPool;
-        uint256 newTokenPool = tokenPool + tokenAmt;
-        uint256 newUsdcPool  = k / newTokenPool;
-        uint256 usdcBack     = usdcPool - newUsdcPool;
+        uint256 back = tokenAmt * getPrice(t) / PRICE_SCALE;
+        uint256 fee = back * FEE / FEE_D;
+        uint256 out = back - fee;
 
-        uint256 fee = usdcBack * FEE / FEE_D;
-        uint256 out = usdcBack - fee;
-
-        require(out > 0, "zero out");
-        require(out <= l.raised, "insufficient pool");
-
-        // 转入代币
-        require(TempoMemeToken(t).transferFrom(msg.sender, address(this), tokenAmt), "token transfer failed");
-        // 转出 USDC
-        require(USDC.transfer(msg.sender, out), "usdc transfer failed");
+        require(out > 0 && out <= l.raised);
+        require(TempoMemeToken(t).transferFrom(msg.sender, address(this), tokenAmt));
+        require(USDC.transfer(msg.sender, out));
 
         l.raised -= out;
-        l.sold   -= tokenAmt;
+        if (l.sold >= tokenAmt) l.sold -= tokenAmt;
         totalFees += fee;
 
         emit TokenSold(t, msg.sender, tokenAmt, out);
     }
 
-    // ── 预估买入 ──
-    function estimateBuy(address t, uint256 usdcAmt) external view returns (uint256 tokensOut, uint256 fee) {
-        Launch storage l = launches[t];
+    function estimateBuy(address t, uint256 usdcAmt) external view returns (uint256 out, uint256 fee) {
         fee = usdcAmt * FEE / FEE_D;
-        uint256 net = usdcAmt - fee;
-        uint256 usdcPool  = VIRTUAL_USDC + l.raised;
-        uint256 tokenPool = VIRTUAL_TOKEN - l.sold;
-        uint256 k         = usdcPool * tokenPool;
-        uint256 newUsdcPool  = usdcPool + net;
-        uint256 newTokenPool = k / newUsdcPool;
-        tokensOut = tokenPool - newTokenPool;
+        out = (usdcAmt - fee) * PRICE_SCALE / getPrice(t);
     }
 
-    // ── 预估卖出 ──
-    function estimateSell(address t, uint256 tokenAmt) external view returns (uint256 usdcOut, uint256 fee) {
+    function estimateSell(address t, uint256 tokenAmt) external view returns (uint256 out, uint256 fee) {
+        uint256 back = tokenAmt * getPrice(t) / PRICE_SCALE;
+        fee = back * FEE / FEE_D;
+        out = back - fee;
+    }
+
+    function getLaunchCount() external view returns (uint256) {
+        return allLaunches.length;
+    }
+
+    function withdrawLaunchUSDC(address t, address to, uint256 amount) external onlyLaunchAdmin(t) {
         Launch storage l = launches[t];
-        uint256 usdcPool  = VIRTUAL_USDC + l.raised;
-        uint256 tokenPool = VIRTUAL_TOKEN - l.sold;
-        uint256 k         = usdcPool * tokenPool;
-        uint256 newTokenPool = tokenPool + tokenAmt;
-        uint256 newUsdcPool  = k / newTokenPool;
-        uint256 usdcBack     = usdcPool - newUsdcPool;
-        fee    = usdcBack * FEE / FEE_D;
-        usdcOut = usdcBack - fee;
+        require(l.graduated);
+        require(amount <= l.raised);
+        l.raised -= amount;
+        require(USDC.transfer(to, amount));
+        emit LaunchUsdcWithdrawn(t, to, amount);
     }
 
-    // ── 查询 ──
-    function getLaunchCount() external view returns (uint256) { return allLaunches.length; }
-
-    function getLaunchInfo(address t) external view returns (
-        address creator,
-        uint256 raised,
-        uint256 sold,
-        bool graduated,
-        uint256 price,
-        uint256 progress  // 售出进度 bps (10000 = 100%)
-    ) {
+    function withdrawLaunchTokens(address t, address to, uint256 amount) external onlyLaunchAdmin(t) {
         Launch storage l = launches[t];
-        creator    = l.creator;
-        raised     = l.raised;
-        sold       = l.sold;
-        graduated  = l.graduated;
-        price      = getPrice(t);
-        progress   = l.sold * 10000 / GRAD_SOLD;
+        require(l.graduated);
+        require(TempoMemeToken(t).transfer(to, amount));
+        emit LaunchTokensWithdrawn(t, to, amount);
     }
 
-    // ── 提取手续费 ──
     function withdrawFees() external onlyOwner {
         uint256 f = totalFees;
         totalFees = 0;
-        require(USDC.transfer(owner, f), "transfer failed");
-    }
-
-    // ── 毕业后提取剩余代币（迁移外盘用）──
-    function withdrawGraduatedTokens(address t, address to) external onlyOwner {
-        require(isLaunch[t], "not a launch");
-        require(launches[t].graduated, "not graduated");
-        uint256 bal = TempoMemeToken(t).balanceOf(address(this));
-        require(bal > 0, "no tokens");
-        require(TempoMemeToken(t).transfer(to, bal), "transfer failed");
-    }
-
-    // ── 毕业后提取募资 USDC（迁移外盘用）──
-    function withdrawGraduatedUSDC(address t, address to) external onlyOwner {
-        require(isLaunch[t], "not a launch");
-        require(launches[t].graduated, "not graduated");
-        uint256 raised = launches[t].raised;
-        require(raised > 0, "no usdc");
-        launches[t].raised = 0;
-        require(USDC.transfer(to, raised), "transfer failed");
-    }
-
-    // ── 转移 owner ──
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(newOwner != address(0));
-        owner = newOwner;
+        require(USDC.transfer(owner, f));
     }
 }

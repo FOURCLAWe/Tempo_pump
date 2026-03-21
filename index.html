@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tempo Pump</title>
+  <title>Tempomeme</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg">
+  <link rel="apple-touch-icon" href="/assets/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -37,6 +39,16 @@
     }
 
     h1, h2, h3 { font-family: "Space Grotesk", sans-serif; letter-spacing: -0.03em; }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes softPulse {
+      0%, 100% { box-shadow: 0 0 0 rgba(141,255,85,0); }
+      50% { box-shadow: 0 0 24px rgba(141,255,85,0.1); }
+    }
 
     .app {
       display: grid;
@@ -77,6 +89,16 @@
       background: linear-gradient(135deg, #acff84, #84ea4e);
       color: #071005;
       box-shadow: 0 10px 18px rgba(141,255,85,0.2);
+      overflow: hidden;
+      padding: 0;
+      background: #050505;
+    }
+
+    .brand-mark img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
     }
 
     .nav {
@@ -95,7 +117,7 @@
       transition: background 160ms ease, color 160ms ease;
     }
 
-    .nav-item:hover { background: rgba(255,255,255,0.04); }
+    .nav-item:hover { background: rgba(255,255,255,0.04); transform: translateX(4px); }
     .nav-item.active { background: rgba(255,255,255,0.05); color: var(--green); }
 
     .nav-icon { width: 18px; text-align: center; }
@@ -124,6 +146,7 @@
       font-size: 13px;
       font-weight: 700;
       text-decoration: none;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
     }
 
     .wallet-btn {
@@ -136,6 +159,7 @@
       font-size: 14px;
       font-weight: 900;
       cursor: pointer;
+      transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease;
     }
 
     .network-badge {
@@ -226,6 +250,7 @@
       color: var(--text);
       font-size: 13px;
       font-weight: 700;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
     }
 
     .page { padding: 18px 20px 28px; }
@@ -236,6 +261,7 @@
       border: 1px solid var(--line);
       border-radius: 18px;
       box-shadow: var(--shadow);
+      animation: riseIn 420ms ease both;
     }
 
     .hero {
@@ -282,6 +308,7 @@
       font-size: 14px;
       font-weight: 800;
       cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
     }
 
     .hero-btn {
@@ -306,6 +333,7 @@
       border-radius: 14px;
       background: var(--panel-2);
       border: 1px solid var(--line);
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
 
     .hero-card-label {
@@ -347,22 +375,39 @@
       overflow: hidden;
       border: 1px solid var(--line);
       background: var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
     }
 
     .search-input {
-      min-height: 46px;
+      min-height: 48px;
       border: none;
       background: transparent;
       color: var(--text);
-      padding: 0 14px;
-      font-size: 14px;
+      padding: 0 18px;
+      font-size: 15px;
       outline: none;
+      transition: box-shadow 180ms ease;
+    }
+
+    .search-input::placeholder {
+      color: #9aa393;
     }
 
     .search-btn {
       border: none;
       border-left: 1px solid var(--line);
       border-radius: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    }
+
+    .search-wrap:focus-within {
+      border-color: rgba(141,255,85,0.28);
+      background: #171a16;
+      box-shadow:
+        0 0 0 4px rgba(141,255,85,0.08),
+        0 18px 34px rgba(0,0,0,0.22);
+      transform: translateY(-1px);
     }
 
     .section-head {
@@ -401,12 +446,13 @@
       border-radius: 12px;
       background: var(--bg-soft);
       border: 1px solid var(--line);
-      transition: transform 160ms ease, border-color 160ms ease;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
 
     .token-card:hover {
-      transform: translateY(-1px);
+      transform: translateY(-2px);
       border-color: var(--green-line);
+      box-shadow: 0 20px 34px rgba(0,0,0,0.34);
     }
 
     .token-body {
@@ -428,6 +474,15 @@
       color: var(--green);
       font-size: 28px;
       font-weight: 900;
+    }
+
+    .token-media img {
+      transition: transform 240ms ease, filter 240ms ease;
+    }
+
+    .token-card:hover .token-media img {
+      transform: scale(1.04);
+      filter: saturate(1.06);
     }
 
     .token-title-row {
@@ -504,6 +559,7 @@
       height: 100%;
       border-radius: 999px;
       background: linear-gradient(90deg, #78db44, #aaff7d);
+      transition: width 0.45s ease;
     }
 
     .token-progress-meta {
@@ -530,6 +586,39 @@
 
     .mono {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    .wallet-btn:hover,
+    .hero-btn:hover,
+    .ghost-btn:hover,
+    .sort-btn:hover,
+    .search-btn:hover,
+    .sidebar-link:hover,
+    .pill:hover {
+      transform: translateY(-2px);
+      border-color: var(--green-line);
+    }
+
+    .wallet-btn:hover,
+    .hero-btn:hover {
+      filter: brightness(1.03);
+      box-shadow: 0 16px 28px rgba(141,255,85,0.16);
+    }
+
+    .hero-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--green-line);
+      animation: softPulse 2.2s ease-in-out infinite;
+    }
+
+    .search-input:focus { box-shadow: none; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
     }
 
     @media (max-width: 1100px) {
@@ -563,8 +652,8 @@
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-mark">✦</span>
-        <span>TEMPO</span>
+        <span class="brand-mark"><img src="/assets/logo.svg" alt="Tempomeme logo"></span>
+        <span>Tempomeme</span>
       </div>
 
       <nav class="nav">
@@ -585,7 +674,7 @@
       <div class="sidebar-foot">
         <button onclick="connectWallet()" id="connectBtn" class="wallet-btn">Connect Wallet</button>
         <div id="networkBadge" class="network-badge">Tempo Mainnet</div>
-        <a class="sidebar-link" href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer">𝕏 Official X</a>
+        <a class="sidebar-link" href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer">X</a>
       </div>
     </aside>
 
@@ -607,7 +696,7 @@
       <div class="page">
         <section id="home-panel" class="section panel hero">
           <div>
-            <div class="hero-kicker">Tempo Pump</div>
+            <div class="hero-kicker">Tempomeme</div>
             <h1 class="hero-title">Home</h1>
             <div class="hero-actions">
               <button onclick="window.location.href='/create'" class="hero-btn">Create Token</button>
@@ -657,7 +746,7 @@
     let allCards = [];
     let currentSort = "latest";
 
-    const LAUNCH_CONTRACT = "0x6C29C8D23600Fb0487436EEB8B22c082f59d9574";
+    const LAUNCH_CONTRACT = "0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4";
     const TEMPO_CHAIN = {
       chainId: "0x1079",
       chainName: "Tempo Mainnet",
@@ -824,7 +913,8 @@
             const localMeta = getLocalMeta(tokenAddr);
             const meta = eventMeta || localMeta || {};
             const raised = Number(ethers.formatUnits(info[1], 6));
-            const priceValue = Number(price) / 1e6;
+            const sold = Number(ethers.formatUnits(info[2], 18));
+            const priceValue = Number(ethers.formatUnits(price, 18));
             const supplyValue = Number(ethers.formatUnits(totalSupply, 18));
             const marketCapValue = priceValue * supplyValue;
             cards.push({
@@ -833,7 +923,7 @@
               symbol,
               raised,
               priceFormatted: priceValue.toFixed(8),
-              progress: Math.min((Number(ethers.formatUnits(info[2], 18)) / 800000000) * 100, 100).toFixed(1),
+              progress: Math.min((sold / 800000000) * 100, 100).toFixed(1),
               creatorShort: info[0].slice(0, 4) + "..." + info[0].slice(-6),
               marketCapValue,
               marketCapLabel: "$" + marketCapValue.toLocaleString(undefined, { maximumFractionDigits: 0 }),
