@@ -217,7 +217,7 @@
       "function getPrice(address tokenAddr) view returns (uint256)",
       "function estimateBuy(address tokenAddr, uint256 usdcAmount) view returns (uint256 tokensOut, uint256 fee)",
       "function estimateSell(address tokenAddr, uint256 tokenAmount) view returns (uint256 usdcOut, uint256 fee)",
-      "function launches(address) view returns (address token, address creator, uint256 raised, uint256 tokensSold, bool graduated)",
+      "function launches(address) view returns (address creator, uint256 raised, uint256 sold, bool graduated)",
       "function getLaunchCount() view returns (uint256)",
       "function allLaunches(uint256) view returns (address)",
       "event LaunchCreated(address indexed token, address indexed creator, string name)",
@@ -384,11 +384,11 @@
       try {
         const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, provider);
         const info = await launch.launches(tokenAddr);
-        const raised = Number(ethers.formatUnits(info.raised, 6));
+        const raised = Number(ethers.formatUnits(info[1], 6));
         simulatedRaised = raised;
         updateProgress();
         document.getElementById("totalRaised").textContent = `$${raised.toFixed(0)}`;
-        if (info.graduated) {
+        if (info[3]) {
           log(`🎓 项目已毕业！`, "purple");
         }
       } catch(e) {}
@@ -429,10 +429,10 @@
               launch.launches(tokenAddr),
               launch.getPrice(tokenAddr)
             ]);
-            const raised = Number(ethers.formatUnits(info.raised, 6));
+            const raised = Number(ethers.formatUnits(info[1], 6));
             const pct = Math.min((raised / 12000) * 100, 100).toFixed(1);
             const priceFormatted = (Number(price) / 1e12).toFixed(6);
-            cards.push({ tokenAddr, name, symbol, raised, pct, priceFormatted, graduated: info.graduated });
+            cards.push({ tokenAddr, name, symbol, raised, pct, priceFormatted, graduated: info[3] });
           } catch(e) {}
         }
 
