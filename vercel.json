@@ -3,6 +3,12 @@
   "builds": [
     { "src": "*.html", "use": "@vercel/static" }
   ],
+  "rewrites": [
+    { "source": "/token", "destination": "/token.html" },
+    { "source": "/tokens", "destination": "/tokens.html" },
+    { "source": "/rules", "destination": "/rules.html" },
+    { "source": "/create", "destination": "/create.html" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

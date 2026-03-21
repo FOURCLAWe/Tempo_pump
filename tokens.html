@@ -180,11 +180,11 @@
           <span class="nav-icon">⌂</span>
           <span class="nav-label">Home</span>
         </a>
-        <a href="/tokens.html" class="nav-item active">
+        <a href="/tokens" class="nav-item active">
           <span class="nav-icon">▦</span>
           <span class="nav-label">Tokens</span>
         </a>
-        <a href="/rules.html" class="nav-item">
+        <a href="/rules" class="nav-item">
           <span class="nav-icon">≡</span>
           <span class="nav-label">Rules</span>
         </a>
@@ -325,7 +325,7 @@
         return;
       }
       tokenListEl.innerHTML = cards.map((c) => `
-        <a href="/token.html?token=${c.tokenAddr}" class="token-card">
+        <a href="/token?token=${c.tokenAddr}" class="token-card">
           <div class="token-body">
             <div class="token-media">
               ${c.meta && c.meta.image

@@ -572,11 +572,11 @@
           <span class="nav-icon">⌂</span>
           <span class="nav-label">Home</span>
         </a>
-        <a href="/tokens.html" class="nav-item">
+        <a href="/tokens" class="nav-item">
           <span class="nav-icon">▦</span>
           <span class="nav-label">Tokens</span>
         </a>
-        <a href="/rules.html" class="nav-item">
+        <a href="/rules" class="nav-item">
           <span class="nav-icon">≡</span>
           <span class="nav-label">Rules</span>
         </a>
@@ -610,8 +610,8 @@
             <div class="hero-kicker">Tempo Pump</div>
             <h1 class="hero-title">Home</h1>
             <div class="hero-actions">
-              <button onclick="window.location.href='/create.html'" class="hero-btn">Create Token</button>
-              <button onclick="window.location.href='/tokens.html'" class="ghost-btn">View All Tokens</button>
+              <button onclick="window.location.href='/create'" class="hero-btn">Create Token</button>
+              <button onclick="window.location.href='/tokens'" class="ghost-btn">View All Tokens</button>
             </div>
           </div>
           <div class="hero-side">
@@ -744,7 +744,7 @@
       }
 
       tokenListEl.innerHTML = cards.map((c) => `
-        <a href="/token.html?token=${c.tokenAddr}" class="token-card">
+        <a href="/token?token=${c.tokenAddr}" class="token-card">
           <div class="token-body">
             <div class="token-media">
               ${c.meta && c.meta.image
