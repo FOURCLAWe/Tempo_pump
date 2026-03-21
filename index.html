@@ -170,17 +170,47 @@
     let simulatedRaised = 0;
     const TARGET = 12000;
 
+    const TEMPO_CHAIN = {
+      chainId: "0x316DB", // 202411 in hex
+      chainName: "Tempo",
+      nativeCurrency: { name: "pathUSD", symbol: "pathUSD", decimals: 18 },
+      rpcUrls: ["https://rpc.tempochain.com"],
+      blockExplorerUrls: ["https://explorer.tempochain.com"]
+    };
+
     async function connectWallet() {
       if (!window.ethereum) return log("请安装 MetaMask 或其他 EVM 钱包", "red");
       try {
+        // 请求连接钱包
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+
+        // 尝试切换到 Tempo Chain
+        try {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: TEMPO_CHAIN.chainId }]
+          });
+        } catch (switchErr) {
+          // 如果链不存在，自动添加
+          if (switchErr.code === 4902) {
+            await window.ethereum.request({
+              method: "wallet_addEthereumChain",
+              params: [TEMPO_CHAIN]
+            });
+          } else {
+            throw switchErr;
+          }
+        }
+
         provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
-        document.getElementById("connectBtn").innerHTML = 
+
+        document.getElementById("connectBtn").innerHTML =
           `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
         document.getElementById("networkBadge").classList.remove("hidden");
         log(`✅ 钱包已连接: ${userAddress}`, "green");
+        log(`✅ 已切换到 Tempo Chain (ChainID: 202411)`, "green");
       } catch(e) {
         log(`❌ 连接失败: ${e.message}`, "red");
       }
