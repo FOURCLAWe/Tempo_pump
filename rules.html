@@ -64,10 +64,13 @@
     .hero-kicker { color: var(--green); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; }
     .hero h1 { margin: 12px 0 10px; font-size: 46px; line-height: 0.96; }
     .hero p { color: var(--muted); font-size: 14px; line-height: 1.8; max-width: 680px; }
+    .hero p { margin: 0; }
     .rules-grid { display: grid; gap: 14px; }
     .rule-card { padding: 18px; border-radius: 16px; background: var(--bg-soft); border: 1px solid var(--line); }
     .rule-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
     .rule-copy { color: var(--muted); font-size: 14px; line-height: 1.8; }
+    .rule-list { margin: 10px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.8; }
+    .rule-list li + li { margin-top: 4px; }
     @media (max-width: 1100px) {
       .app { grid-template-columns: 1fr; }
       .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
@@ -112,24 +115,72 @@
         <section class="panel hero">
           <div class="hero-kicker">Tempo Pump</div>
           <h1>Rules</h1>
+          <p>This page explains how token creation, pricing, trading, rankings, and live data work across the site.</p>
         </section>
 
         <section class="rules-grid">
           <div class="rule-card">
-            <div class="rule-title">1. Creation</div>
-            <div class="rule-copy">Connect your wallet before creating a token. Submitting the form deploys a new launch project on-chain.</div>
+            <div class="rule-title">1. Token Creation</div>
+            <div class="rule-copy">Any connected wallet can create a new launch. Creating a token deploys a new on-chain meme token and registers it in the launch contract.</div>
+            <ul class="rule-list">
+              <li>The create form supports name, symbol, description, image, X link, and website.</li>
+              <li>Project metadata is stored in the launch event and used by the site to render token cards and detail pages.</li>
+              <li>New tokens appear in the Home and Tokens pages after the launch is indexed from chain data.</li>
+            </ul>
           </div>
           <div class="rule-card">
-            <div class="rule-title">2. Trading</div>
-            <div class="rule-copy">All trades are settled in USDC. Buy and sell actions follow the live on-chain pricing curve, and page data is read directly from chain state.</div>
+            <div class="rule-title">2. Trading and Settlement</div>
+            <div class="rule-copy">All trades on Tempo Pump are settled in USDC. Buy and sell actions interact directly with the launch contract.</div>
+            <ul class="rule-list">
+              <li>Buys use USDC and deliver token output based on the current curve price.</li>
+              <li>Sells return USDC based on the current curve price and available contract liquidity.</li>
+              <li>The protocol fee is 1% on both buy and sell transactions.</li>
+            </ul>
           </div>
           <div class="rule-card">
-            <div class="rule-title">3. Ranking</div>
-            <div class="rule-copy">Token lists can be sorted by creation order or market cap. Market cap is calculated from live on-chain price and total supply.</div>
+            <div class="rule-title">3. Curve and Graduation</div>
+            <div class="rule-copy">Pricing follows the launch contract curve. Each token progresses along the curve as net USDC is added through buys.</div>
+            <ul class="rule-list">
+              <li>Curve progress is displayed as a percentage of the graduation target.</li>
+              <li>The graduation target is 12,000 USDC.</li>
+              <li>When a token reaches the target, the launch is marked as graduated on-chain.</li>
+            </ul>
           </div>
           <div class="rule-card">
-            <div class="rule-title">4. Ticker</div>
-            <div class="rule-copy">The top ticker only shows real on-chain trades. If no live events are available, the site shows an empty live-trade state instead of fake activity.</div>
+            <div class="rule-title">4. Rankings and Token Lists</div>
+            <div class="rule-copy">The site provides token lists on the Home page and the dedicated Tokens page.</div>
+            <ul class="rule-list">
+              <li>Lists can be sorted by latest creation order or by market cap.</li>
+              <li>Market cap is derived from live price and token total supply.</li>
+              <li>Cards show live curve progress instead of raised USDC totals.</li>
+            </ul>
+          </div>
+          <div class="rule-card">
+            <div class="rule-title">5. Charts, Activity, and Holders</div>
+            <div class="rule-copy">Token detail pages use on-chain events to build the market view for each token.</div>
+            <ul class="rule-list">
+              <li>The price chart is generated from real TokenBought and TokenSold events.</li>
+              <li>Activity tables show only real on-chain trades.</li>
+              <li>Holder tables are derived from token Transfer events and current balances.</li>
+            </ul>
+          </div>
+          <div class="rule-card">
+            <div class="rule-title">6. Live Data Policy</div>
+            <div class="rule-copy">Tempo Pump does not fabricate market activity.</div>
+            <ul class="rule-list">
+              <li>The top ticker shows only real trades from chain events.</li>
+              <li>If no recent trades exist, the site shows an empty state instead of fake messages.</li>
+              <li>Wallet balances, prices, and token state are read from live contract data.</li>
+            </ul>
+          </div>
+          <div class="rule-card">
+            <div class="rule-title">7. User Responsibility</div>
+            <div class="rule-copy">Users are responsible for reviewing token information and transaction details before confirming any action.</div>
+            <ul class="rule-list">
+              <li>Always check wallet prompts, slippage expectations, and token amounts before signing.</li>
+              <li>On-chain transactions are final once confirmed.</li>
+              <li>Token creation and trading involve market risk, liquidity risk, and smart contract risk.</li>
+            </ul>
           </div>
         </section>
       </div>

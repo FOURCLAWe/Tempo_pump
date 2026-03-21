@@ -531,8 +531,8 @@
           <div id="marketCap" class="stat-value">-</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Raised</div>
-          <div id="raisedAmtTop" class="stat-value">$0</div>
+          <div class="stat-label">Curve Progress</div>
+          <div id="curveProgressTop" class="stat-value">0.0%</div>
         </div>
         <div class="stat-box">
           <div class="stat-label">Holders</div>
@@ -671,11 +671,11 @@
           </div>
 
           <div class="progress-wrap">
-            <div class="metric-row"><span>Raised</span><span id="raisedAmt">$0 Raised</span></div>
+            <div class="metric-row"><span>Curve Progress</span><span id="curveProgressLabel">0.0%</span></div>
             <div class="progress-track">
               <div id="progressFill" class="progress-fill" style="width:0%"></div>
             </div>
-            <div class="metric-row" style="margin-top:10px;"><span>Target</span><span>$12,000</span></div>
+            <div class="metric-row" style="margin-top:10px;"><span>Completion</span><span id="curveProgressBottom">0.0%</span></div>
           </div>
         </section>
       </aside>
@@ -863,10 +863,10 @@
         document.getElementById("currentPrice").textContent = priceValue.toFixed(8) + " USDC";
         document.getElementById("priceChange").textContent = info[3] ? "Graduated" : "Live Price";
         document.getElementById("marketCap").textContent = "$" + marketCap.toLocaleString(undefined, { maximumFractionDigits: 0 });
-        document.getElementById("raisedAmtTop").textContent = "$" + raised.toFixed(2);
-        document.getElementById("raisedAmt").textContent = "$" + raised.toFixed(2) + " Raised";
+        document.getElementById("curveProgressTop").textContent = pct + "%";
+        document.getElementById("curveProgressLabel").textContent = pct + "%";
+        document.getElementById("curveProgressBottom").textContent = pct + "%";
         document.getElementById("progressFill").style.width = pct + "%";
-        document.getElementById("progressPct").textContent = pct + "%";
         document.getElementById("graduatedStatus").textContent = info[3] ? "Graduated" : "Live";
         document.getElementById("graduatedBadge").style.display = info[3] ? "inline-flex" : "none";
 
