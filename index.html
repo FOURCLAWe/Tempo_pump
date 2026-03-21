@@ -167,15 +167,33 @@
   <script>
     let provider, signer, userAddress;
     const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
+    const LAUNCH_CONTRACT = "0x6ed41d12DB718972923Fd9E7e3271888a70B9E2c";
+    
+    const LAUNCH_ABI = [
+      "function createLaunch(string name, string symbol) returns (address)",
+      "function buy(address tokenAddr, uint256 usdcAmount)",
+      "function getPrice(address tokenAddr) view returns (uint256)",
+      "function launches(address) view returns (address token, address creator, uint256 raised, bool graduated)",
+      "function getLaunchCount() view returns (uint256)",
+      "event LaunchCreated(address indexed token, address indexed creator, string name)",
+      "event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut)",
+      "event LaunchGraduated(address indexed token)"
+    ];
+    
+    const USDC_ABI = [
+      "function approve(address spender, uint256 amount) returns (bool)",
+      "function allowance(address owner, address spender) view returns (uint256)",
+      "function balanceOf(address) view returns (uint256)"
+    ];
     let simulatedRaised = 0;
     const TARGET = 12000;
 
     const TEMPO_CHAIN = {
-      chainId: "0x316DB", // 202411 in hex
+      chainId: "0x1079", // 4217 in hex
       chainName: "Tempo",
       nativeCurrency: { name: "pathUSD", symbol: "pathUSD", decimals: 18 },
-      rpcUrls: ["https://rpc.tempochain.com"],
-      blockExplorerUrls: ["https://explorer.tempochain.com"]
+      rpcUrls: ["https://rpc.tempo.xyz"],
+      blockExplorerUrls: ["https://explorer.tempo.xyz"]
     };
 
     async function connectWallet() {
@@ -219,17 +237,32 @@
     async function createLaunch() {
       const name = document.getElementById("name").value;
       const symbol = document.getElementById("symbol").value;
-      const contract = document.getElementById("contractAddr").value;
       if (!name || !symbol) return log("❌ 请填写代币名称和符号", "red");
       if (!userAddress) return log("❌ 请先连接钱包", "red");
-      log(`🚀 正在创建发射: ${name} (${symbol})...`);
-      await sleep(1000);
-      const fakeAddr = "0x" + Math.random().toString(16).slice(2, 42).padEnd(40, "0");
-      log(`✅ 代币地址: ${fakeAddr}`, "green");
-      log(`✅ 项目创建成功！等待用户购买...`, "green");
-      document.getElementById("totalLaunches").textContent = 
-        parseInt(document.getElementById("totalLaunches").textContent) + 1;
-      document.getElementById("tokenAddr").value = fakeAddr;
+      try {
+        log(`🚀 正在创建发射: ${name} (${symbol})...`);
+        const contract = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
+        const tx = await contract.createLaunch(name, symbol);
+        log(`⏳ 交易已发送: ${tx.hash}`);
+        const receipt = await tx.wait();
+        // 从事件中获取代币地址
+        const iface = new ethers.Interface(LAUNCH_ABI);
+        let tokenAddr = '';
+        for (const log2 of receipt.logs) {
+          try {
+            const parsed = iface.parseLog(log2);
+            if (parsed.name === 'LaunchCreated') {
+              tokenAddr = parsed.args.token;
+            }
+          } catch(e) {}
+        }
+        log(`✅ 代币地址: ${tokenAddr}`, "green");
+        log(`✅ 项目创建成功！`, "green");
+        document.getElementById("tokenAddr").value = tokenAddr;
+        await refreshStats();
+      } catch(e) {
+        log(`❌ 创建失败: ${e.message}`, "red");
+      }
     }
 
     async function buyTokens() {
@@ -238,23 +271,52 @@
       if (!tokenAddr) return log("❌ 请填写代币地址", "red");
       if (!amount || amount <= 0) return log("❌ 请输入购买数量", "red");
       if (!userAddress) return log("❌ 请先连接钱包", "red");
-      const fee = amount * 0.01;
-      const afterFee = amount - fee;
-      log(`💰 正在购买 ${amount} USDC 的代币...`);
-      log(`📊 手续费: ${fee.toFixed(2)} USDC`);
-      await sleep(800);
-      simulatedRaised += afterFee;
-      if (simulatedRaised > TARGET) simulatedRaised = TARGET;
-      updateProgress();
-      const tokens = (afterFee * 1e18 / getCurrentSimPrice()).toFixed(2);
-      log(`✅ 购买成功！获得 ${tokens} 代币`, "green");
-      document.getElementById("totalRaised").textContent = 
-        `$${simulatedRaised.toFixed(0)}`;
-      if (simulatedRaised >= TARGET) {
-        log(`🎓 恭喜！项目已达到毕业条件！正在创建流动性...`, "purple");
-        document.getElementById("graduated").textContent = 
-          parseInt(document.getElementById("graduated").textContent) + 1;
+      try {
+        const usdcAmount = ethers.parseUnits(amount.toString(), 6);
+        const usdc = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
+        
+        // 检查 allowance
+        const allowance = await usdc.allowance(userAddress, LAUNCH_CONTRACT);
+        if (allowance < usdcAmount) {
+          log(`🔓 正在 approve USDC...`);
+          const approveTx = await usdc.approve(LAUNCH_CONTRACT, usdcAmount);
+          await approveTx.wait();
+          log(`✅ Approve 成功`, "green");
+        }
+        
+        log(`💰 正在购买 ${amount} USDC 的代币...`);
+        const tx = await launch.buy(tokenAddr, usdcAmount);
+        log(`⏳ 交易已发送: ${tx.hash}`);
+        await tx.wait();
+        log(`✅ 购买成功！`, "green");
+        await refreshLaunchInfo(tokenAddr);
+        await refreshStats();
+      } catch(e) {
+        log(`❌ 购买失败: ${e.message}`, "red");
       }
+    }
+
+    async function refreshLaunchInfo(tokenAddr) {
+      try {
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, provider);
+        const info = await launch.launches(tokenAddr);
+        const raised = Number(ethers.formatUnits(info.raised, 6));
+        simulatedRaised = raised;
+        updateProgress();
+        document.getElementById("totalRaised").textContent = `$${raised.toFixed(0)}`;
+        if (info.graduated) {
+          log(`🎓 项目已毕业！`, "purple");
+        }
+      } catch(e) {}
+    }
+
+    async function refreshStats() {
+      try {
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, provider);
+        const count = await launch.getLaunchCount();
+        document.getElementById("totalLaunches").textContent = count.toString();
+      } catch(e) {}
     }
 
     function getCurrentSimPrice() {
