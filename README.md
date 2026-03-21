@@ -1,27 +1,46 @@
-# Tempo Pump 🚀
+# Tempomeme
 
-> Fair Launch Platform on Tempo Chain
+Tempomeme is a meme launchpad built on Tempo Mainnet.
 
-一个类似 Four.meme 的 meme 代币发射台，专为 Tempo 链设计。
+It combines:
+- a `TempoUSDCLaunch` contract for token creation, curve trading, fees, and graduation
+- a static multi-page frontend for market browsing, token creation, token detail, and docs
+- Vercel rewrites for clean routes like `/token?token=...`
 
-## 特点
+## Docs
 
-- 使用 USDC 支付（需 approve）
-- 改进型指数曲线（初始 $4k → 毕业 $65k）
-- 打满需注入 12,000 USDC
-- 平台手续费 1%
-- 自动毕业并创建流动性池
+Project documentation lives here:
 
-## 网络信息
+- [docs/overview.md](/Users/xiaoyu/Documents/New%20project/Tempo_pump/docs/overview.md)
 
-- **Chain**: Tempo Chain
-- **ChainID**: 202411
-- **USDC**: `0x20c000000000000000000000b9537d11c60e8b50`
+## Current Network
 
-## 使用方法
+- Chain: `Tempo Mainnet`
+- Chain ID: `4217`
+- USDC: `0x20c000000000000000000000b9537d11c60e8b50`
+- Primary launch contract: `0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4`
 
-访问测试网站，连接钱包即可开始测试。
+## Frontend Routes
 
-## 合约
+- `/`
+- `/tokens`
+- `/create`
+- `/token?token=<token-address>`
 
-部署后更新合约地址。
+## Local Preview
+
+From the project root:
+
+```bash
+python3 -m http.server 4175
+```
+
+Then open:
+
+```text
+http://127.0.0.1:4175/
+```
+
+## Notes
+
+- The current primary contract uses an `80%` internal sale cap and manual post-graduation withdrawal for external LP setup.

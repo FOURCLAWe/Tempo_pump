@@ -195,6 +195,48 @@
       font-size: 13px;
     }
 
+    .token-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .token-links[hidden] {
+      display: none !important;
+    }
+
+    .token-link {
+      min-height: 34px;
+      padding: 0 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(180deg, rgba(22,24,21,0.96), rgba(12,13,12,0.98));
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, color 180ms ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .token-link:hover {
+      transform: translateY(-2px);
+      border-color: rgba(232,191,82,0.2);
+      box-shadow: 0 16px 30px rgba(232,191,82,0.14);
+      color: var(--green);
+    }
+
+    .token-link-label {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
     .price-box {
@@ -467,6 +509,109 @@
       border: 1px solid rgba(255,255,255,0.07);
     }
 
+    .interactive-trade {
+      --trade-accent: var(--green);
+      --trade-soft: rgba(151,255,93,0.14);
+      --trade-line: rgba(151,255,93,0.26);
+      --trade-glow: rgba(151,255,93,0.22);
+    }
+
+    .interactive-trade.trade-mode-sell {
+      --trade-accent: var(--red);
+      --trade-soft: rgba(255,143,128,0.14);
+      --trade-line: rgba(255,143,128,0.24);
+      --trade-glow: rgba(255,143,128,0.18);
+    }
+
+    .interactive-trade::after {
+      content: "";
+      position: absolute;
+      inset: auto -70px -90px auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 999px;
+      background: var(--trade-glow);
+      filter: blur(56px);
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .interactive-trade .section-title,
+    .interactive-trade .field label {
+      color: var(--trade-accent);
+    }
+
+    .interactive-trade .tab-btn {
+      border-color: var(--trade-line);
+      color: var(--trade-accent);
+      background: linear-gradient(180deg, rgba(15,17,15,0.98), rgba(9,10,9,0.99));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .interactive-trade .tab-btn.active {
+      background: linear-gradient(180deg, var(--trade-soft), rgba(255,255,255,0.02));
+      border-color: var(--trade-line);
+      color: var(--trade-accent);
+      box-shadow: 0 14px 30px var(--trade-glow), inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .interactive-trade .preset-btn {
+      border-color: var(--trade-line);
+      color: var(--trade-accent);
+      background: linear-gradient(180deg, rgba(20,22,20,0.98), rgba(11,12,11,0.99));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    .interactive-trade .preset-btn.active {
+      background: linear-gradient(180deg, var(--trade-soft), rgba(255,255,255,0.03));
+      border-color: var(--trade-line);
+      box-shadow: 0 12px 26px var(--trade-glow), inset 0 1px 0 rgba(255,255,255,0.04);
+      transform: translateY(-1px);
+    }
+
+    .interactive-trade .metric-row {
+      border-color: rgba(255,255,255,0.04);
+    }
+
+    .interactive-trade .metric-row span:first-child {
+      color: var(--trade-accent);
+      opacity: 0.88;
+    }
+
+    .interactive-trade .input {
+      border-color: rgba(255,255,255,0.08);
+      background:
+        linear-gradient(180deg, rgba(11,12,11,0.98), rgba(8,9,8,1)),
+        linear-gradient(90deg, var(--trade-soft), transparent 40%);
+      background-blend-mode: normal;
+    }
+
+    .interactive-trade .input:focus {
+      box-shadow: 0 0 0 4px var(--trade-soft), 0 14px 30px var(--trade-glow);
+      border-color: var(--trade-line);
+    }
+
+    .interactive-trade.trade-mode-buy .trade-action.buy {
+      background: linear-gradient(135deg, #b6ff89, #70ea2d);
+      color: #081004;
+      box-shadow: 0 18px 34px rgba(151,255,93,0.28);
+      border: none;
+    }
+
+    .interactive-trade.trade-mode-sell .trade-action.sell {
+      background: linear-gradient(135deg, #ffb3a8, #ff7364);
+      color: #240907;
+      box-shadow: 0 18px 34px rgba(255,143,128,0.24);
+      border: none;
+    }
+
+    .trade-status {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
     .progress-wrap {
       padding: 16px;
       border-radius: 18px;
@@ -524,6 +669,12 @@
     .pill:hover, .link-btn:hover, .chart-tool:hover, .tab-btn:hover, .preset-btn:hover {
       transform: translateY(-2px);
       border-color: rgba(232,191,82,0.16);
+    }
+
+    .interactive-trade .tab-btn:hover,
+    .interactive-trade .preset-btn:hover {
+      border-color: var(--trade-line);
+      box-shadow: 0 10px 24px var(--trade-glow);
     }
 
     .trade-action:hover {
@@ -624,6 +775,7 @@
             <span id="tokenAddr" class="mono"></span>
             <span id="creatorAddr" class="mono"></span>
           </div>
+          <div id="tokenLinks" class="token-links" hidden></div>
         </div>
         <div class="price-box">
           <div id="tokenPrice" class="price-main">-.--</div>
@@ -727,7 +879,7 @@
       </div>
 
       <aside class="right-stack">
-        <section class="panel trade-panel">
+        <section id="tradePanel" class="panel trade-panel interactive-trade trade-mode-buy">
           <div class="section-head">
             <div class="section-title">Trade</div>
           </div>
@@ -745,19 +897,19 @@
 
             <div class="field">
               <label id="amountLabel" for="tradeAmount">Buy Amount (USDC)</label>
-              <input id="tradeAmount" class="input" type="number" value="100" oninput="updateTradeEstimate()">
+              <input id="tradeAmount" class="input" type="number" min="0" step="any" value="100" oninput="handleTradeAmountInput()">
             </div>
 
             <div id="buyPresetRow" class="preset-row">
-              <button class="preset-btn" onclick="setPreset(10)">10</button>
-              <button class="preset-btn" onclick="setPreset(100)">100</button>
-              <button class="preset-btn" onclick="setPreset(500)">500</button>
+              <button class="preset-btn" data-preset="10" onclick="setPreset(10, this)">10</button>
+              <button class="preset-btn active" data-preset="100" onclick="setPreset(100, this)">100</button>
+              <button class="preset-btn" data-preset="500" onclick="setPreset(500, this)">500</button>
             </div>
 
             <div id="sellPercentRow" class="preset-row" style="display:none;">
-              <button class="preset-btn" onclick="setSellPercent(25)">25%</button>
-              <button class="preset-btn" onclick="setSellPercent(50)">50%</button>
-              <button class="preset-btn" onclick="setSellPercent(100)">100%</button>
+              <button class="preset-btn" data-percent="25" onclick="setSellPercent(25, this)">25%</button>
+              <button class="preset-btn" data-percent="50" onclick="setSellPercent(50, this)">50%</button>
+              <button class="preset-btn" data-percent="100" onclick="setSellPercent(100, this)">100%</button>
             </div>
 
             <div class="metric-list">
@@ -767,6 +919,7 @@
             </div>
 
             <button id="tradeActionBtn" onclick="submitTrade()" class="trade-action buy">Buy</button>
+            <div id="tradeStatus" class="trade-status"></div>
           </div>
         </section>
 
@@ -791,9 +944,6 @@
   <script>
     const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
     const PRIMARY_LAUNCH_CONTRACT = "0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4";
-    const SECONDARY_LAUNCH_CONTRACT = "0x021436C2d4CCc121CA4fFB83710305268DB0Eb36";
-    const TERTIARY_LAUNCH_CONTRACT = "0x641a724618dcf75F27367Ba4e67A2501ba0A21A3";
-    const LEGACY_LAUNCH_CONTRACT = "0x9571aFb3Fe4a2b6C47D441c7b37f50Ef3A71023F";
     const LAUNCH_ABI = [
       "function buy(address tokenAddr, uint256 usdcAmount)",
       "function sell(address tokenAddr, uint256 tokenAmount)",
@@ -828,12 +978,13 @@
       blockExplorerUrls: ["https://explore.mainnet.tempo.xyz"]
     };
     const SUPPLY_RAW = 1000000000n * 10n ** 18n;
+    const SALE_CAP_RAW = 800000000n * 10n ** 18n;
     const PRICE_RATIO_SCALE = 10n ** 18n;
     const PRICE_DENOM = 10n ** 18n;
-    const INIT_PRICE_RAW = 4n * 10n ** 12n;
-    const SLOPE_RAW = 12000n * 10n ** 12n;
+    const PRIMARY_INIT_PRICE_RAW = 3n * 10n ** 12n;
+    const PRIMARY_PRICE_DELTA_RAW = 62n * 10n ** 12n;
 
-    let provider, signer, userAddress, priceChart, candleSeries, chartResizeObserver;
+    let provider, signer, userAddress, priceChart, candleSeries, volumeSeries, chartResizeObserver;
     let tradeMode = "buy";
     let chartInterval = "1m";
     let latestTrades = [];
@@ -843,27 +994,25 @@
     const blockCache = new Map();
 
     function launchCandidates() {
-      return [
-        { address: PRIMARY_LAUNCH_CONTRACT, version: "v2" },
-        { address: SECONDARY_LAUNCH_CONTRACT, version: "v2" },
-        { address: TERTIARY_LAUNCH_CONTRACT, version: "v2" },
-        { address: LEGACY_LAUNCH_CONTRACT, version: "v1" }
-      ];
+      return [{ address: PRIMARY_LAUNCH_CONTRACT, version: "v2" }];
     }
 
-    function hasLaunchData(info) {
-      return info && (
-        info[0] !== ethers.ZeroAddress ||
-        info[1] > 0n ||
-        info[2] > 0n ||
-        info[3] === true
-      );
+    function getCurveModel(context) {
+      const address = context?.address?.toLowerCase();
+      if (!address) return null;
+      if (address === PRIMARY_LAUNCH_CONTRACT.toLowerCase()) {
+        return {
+          type: "sale-cap-quadratic",
+          initPriceRaw: PRIMARY_INIT_PRICE_RAW,
+          priceDeltaRaw: PRIMARY_PRICE_DELTA_RAW,
+          denominatorRaw: SALE_CAP_RAW
+        };
+      }
+      return null;
     }
 
-    function parseLaunchPrice(priceRaw, version) {
-      return version === "v1"
-        ? Number(ethers.formatUnits(priceRaw, 6))
-        : Number(ethers.formatUnits(priceRaw, 18));
+    function parseLaunchPrice(priceRaw) {
+      return Number(ethers.formatUnits(priceRaw, 18));
     }
 
     async function queryFilterChunked(contract, filter, fromBlock, toBlock, chunkSize = 4000) {
@@ -880,19 +1029,6 @@
       if (launchContextPromise) return launchContextPromise;
       launchContextPromise = (async () => {
         const latestBlock = await provider.getBlockNumber();
-
-        for (const candidate of launchCandidates()) {
-          const launch = new ethers.Contract(candidate.address, LAUNCH_ABI, provider);
-          const info = await launch.launches(tokenAddress);
-          if (!hasLaunchData(info)) continue;
-
-          return {
-            ...candidate,
-            launch,
-            createdBlock: Math.max(0, latestBlock - 20000)
-          };
-        }
-
         return {
           address: PRIMARY_LAUNCH_CONTRACT,
           version: "v2",
@@ -962,6 +1098,20 @@
         }
       });
 
+      volumeSeries = priceChart.addHistogramSeries({
+        priceFormat: { type: "volume" },
+        priceScaleId: "volume",
+        lastValueVisible: false,
+        priceLineVisible: false
+      });
+
+      priceChart.priceScale("volume").applyOptions({
+        scaleMargins: {
+          top: 0.8,
+          bottom: 0.02
+        }
+      });
+
       const resize = () => {
         const rect = container.getBoundingClientRect();
         priceChart.applyOptions({ width: Math.max(280, Math.floor(rect.width)), height: Math.max(320, Math.floor(rect.height)) });
@@ -1010,8 +1160,90 @@
       } catch (e) {}
     }
 
+    function setTradeStatus(message = "", tone = "muted") {
+      const el = document.getElementById("tradeStatus");
+      if (!el) return;
+      el.textContent = message;
+      if (tone === "error") el.style.color = "#ffb0a3";
+      else if (tone === "success") el.style.color = "#d9ffc7";
+      else el.style.color = "#879082";
+    }
+
+    function normalizeDecimalInput(value) {
+      const raw = String(value ?? "").trim();
+      if (!raw) return "";
+      if (/[eE]/.test(raw)) return null;
+      if (!/^\d*\.?\d*$/.test(raw)) return null;
+      if (raw === "." || raw === "0.") return "0";
+      if (raw.endsWith(".")) return raw.slice(0, -1);
+      return raw;
+    }
+
+    function parseTradeAmount(amount, decimals) {
+      const normalized = normalizeDecimalInput(amount);
+      if (normalized === null || normalized === "") return null;
+      try {
+        return ethers.parseUnits(normalized, decimals);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function normalizeExternalUrl(url) {
+      const raw = String(url || "").trim();
+      if (!raw) return "";
+      const withProtocol = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(raw) ? raw : `https://${raw}`;
+      try {
+        return new URL(withProtocol).toString();
+      } catch (e) {
+        return "";
+      }
+    }
+
+    function renderTokenLinks(meta = {}) {
+      const wrap = document.getElementById("tokenLinks");
+      if (!wrap) return;
+      const links = [];
+      const websiteUrl = normalizeExternalUrl(meta.website);
+      const twitterUrl = normalizeExternalUrl(meta.twitter);
+
+      if (websiteUrl) {
+        links.push(`<a class="token-link" href="${websiteUrl}" target="_blank" rel="noopener noreferrer"><span class="token-link-label">Web</span><span>Website</span></a>`);
+      }
+      if (twitterUrl) {
+        links.push(`<a class="token-link" href="${twitterUrl}" target="_blank" rel="noopener noreferrer"><span class="token-link-label">X</span><span>Profile</span></a>`);
+      }
+
+      if (!links.length) {
+        wrap.innerHTML = "";
+        wrap.hidden = true;
+        return;
+      }
+
+      wrap.innerHTML = links.join("");
+      wrap.hidden = false;
+    }
+
+    function clearPresetActive(rowId) {
+      document.querySelectorAll(`#${rowId} .preset-btn`).forEach((button) => button.classList.remove("active"));
+    }
+
+    function setPresetActive(rowId, buttonEl) {
+      clearPresetActive(rowId);
+      if (buttonEl) buttonEl.classList.add("active");
+    }
+
+    function handleTradeAmountInput() {
+      if (tradeMode === "buy") clearPresetActive("buyPresetRow");
+      else clearPresetActive("sellPercentRow");
+      updateTradeEstimate();
+    }
+
     function setTradeMode(mode) {
       tradeMode = mode;
+      const panel = document.getElementById("tradePanel");
+      panel.classList.toggle("trade-mode-buy", mode === "buy");
+      panel.classList.toggle("trade-mode-sell", mode === "sell");
       document.getElementById("buyTab").classList.toggle("active", mode === "buy");
       document.getElementById("sellTab").classList.toggle("active", mode === "sell");
       document.getElementById("amountLabel").textContent = mode === "buy" ? "Buy Amount (USDC)" : "Sell Amount (Tokens)";
@@ -1022,15 +1254,23 @@
       btn.textContent = mode === "buy" ? "Buy" : "Sell";
       btn.className = `trade-action ${mode}`;
       document.getElementById("tradeAmount").value = mode === "buy" ? "100" : "";
+      clearPresetActive("buyPresetRow");
+      clearPresetActive("sellPercentRow");
+      if (mode === "buy") {
+        document.querySelector('#buyPresetRow .preset-btn[data-preset="100"]')?.classList.add("active");
+      }
+      setTradeStatus("");
       updateTradeEstimate();
     }
 
-    function setPreset(value) {
+    function setPreset(value, buttonEl) {
+      setPresetActive("buyPresetRow", buttonEl);
       document.getElementById("tradeAmount").value = value;
+      setTradeStatus("");
       updateTradeEstimate();
     }
 
-    async function setSellPercent(percent) {
+    async function setSellPercent(percent, buttonEl) {
       if (tradeMode !== "sell") return;
       if (!userAddress) return;
       try {
@@ -1038,7 +1278,9 @@
         const balance = await token.balanceOf(userAddress);
         const balanceFloat = Number(ethers.formatUnits(balance, 18));
         const value = balanceFloat * (percent / 100);
+        setPresetActive("sellPercentRow", buttonEl);
         document.getElementById("tradeAmount").value = value > 0 ? value.toFixed(6).replace(/\.?0+$/, "") : "0";
+        setTradeStatus("");
         updateTradeEstimate();
       } catch (e) {
         console.error(e);
@@ -1067,13 +1309,14 @@
         document.getElementById("tokenSymbol").textContent = symbol;
         document.getElementById("tokenAddr").textContent = tokenAddress;
         document.getElementById("creatorAddr").textContent = info[0] ? `Creator ${info[0].slice(0, 6)}...${info[0].slice(-4)}` : "";
+        renderTokenLinks(meta);
         if (meta.image) {
           document.getElementById("tokenIcon").innerHTML = `<img src="${meta.image}" class="w-full h-full object-cover" onerror="this.parentElement.textContent='${symbol.slice(0,2).toUpperCase()}'">`;
         } else {
           document.getElementById("tokenIcon").textContent = symbol.slice(0, 2).toUpperCase();
         }
 
-        const priceValue = parseLaunchPrice(price, context.version);
+        const priceValue = parseLaunchPrice(price);
         const sold = Number(ethers.formatUnits(info[2], 18));
         const pct = Math.min((sold / 800000000) * 100, 100).toFixed(1);
         const totalSupplyValue = Number(ethers.formatUnits(totalSupply, 18));
@@ -1173,6 +1416,8 @@
 
             const grossUsdc = isBuy ? usdc : usdc / 0.99;
             const executionPrice = tokenAmt > 0 ? grossUsdc / tokenAmt : 0;
+            const markPrice = getMarkPriceFromSoldRaw(runningSoldRaw, context);
+            const chartPrice = Number.isFinite(markPrice) && markPrice > 0 ? markPrice : executionPrice;
 
             return {
               wallet,
@@ -1181,7 +1426,9 @@
               tokenAmt,
               blockNumber: ev.blockNumber,
               timestamp: Number(block.timestamp),
-              price: executionPrice,
+              executionPrice,
+              markPrice,
+              chartPrice,
               soldRaw: runningSoldRaw
             };
           })
@@ -1210,10 +1457,24 @@
       }
     }
 
-    function getCurvePriceFromSoldRaw(soldRaw) {
-      const r = soldRaw * PRICE_RATIO_SCALE / SUPPLY_RAW;
-      const priceRaw = INIT_PRICE_RAW + (SLOPE_RAW * r * r) / PRICE_DENOM / PRICE_DENOM;
-      return Number(ethers.formatUnits(priceRaw, 18));
+    function getMarkPriceFromSoldRaw(soldRaw, context) {
+      const model = getCurveModel(context);
+      if (!model) return null;
+
+      const cappedSold = soldRaw > model.denominatorRaw ? model.denominatorRaw : soldRaw;
+      const ratio = (cappedSold * PRICE_RATIO_SCALE) / model.denominatorRaw;
+
+      if (model.type === "sale-cap-quadratic") {
+        const priceRaw = model.initPriceRaw + (model.priceDeltaRaw * ratio * ratio) / PRICE_DENOM / PRICE_DENOM;
+        return Number(ethers.formatUnits(priceRaw, 18));
+      }
+
+      if (model.type === "supply-ratio-quadratic") {
+        const priceRaw = model.initPriceRaw + (model.slopeRaw * ratio * ratio) / PRICE_DENOM / PRICE_DENOM;
+        return Number(ethers.formatUnits(priceRaw, 18));
+      }
+
+      return null;
     }
 
     async function getBlockCached(blockNumber) {
@@ -1241,12 +1502,15 @@
       };
       const intervalSeconds = intervalSecondsMap[interval] || 60;
       const validTrades = [...trades]
-        .filter((t) => Number.isFinite(t.price) && t.price > 0 && Number.isFinite(t.timestamp))
+        .filter((t) => Number.isFinite(t.chartPrice) && t.chartPrice > 0 && Number.isFinite(t.timestamp))
         .sort((a, b) => a.timestamp - b.timestamp);
 
       if (!validTrades.length) return [];
 
+      const firstBucket = Math.floor(validTrades[0].timestamp / intervalSeconds) * intervalSeconds;
+      const lastBucket = Math.floor(validTrades[validTrades.length - 1].timestamp / intervalSeconds) * intervalSeconds;
       const buckets = new Map();
+
       for (const trade of validTrades) {
         const bucketStart = Math.floor(trade.timestamp / intervalSeconds) * intervalSeconds;
         if (!buckets.has(bucketStart)) {
@@ -1255,19 +1519,41 @@
         buckets.get(bucketStart).push(trade);
       }
 
-      return [...buckets.entries()]
-        .sort((a, b) => a[0] - b[0])
-        .map(([bucketStart, items]) => {
-          const prices = items.map((item) => item.price);
-          return {
+      const bars = [];
+      let previousClose = null;
+
+      for (let bucketStart = firstBucket; bucketStart <= lastBucket; bucketStart += intervalSeconds) {
+        const items = buckets.get(bucketStart) || [];
+
+        if (items.length) {
+          const prices = items.map((item) => item.chartPrice);
+          const open = previousClose ?? prices[0];
+          const close = prices[prices.length - 1];
+          const high = Math.max(open, ...prices);
+          const low = Math.min(open, ...prices);
+          const volume = items.reduce((sum, item) => sum + item.usdc, 0);
+          bars.push({
             timestamp: bucketStart,
-            open: prices[0],
-            high: Math.max(...prices),
-            low: Math.min(...prices),
-            close: prices[prices.length - 1],
-            volume: items.reduce((sum, item) => sum + item.usdc, 0)
-          };
-        });
+            open,
+            high,
+            low,
+            close,
+            volume
+          });
+          previousClose = close;
+        } else if (previousClose !== null) {
+          bars.push({
+            timestamp: bucketStart,
+            open: previousClose,
+            high: previousClose,
+            low: previousClose,
+            close: previousClose,
+            volume: 0
+          });
+        }
+      }
+
+      return bars;
     }
 
     function updateTradeChart(trades) {
@@ -1277,6 +1563,7 @@
         document.getElementById("ohlcBar").innerHTML = "<span>No chart data</span>";
         document.getElementById("chartPrice").textContent = "-.--";
         if (candleSeries) candleSeries.setData([]);
+        if (volumeSeries) volumeSeries.setData([]);
         return;
       }
 
@@ -1288,6 +1575,13 @@
         close: item.close
       }));
       candleSeries.setData(candles);
+      if (volumeSeries) {
+        volumeSeries.setData(grouped.map((item) => ({
+          time: Math.floor(item.timestamp),
+          value: item.volume,
+          color: item.close >= item.open ? "rgba(141,255,85,0.36)" : "rgba(255,143,128,0.36)"
+        })));
+      }
       priceChart.timeScale().fitContent();
       priceChart.applyOptions({
         timeScale: {
@@ -1366,19 +1660,40 @@
 
     async function updateTradeEstimate() {
       const amount = document.getElementById("tradeAmount").value;
-      if (!amount || !tokenAddress) return;
+      if (!amount || !tokenAddress) {
+        setTradeStatus("");
+        return;
+      }
       try {
         const { launch } = await getLaunchContext();
         if (tradeMode === "buy") {
-          const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, ethers.parseUnits(amount, 6));
+          const parsedAmount = parseTradeAmount(amount, 6);
+          if (!parsedAmount || parsedAmount <= 0n) {
+            document.getElementById("tradeEstimate").textContent = "-.--";
+            document.getElementById("tradeFee").textContent = "-.--";
+            setTradeStatus("Enter a valid USDC amount.", "error");
+            return;
+          }
+          const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, parsedAmount);
           document.getElementById("tradeEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " tokens";
           document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+          setTradeStatus(tokensOut > 0n ? "" : "Amount too small for this trade.", tokensOut > 0n ? "muted" : "error");
         } else {
-          const [usdcOut, fee] = await launch.estimateSell(tokenAddress, ethers.parseUnits(amount || "0", 18));
+          const parsedAmount = parseTradeAmount(amount, 18);
+          if (!parsedAmount || parsedAmount <= 0n) {
+            document.getElementById("tradeEstimate").textContent = "-.--";
+            document.getElementById("tradeFee").textContent = "-.--";
+            setTradeStatus("Enter a valid token amount.", "error");
+            return;
+          }
+          const [usdcOut, fee] = await launch.estimateSell(tokenAddress, parsedAmount);
           document.getElementById("tradeEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " USDC";
           document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+          setTradeStatus(usdcOut > 0n ? "" : "Sell amount is too small. Increase the amount and try again.", usdcOut > 0n ? "muted" : "error");
         }
-      } catch (e) {}
+      } catch (e) {
+        setTradeStatus("Unable to estimate this trade.", "error");
+      }
     }
 
     async function connectWallet(requestAccess = true) {
@@ -1423,19 +1738,31 @@
       if (!amount || amount <= 0) return;
       try {
         const { address: launchAddress } = await getLaunchContext();
-        const usdcAmount = ethers.parseUnits(amount.toString(), 6);
+        const usdcAmount = parseTradeAmount(amount, 6);
+        if (!usdcAmount || usdcAmount <= 0n) {
+          setTradeStatus("Enter a valid USDC amount.", "error");
+          return;
+        }
         const usdc = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
         const launch = new ethers.Contract(launchAddress, LAUNCH_ABI, signer);
+        const [tokensOut] = await launch.estimateBuy(tokenAddress, usdcAmount);
+        if (tokensOut <= 0n) {
+          setTradeStatus("Buy amount is too small. Increase the amount and try again.", "error");
+          return;
+        }
+        setTradeStatus("Submitting buy transaction...", "muted");
         const allowance = await usdc.allowance(userAddress, launchAddress);
         if (allowance < usdcAmount) {
           await (await usdc.approve(launchAddress, usdcAmount)).wait();
         }
         const tx = await launch.buy(tokenAddress, usdcAmount);
         await tx.wait();
+        setTradeStatus("Buy completed.", "success");
         await updateWalletBalances();
         await Promise.all([loadTokenInfo(), loadActivity(), loadHolders()]);
       } catch (e) {
         console.error(e);
+        setTradeStatus(e?.shortMessage || e?.reason || "Buy failed.", "error");
       }
     }
 
@@ -1445,19 +1772,31 @@
       if (!amount || amount <= 0) return;
       try {
         const { address: launchAddress } = await getLaunchContext();
-        const tokenAmount = ethers.parseUnits(amount.toString(), 18);
+        const tokenAmount = parseTradeAmount(amount, 18);
+        if (!tokenAmount || tokenAmount <= 0n) {
+          setTradeStatus("Enter a valid token amount.", "error");
+          return;
+        }
         const token = new ethers.Contract(tokenAddress, TOKEN_ABI, signer);
         const launch = new ethers.Contract(launchAddress, LAUNCH_ABI, signer);
+        const [usdcOut] = await launch.estimateSell(tokenAddress, tokenAmount);
+        if (usdcOut <= 0n) {
+          setTradeStatus("Sell amount is too small. Increase the amount and try again.", "error");
+          return;
+        }
+        setTradeStatus("Submitting sell transaction...", "muted");
         const allowance = await token.allowance(userAddress, launchAddress);
         if (allowance < tokenAmount) {
           await (await token.approve(launchAddress, tokenAmount)).wait();
         }
         const tx = await launch.sell(tokenAddress, tokenAmount);
         await tx.wait();
+        setTradeStatus("Sell completed.", "success");
         await updateWalletBalances();
         await Promise.all([loadTokenInfo(), loadActivity(), loadHolders()]);
       } catch (e) {
         console.error(e);
+        setTradeStatus(e?.shortMessage || e?.reason || "Sell failed.", "error");
       }
     }
 

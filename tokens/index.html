@@ -78,14 +78,16 @@
       box-shadow: inset -1px 0 0 rgba(232,191,82,0.06);
     }
     .brand {
-      display: flex; align-items: center; gap: 12px; padding: 10px 10px 16px; font-family: "Space Grotesk", sans-serif;
-      font-size: 26px; font-weight: 700;
+      display: flex; align-items: center; gap: 10px; padding: 10px 10px 16px; font-family: "Space Grotesk", sans-serif;
+      font-size: 22px; font-weight: 700; min-width: 0;
     }
     .brand-mark {
       width: 38px; height: 38px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
+      min-width: 38px; flex: 0 0 38px; line-height: 0;
       background: #050505; color: #071005; overflow: hidden; padding: 0; border: 1px solid rgba(232,191,82,0.18); box-shadow: 0 14px 30px rgba(232,191,82,0.16);
     }
-    .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .brand-mark img,
+    .brand-mark svg { width: 100%; height: 100%; display: block; object-fit: cover; }
     .nav { display: grid; gap: 6px; }
     .nav-item {
       display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-radius: 14px;
@@ -136,26 +138,6 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
       pointer-events: none;
     }
-    .hero {
-      padding: 28px 30px;
-      margin-bottom: 18px;
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
-      align-items: center;
-      background:
-        radial-gradient(circle at top right, rgba(232,191,82,0.16), transparent 34%),
-        radial-gradient(circle at left center, rgba(151,255,93,0.08), transparent 28%);
-    }
-    .hero-kicker { color: #f0ca67; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.18em; }
-    .hero-title { margin: 14px 0 12px; font-size: 54px; line-height: 0.94; }
-    .hero-copy { max-width: 620px; color: var(--muted); font-size: 15px; line-height: 1.9; }
-    .hero-stats { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .hero-stat {
-      padding: 18px; border-radius: 18px; background: linear-gradient(180deg, rgba(31,34,30,0.92), rgba(15,16,15,0.98)); border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-    .hero-stat-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800; }
-    .hero-stat-value { margin-top: 10px; font-size: 28px; font-family: "Space Grotesk", sans-serif; font-weight: 700; }
     .token-panel { padding: 22px; }
     .section-head {
       display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
@@ -247,8 +229,6 @@
       .page, .topbar { padding-left: 14px; padding-right: 14px; }
       .toolbar { align-items: stretch; }
       .toolbar-left, .toolbar-right { width: 100%; }
-      .hero { grid-template-columns: 1fr; padding: 24px 18px; }
-      .hero-title { font-size: 42px; }
       .search-wrap { width: 100%; grid-template-columns: 1fr; }
       .search-btn { border-left: none; border-top: 1px solid var(--line); }
       .token-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -264,7 +244,19 @@
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-mark"><img src="/assets/logo.svg" alt="Tempomeme logo"></span>
+        <span class="brand-mark" aria-label="Tempomeme logo">
+          <svg viewBox="0 0 256 256" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="brandGoldTokens" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff3a0"/>
+                <stop offset="45%" stop-color="#ffd45a"/>
+                <stop offset="100%" stop-color="#b87a12"/>
+              </linearGradient>
+            </defs>
+            <rect width="256" height="256" rx="44" fill="#050505"/>
+            <path fill="url(#brandGoldTokens)" d="M74 78h128l-12 34h-47l-29 105H76l29-105H62z"/>
+          </svg>
+        </span>
         <span>Tempomeme</span>
       </div>
 
@@ -273,13 +265,17 @@
           <span class="nav-icon">⌂</span>
           <span class="nav-label">Home</span>
         </a>
+        <a href="/create" class="nav-item">
+          <span class="nav-icon">＋</span>
+          <span class="nav-label">Create Token</span>
+        </a>
         <a href="/tokens" class="nav-item active">
           <span class="nav-icon">▦</span>
           <span class="nav-label">Tokens</span>
         </a>
-        <a href="/rules" class="nav-item">
-          <span class="nav-icon">≡</span>
-          <span class="nav-label">Rules</span>
+        <a href="/docs" class="nav-item">
+          <span class="nav-icon">◫</span>
+          <span class="nav-label">Docs</span>
         </a>
       </nav>
 
@@ -305,24 +301,6 @@
       </div>
 
       <div class="page">
-        <section class="panel hero">
-          <div>
-            <div class="hero-kicker">Tempomeme</div>
-            <div class="hero-title">Browse the full launch board.</div>
-            <div class="hero-copy">Scan fresh launches, sort by market cap, and move through the market with a tighter, more readable overview of every token on the curve.</div>
-          </div>
-          <div class="hero-stats">
-            <div class="hero-stat">
-              <div class="hero-stat-label">Default Settlement</div>
-              <div class="hero-stat-value">USDC</div>
-            </div>
-            <div class="hero-stat">
-              <div class="hero-stat-label">Graduation Goal</div>
-              <div class="hero-stat-value">12K</div>
-            </div>
-          </div>
-        </section>
-
         <section class="panel token-panel">
           <div class="section-head">
             <div class="section-title">Created Tokens</div>

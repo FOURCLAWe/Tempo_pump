@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs - Tempomeme</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="apple-touch-icon" href="/assets/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090a0d;
+      --bg-soft: #121418;
+      --panel: #111317;
+      --panel-2: #15181d;
+      --line: rgba(255,255,255,0.08);
+      --line-strong: rgba(255,255,255,0.14);
+      --text: #f5f7fb;
+      --muted: #9ca4b3;
+      --muted-2: #788193;
+      --gold: #e8bf52;
+      --gold-soft: rgba(232,191,82,0.12);
+      --green: #97ff5d;
+      --shadow: 0 24px 60px rgba(0,0,0,0.38);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Manrope", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(151,255,93,0.08), transparent 20%),
+        radial-gradient(circle at 100% 0%, rgba(232,191,82,0.1), transparent 22%),
+        linear-gradient(180deg, #060708 0%, #0b0d10 50%, #090a0d 100%);
+      background-attachment: fixed;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    code {
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      color: #f8e6a5;
+    }
+
+    .docs-app {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 220px;
+      min-height: 100vh;
+    }
+
+    .sidebar,
+    .toc {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 20px 18px;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--line);
+      background: rgba(10,11,13,0.8);
+      backdrop-filter: blur(16px);
+    }
+
+    .toc {
+      border-left: 1px solid var(--line);
+      background: rgba(10,11,13,0.5);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      margin-bottom: 18px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      flex: 0 0 38px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(232,191,82,0.18);
+      background: #050505;
+      box-shadow: 0 14px 30px rgba(232,191,82,0.14);
+    }
+
+    .brand-mark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .back-link {
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(180deg, rgba(24,27,31,0.96), rgba(14,16,19,0.98));
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .search-shell {
+      margin-top: 18px;
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(18,20,24,0.98), rgba(12,14,17,0.98));
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .search-key {
+      padding: 3px 8px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: #d7dbe4;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    .sidebar-group {
+      margin-top: 24px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .sidebar-label {
+      margin-bottom: 8px;
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .sidebar-link {
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      border: 1px solid transparent;
+      color: #dce1ea;
+      font-size: 14px;
+      font-weight: 600;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .sidebar-link:hover {
+      transform: translateX(3px);
+      background: rgba(255,255,255,0.03);
+      border-color: rgba(255,255,255,0.05);
+    }
+
+    .sidebar-link.active {
+      background: linear-gradient(90deg, rgba(232,191,82,0.12), rgba(151,255,93,0.06));
+      border-color: rgba(232,191,82,0.16);
+      color: var(--text);
+    }
+
+    .content {
+      min-width: 0;
+      padding: 28px 32px 40px;
+    }
+
+    .article {
+      width: min(860px, 100%);
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .article h1 {
+      margin: 0;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(38px, 5vw, 60px);
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+    }
+
+    .lede {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+      max-width: 760px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 26px 0 34px;
+    }
+
+    .summary-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(19,22,26,0.96), rgba(12,14,17,0.98));
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .summary-label {
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .summary-value {
+      margin-top: 10px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .doc-section {
+      padding: 28px 0;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      scroll-margin-top: 30px;
+    }
+
+    .doc-section:first-of-type {
+      border-top: none;
+      padding-top: 8px;
+    }
+
+    .doc-section h2 {
+      margin: 0 0 10px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 30px;
+      letter-spacing: -0.03em;
+    }
+
+    .doc-text {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.9;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .info-card {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(18,20,24,0.96), rgba(12,14,17,0.98));
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .info-title {
+      margin: 0 0 8px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .info-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .formula-box {
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(18,20,24,0.98), rgba(10,12,15,1));
+      border: 1px solid rgba(232,191,82,0.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      overflow-x: auto;
+    }
+
+    .formula-label {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .formula-text {
+      margin-top: 12px;
+      color: #f6f2df;
+      font-size: 15px;
+      line-height: 1.8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+    }
+
+    .doc-list {
+      margin: 16px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.9;
+    }
+
+    .doc-list li + li { margin-top: 6px; }
+
+    .toc-card {
+      padding: 18px 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(17,19,23,0.96), rgba(12,14,17,0.98));
+      border: 1px solid var(--line);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+
+    .toc-label {
+      margin-bottom: 12px;
+      color: var(--muted-2);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 10px 0;
+      color: #dce1ea;
+      font-size: 13px;
+      font-weight: 600;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .toc-link:first-of-type { border-top: none; }
+
+    .toc-link:hover { color: var(--green); }
+
+    @media (max-width: 1180px) {
+      .docs-app {
+        grid-template-columns: 260px minmax(0, 1fr);
+      }
+
+      .toc {
+        display: none;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .docs-app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .content {
+        padding: 20px 16px 32px;
+      }
+
+      .summary-grid,
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="docs-app">
+    <aside class="sidebar">
+      <a href="/" class="brand">
+        <span class="brand-mark" aria-label="Tempomeme logo">
+          <svg viewBox="0 0 256 256" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="brandGoldDocsRefined" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff3a0"/>
+                <stop offset="45%" stop-color="#ffd45a"/>
+                <stop offset="100%" stop-color="#b87a12"/>
+              </linearGradient>
+            </defs>
+            <rect width="256" height="256" rx="44" fill="#050505"/>
+            <path fill="url(#brandGoldDocsRefined)" d="M74 78h128l-12 34h-47l-29 105H76l29-105H62z"/>
+          </svg>
+        </span>
+        <span>Tempomeme Docs</span>
+      </a>
+
+      <a href="/" class="back-link">← Back to App</a>
+
+      <div class="search-shell">
+        <span>Search docs</span>
+        <span class="search-key">⌘K</span>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-label">Overview</div>
+        <a href="#overview" class="sidebar-link active">Brief Overview</a>
+        <a href="#chain" class="sidebar-link">1. Chain</a>
+        <a href="#curve" class="sidebar-link">2. Curve & Migration</a>
+        <a href="#tme" class="sidebar-link">3. Official Token</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <article class="article">
+        <p class="eyebrow" id="overview">Tempomeme</p>
+        <h1>Brief Overview of Tempomeme</h1>
+        <p class="lede">Tempomeme is a Tempo Mainnet meme launch platform centered on USDC-settled curve trading, internal sale completion, and a defined platform fee policy around the official token <code>$TME</code>.</p>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-label">Network</div>
+            <div class="summary-value">Tempo Mainnet</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-label">Chain ID</div>
+            <div class="summary-value">4217</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-label">Official Token</div>
+            <div class="summary-value">$TME</div>
+          </div>
+        </div>
+
+        <section class="doc-section" id="chain">
+          <h2>1. Chain</h2>
+          <p class="doc-text">Tempomeme is deployed on Tempo Mainnet. The current frontend, wallet connection flow, token creation flow, and trade flow are all designed around this chain only, so users interact with a single network and a single settlement asset.</p>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-title">Network Parameters</div>
+              <p class="info-copy">Network: <code>Tempo Mainnet</code><br>Chain ID: <code>4217</code><br>RPC: <code>https://rpc.tempo.xyz</code></p>
+            </div>
+            <div class="info-card">
+              <div class="info-title">Settlement Asset</div>
+              <p class="info-copy">All current platform trading is settled in USDC on Tempo.<br>USDC: <code>0x20c000000000000000000000b9537d11c60e8b50</code></p>
+            </div>
+          </div>
+
+          <ul class="doc-list">
+            <li>Users need an EVM wallet connected to Tempo Mainnet.</li>
+            <li>Token creation, buying, and selling all run on Tempo.</li>
+            <li>The current launch flow uses USDC as the settlement token for the internal curve.</li>
+          </ul>
+        </section>
+
+        <section class="doc-section" id="curve">
+          <h2>2. Price Curve and External Migration</h2>
+          <p class="doc-text">The current primary launch contract uses a quadratic pricing curve across the internal sale cap. Price moves upward as sold supply increases, and the project only moves to the external liquidity stage after the internal curve is completely filled.</p>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-title">Primary Launch Contract</div>
+              <p class="info-copy"><code>0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4</code></p>
+            </div>
+            <div class="info-card">
+              <div class="info-title">Internal Sale Cap</div>
+              <p class="info-copy"><code>800,000,000</code> tokens<br>This represents <code>80%</code> of the total supply.</p>
+            </div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-label">Curve Formula</div>
+            <div class="formula-text">price(sold) = 0.000003 + 0.000062 * (sold / 800,000,000)^2</div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-label">Detailed Calculation</div>
+            <div class="formula-text">Let:
+saleCap = 800,000,000
+r = sold / saleCap
+
+Then:
+price(sold) = 0.000003 + 0.000062 * r^2
+
+Buy side:
+buyFee = usdcIn * 1%
+netUsdc = usdcIn - buyFee
+tokensOut = netUsdc / price(sold)
+
+Sell side:
+grossUsdcBack = tokensIn * price(sold)
+sellFee = grossUsdcBack * 1%
+usdcOut = grossUsdcBack - sellFee
+
+Migration condition:
+migrate when sold >= 800,000,000</div>
+          </div>
+
+          <ul class="doc-list">
+            <li>The curve starts near <code>0.00000300 USDC</code>.</li>
+            <li>Because the pricing model is quadratic, the price accelerates more aggressively later in the sale than at the beginning.</li>
+            <li>The simplified ratio form is <code>r = sold / 800,000,000</code>, so all price movement is driven by sold supply progress on the internal curve.</li>
+            <li>For buys, the 1% fee is removed first, then the remaining USDC is converted at the current curve price.</li>
+            <li>For sells, the token amount is first converted back into gross USDC at the current curve price, then the 1% fee is deducted.</li>
+            <li>External migration is triggered only after <code>800,000,000</code> tokens are sold on the internal curve.</li>
+            <li>On a no-sell path, completely filling the curve is about <code>19,124.58 USDC</code> gross user spend.</li>
+            <li>After the current <code>1%</code> trading fee, the contract retains about <code>18,933.33 USDC</code> net.</li>
+          </ul>
+        </section>
+
+        <section class="doc-section" id="tme">
+          <h2>3. Official Token</h2>
+          <p class="doc-text">The official ecosystem token is <code>$TME</code>. In the current platform description, trading fees are treated as both ecosystem support and operating revenue, with the stated split designed to support the token and the platform at the same time.</p>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-title">Buyback Allocation</div>
+              <p class="info-copy"><code>50%</code> of trading fees are allocated to buy back <code>$TME</code>.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-title">Operations Allocation</div>
+              <p class="info-copy"><code>50%</code> of trading fees are reserved for maintenance and project development.</p>
+            </div>
+          </div>
+
+          <ul class="doc-list">
+            <li>The buyback portion is meant to support the official token over time.</li>
+            <li>The development portion is meant to support maintenance, upgrades, and ecosystem growth.</li>
+            <li>This section describes the platform fee policy around <code>$TME</code>.</li>
+          </ul>
+        </section>
+      </article>
+    </main>
+
+    <aside class="toc">
+      <div class="toc-card">
+        <div class="toc-label">On this page</div>
+        <a href="#overview" class="toc-link">Brief Overview</a>
+        <a href="#chain" class="toc-link">1. Chain</a>
+        <a href="#curve" class="toc-link">2. Curve & Migration</a>
+        <a href="#tme" class="toc-link">3. Official Token</a>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>
