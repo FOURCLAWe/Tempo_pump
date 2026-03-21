@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tempo Launch 测试平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #0f172a, #1e2937); color: white; font-family: 'Inter', sans-serif; }
+    .card { background: rgba(30, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+    .btn-primary { background: linear-gradient(to right, #a855f7, #22d3ee); }
+    .btn-buy { background: linear-gradient(to right, #10b981, #059669); }
+    .progress-bar { height: 8px; background: #1e2937; border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(to right, #a855f7, #22d3ee); border-radius: 999px; transition: width 0.5s ease; }
+    input:focus { outline: none; border-color: #a855f7; }
+    .log-entry { border-left: 2px solid #a855f7; padding-left: 8px; margin-bottom: 6px; }
+  </style>
+</head>
+<body class="min-h-screen p-6">
+
+  <!-- Header -->
+  <div class="max-w-6xl mx-auto">
+    <div class="flex justify-between items-center mb-10">
+      <div>
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">Tempo Launch</h1>
+        <p class="text-gray-400 text-sm mt-1">Fair Launch Platform on Tempo Chain</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <div id="networkBadge" class="hidden bg-green-500/20 text-green-400 px-4 py-1.5 rounded-full text-xs font-medium">Tempo Chain</div>
+        <button onclick="connectWallet()" id="connectBtn"
+                class="btn-primary px-6 py-2.5 rounded-2xl text-sm font-semibold hover:brightness-110 transition">
+          连接钱包
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <div class="card rounded-2xl p-5 text-center">
+        <div class="text-3xl font-black text-purple-400" id="totalLaunches">0</div>
+        <div class="text-gray-400 text-sm mt-1">已发射项目</div>
+      </div>
+      <div class="card rounded-2xl p-5 text-center">
+        <div class="text-3xl font-black text-cyan-400" id="totalRaised">$0</div>
+        <div class="text-gray-400 text-sm mt-1">总募集 USDC</div>
+      </div>
+      <div class="card rounded-2xl p-5 text-center">
+        <div class="text-3xl font-black text-green-400" id="graduated">0</div>
+        <div class="text-gray-400 text-sm mt-1">已毕业项目</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- 左侧：创建项目 -->
+      <div class="card rounded-3xl p-8">
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400 text-sm">🚀</span>
+          创建新发射项目
+        </h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs text-gray-400 mb-1.5">代币名称</label>
+            <input id="name" placeholder="如: PepeTempo" 
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1.5">代币符号</label>
+            <input id="symbol" placeholder="如: PTEMPO" 
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs text-gray-400 mb-1.5">合约地址（已部署）</label>
+            <input id="contractAddr" placeholder="0x..." 
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-mono">
+          </div>
+          <button onclick="createLaunch()" 
+                  class="w-full btn-primary py-3.5 rounded-xl font-bold text-sm hover:brightness-110 transition">
+            立即创建发射
+          </button>
+        </div>
+
+        <!-- 曲线信息 -->
+        <div class="mt-6 bg-slate-900 rounded-2xl p-5">
+          <h3 class="text-sm font-semibold mb-3 text-gray-300">曲线参数</h3>
+          <div class="space-y-2 text-xs text-gray-400">
+            <div class="flex justify-between"><span>初始市值</span><span class="text-white">~$4,000</span></div>
+            <div class="flex justify-between"><span>打满所需</span><span class="text-white">12,000 USDC</span></div>
+            <div class="flex justify-between"><span>毕业市值</span><span class="text-white">~$65,000</span></div>
+            <div class="flex justify-between"><span>平台手续费</span><span class="text-white">1%</span></div>
+            <div class="flex justify-between"><span>曲线类型</span><span class="text-purple-400">改进型指数曲线</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：购买与进度 -->
+      <div class="space-y-6">
+
+        <!-- 购买区 -->
+        <div class="card rounded-3xl p-8">
+          <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+            <span class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400 text-sm">💰</span>
+            购买代币
+          </h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5">代币地址</label>
+              <input id="tokenAddr" placeholder="0x..." 
+                     class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-mono">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5">购买数量 (USDC)</label>
+              <input id="usdcAmount" type="number" value="100" 
+                     oninput="updatePriceEstimate()"
+                     class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div class="bg-slate-900 rounded-xl p-4 text-xs space-y-2">
+              <div class="flex justify-between">
+                <span class="text-gray-400">当前价格</span>
+                <span class="text-cyan-400" id="currentPrice">-.--</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">预计获得</span>
+                <span class="text-green-400" id="estimatedTokens">-.--</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">手续费 (1%)</span>
+                <span class="text-yellow-400" id="feeAmount">-.--</span>
+              </div>
+            </div>
+            <button onclick="buyTokens()" 
+                    class="w-full btn-buy py-3.5 rounded-xl font-bold text-sm hover:brightness-110 transition">
+              购买代币
+            </button>
+          </div>
+        </div>
+
+        <!-- 募集进度 -->
+        <div class="card rounded-3xl p-6">
+          <h3 class="text-sm font-semibold mb-4">募集进度</h3>
+          <div class="progress-bar mb-2">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between text-xs text-gray-400">
+            <span id="raisedAmt">$0 募集</span>
+            <span>目标 $12,000</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 日志区 -->
+    <div class="mt-6 card rounded-3xl p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-sm font-semibold">操作日志</h3>
+        <button onclick="clearLog()" class="text-xs text-gray-500 hover:text-gray-300">清空</button>
+      </div>
+      <div id="logArea" class="text-xs font-mono min-h-[120px] max-h-[200px] overflow-auto space-y-1">
+        <div class="text-gray-500">等待操作...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let provider, signer, userAddress;
+    const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
+    let simulatedRaised = 0;
+    const TARGET = 12000;
+
+    async function connectWallet() {
+      if (!window.ethereum) return log("请安装 MetaMask 或其他 EVM 钱包", "red");
+      try {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+        document.getElementById("connectBtn").innerHTML = 
+          `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+        document.getElementById("networkBadge").classList.remove("hidden");
+        log(`✅ 钱包已连接: ${userAddress}`, "green");
+      } catch(e) {
+        log(`❌ 连接失败: ${e.message}`, "red");
+      }
+    }
+
+    async function createLaunch() {
+      const name = document.getElementById("name").value;
+      const symbol = document.getElementById("symbol").value;
+      const contract = document.getElementById("contractAddr").value;
+      if (!name || !symbol) return log("❌ 请填写代币名称和符号", "red");
+      if (!userAddress) return log("❌ 请先连接钱包", "red");
+      log(`🚀 正在创建发射: ${name} (${symbol})...`);
+      await sleep(1000);
+      const fakeAddr = "0x" + Math.random().toString(16).slice(2, 42).padEnd(40, "0");
+      log(`✅ 代币地址: ${fakeAddr}`, "green");
+      log(`✅ 项目创建成功！等待用户购买...`, "green");
+      document.getElementById("totalLaunches").textContent = 
+        parseInt(document.getElementById("totalLaunches").textContent) + 1;
+      document.getElementById("tokenAddr").value = fakeAddr;
+    }
+
+    async function buyTokens() {
+      const tokenAddr = document.getElementById("tokenAddr").value;
+      const amount = parseFloat(document.getElementById("usdcAmount").value);
+      if (!tokenAddr) return log("❌ 请填写代币地址", "red");
+      if (!amount || amount <= 0) return log("❌ 请输入购买数量", "red");
+      if (!userAddress) return log("❌ 请先连接钱包", "red");
+      const fee = amount * 0.01;
+      const afterFee = amount - fee;
+      log(`💰 正在购买 ${amount} USDC 的代币...`);
+      log(`📊 手续费: ${fee.toFixed(2)} USDC`);
+      await sleep(800);
+      simulatedRaised += afterFee;
+      if (simulatedRaised > TARGET) simulatedRaised = TARGET;
+      updateProgress();
+      const tokens = (afterFee * 1e18 / getCurrentSimPrice()).toFixed(2);
+      log(`✅ 购买成功！获得 ${tokens} 代币`, "green");
+      document.getElementById("totalRaised").textContent = 
+        `$${simulatedRaised.toFixed(0)}`;
+      if (simulatedRaised >= TARGET) {
+        log(`🎓 恭喜！项目已达到毕业条件！正在创建流动性...`, "purple");
+        document.getElementById("graduated").textContent = 
+          parseInt(document.getElementById("graduated").textContent) + 1;
+      }
+    }
+
+    function getCurrentSimPrice() {
+      if (simulatedRaised === 0) return 1e12;
+      const progress = simulatedRaised / TARGET;
+      return 1e12 + (progress ** 2) * 1e18 / 7e10;
+    }
+
+    function updatePriceEstimate() {
+      const amount = parseFloat(document.getElementById("usdcAmount").value) || 0;
+      const fee = amount * 0.01;
+      const afterFee = amount - fee;
+      const price = getCurrentSimPrice();
+      const tokens = (afterFee * 1e18 / price).toFixed(2);
+      document.getElementById("currentPrice").textContent = 
+        (price / 1e12).toFixed(6) + " USDC";
+      document.getElementById("estimatedTokens").textContent = 
+        Number(tokens).toLocaleString() + " 代币";
+      document.getElementById("feeAmount").textContent = 
+        fee.toFixed(2) + " USDC";
+    }
+
+    function updateProgress() {
+      const pct = Math.min((simulatedRaised / TARGET) * 100, 100).toFixed(1);
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("raisedAmt").textContent = 
+        `$${simulatedRaised.toFixed(0)} 募集`;
+    }
+
+    function log(msg, color = "gray") {
+      const logArea = document.getElementById("logArea");
+      const time = new Date().toLocaleTimeString();
+      const colorMap = {
+        gray: "text-gray-400", green: "text-green-400",
+        red: "text-red-400", purple: "text-purple-400"
+      };
+      logArea.innerHTML += `
+        <div class="log-entry ${colorMap[color] || 'text-gray-400'}">
+          <span class="text-gray-600">[${time}]</span> ${msg}
+        </div>`;
+      logArea.scrollTop = logArea.scrollHeight;
+    }
+
+    function clearLog() {
+      document.getElementById("logArea").innerHTML = 
+        "<div class='text-gray-500'>日志已清空</div>";
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // 初始化
+    updatePriceEstimate();
+  </script>
+</body>
+</html>
