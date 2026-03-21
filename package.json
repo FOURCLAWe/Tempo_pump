@@ -18,8 +18,14 @@
   },
   "homepage": "https://github.com/FOURCLAWe/Tempo_pump#readme",
   "dependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^7.0.0",
     "@openzeppelin/contracts": "^5.6.1",
-    "hardhat": "^3.2.0"
+    "dotenv": "^17.3.1",
+    "ethers": "^6.16.0",
+    "hardhat": "^3.2.0",
+    "solc": "^0.8.34"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.2"
   }
 }
