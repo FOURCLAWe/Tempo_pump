@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Token - Tempo Launch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #0f172a, #1e2937); color: white; }
+    .card { background: rgba(30, 41, 55, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); }
+    .progress-bar { height: 8px; background: #1e2937; border-radius: 999px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(to right, #a855f7, #22d3ee); border-radius: 999px; transition: width 0.5s ease; }
+  </style>
+</head>
+<body class="min-h-screen p-6">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <a href="/" class="text-purple-400 hover:text-purple-300 flex items-center gap-2 text-sm">
+        ← 返回首页
+      </a>
+      <button onclick="connectWallet()" id="connectBtn"
+              class="bg-gradient-to-r from-purple-500 to-cyan-500 px-5 py-2 rounded-2xl text-sm font-semibold">
+        连接钱包
+      </button>
+    </div>
+
+    <!-- 代币信息 -->
+    <div class="card rounded-3xl p-8 mb-6">
+      <div class="flex items-center gap-5 mb-6">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-2xl font-black" id="tokenIcon">?</div>
+        <div>
+          <h1 class="text-3xl font-black" id="tokenName">加载中...</h1>
+          <p class="text-gray-400 text-sm" id="tokenSymbol"></p>
+          <p class="text-xs text-gray-600 font-mono mt-1" id="tokenAddr"></p>
+        </div>
+        <div class="ml-auto text-right">
+          <div class="text-2xl font-bold text-cyan-400" id="tokenPrice">-.--</div>
+          <div class="text-xs text-gray-400">当前价格 (USDC)</div>
+        </div>
+      </div>
+
+      <!-- 募集进度 -->
+      <div class="mb-2 flex justify-between text-sm">
+        <span class="text-gray-400">募集进度</span>
+        <span id="progressPct" class="text-purple-400">0%</span>
+      </div>
+      <div class="progress-bar mb-2">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="flex justify-between text-xs text-gray-500">
+        <span id="raisedAmt">$0 募集</span>
+        <span>目标 $12,000 USDC</span>
+      </div>
+
+      <!-- 状态 -->
+      <div id="graduatedBadge" class="hidden mt-4 bg-green-500/20 text-green-400 px-4 py-2 rounded-xl text-sm text-center">
+        🎓 此项目已毕业！
+      </div>
+    </div>
+
+    <!-- 买卖区 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+      <!-- 买入 -->
+      <div class="card rounded-3xl p-6">
+        <h2 class="text-lg font-bold mb-4 text-green-400">💰 买入</h2>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs text-gray-400 mb-1 block">USDC 数量</label>
+            <input id="buyAmount" type="number" placeholder="100" value="100"
+                   oninput="updateBuyEstimate()"
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+          </div>
+          <div class="bg-slate-900 rounded-xl p-3 text-xs space-y-1">
+            <div class="flex justify-between">
+              <span class="text-gray-400">预计获得</span>
+              <span class="text-green-400" id="buyEstimate">-.--</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">手续费 (1%)</span>
+              <span class="text-yellow-400" id="buyFee">-.--</span>
+            </div>
+          </div>
+          <button onclick="buyTokens()"
+                  class="w-full bg-green-500 hover:bg-green-600 py-3 rounded-xl font-bold text-sm transition">
+            买入代币
+          </button>
+        </div>
+      </div>
+
+      <!-- 卖出 -->
+      <div class="card rounded-3xl p-6">
+        <h2 class="text-lg font-bold mb-4 text-red-400">💸 卖出</h2>
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs text-gray-400 mb-1 block">代币数量</label>
+            <input id="sellAmount" type="number" placeholder="1000000"
+                   oninput="updateSellEstimate()"
+                   class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+          </div>
+          <div class="bg-slate-900 rounded-xl p-3 text-xs space-y-1">
+            <div class="flex justify-between">
+              <span class="text-gray-400">预计获得</span>
+              <span class="text-green-400" id="sellEstimate">-.-- USDC</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">手续费 (1%)</span>
+              <span class="text-yellow-400" id="sellFee">-.--</span>
+            </div>
+          </div>
+          <button onclick="sellTokens()"
+                  class="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-bold text-sm transition">
+            卖出代币
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 日志 -->
+    <div class="card rounded-3xl p-6">
+      <div class="flex justify-between mb-3">
+        <h3 class="text-sm font-semibold">操作日志</h3>
+        <button onclick="document.getElementById('logArea').innerHTML=''" class="text-xs text-gray-500">清空</button>
+      </div>
+      <div id="logArea" class="text-xs font-mono min-h-[100px] max-h-[200px] overflow-auto"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
+    const LAUNCH_CONTRACT = "0x9C95737F01c6aeD3fadDef5C6C362127562A0340";
+    const LAUNCH_ABI = [
+      "function buy(address tokenAddr, uint256 usdcAmount)",
+      "function sell(address tokenAddr, uint256 tokenAmount)",
+      "function getPrice(address tokenAddr) view returns (uint256)",
+      "function estimateBuy(address tokenAddr, uint256 usdcAmount) view returns (uint256 tokensOut, uint256 fee)",
+      "function estimateSell(address tokenAddr, uint256 tokenAmount) view returns (uint256 usdcOut, uint256 fee)",
+      "function launches(address) view returns (address token, address creator, uint256 raised, uint256 tokensSold, bool graduated)"
+    ];
+    const USDC_ABI = [
+      "function approve(address spender, uint256 amount) returns (bool)",
+      "function allowance(address owner, address spender) view returns (uint256)"
+    ];
+    const TOKEN_ABI = [
+      "function name() view returns (string)",
+      "function symbol() view returns (string)",
+      "function approve(address spender, uint256 amount) returns (bool)",
+      "function allowance(address owner, address spender) view returns (uint256)",
+      "function balanceOf(address) view returns (uint256)"
+    ];
+
+    const TEMPO_CHAIN = {
+      chainId: "0x1079",
+      chainName: "Tempo",
+      nativeCurrency: { name: "pathUSD", symbol: "pathUSD", decimals: 18 },
+      rpcUrls: ["https://rpc.tempo.xyz"],
+      blockExplorerUrls: ["https://explorer.tempo.xyz"]
+    };
+
+    let provider, signer, userAddress;
+    const params = new URLSearchParams(window.location.search);
+    const tokenAddress = params.get("token");
+
+    async function init() {
+      if (!tokenAddress) {
+        document.getElementById("tokenName").textContent = "未指定代币";
+        return;
+      }
+      document.getElementById("tokenAddr").textContent = tokenAddress;
+      provider = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
+      await loadTokenInfo();
+      setInterval(loadTokenInfo, 10000);
+    }
+
+    async function loadTokenInfo() {
+      try {
+        const token = new ethers.Contract(tokenAddress, TOKEN_ABI, provider);
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, provider);
+
+        const [name, symbol, info, price] = await Promise.all([
+          token.name(),
+          token.symbol(),
+          launch.launches(tokenAddress),
+          launch.getPrice(tokenAddress)
+        ]);
+
+        document.getElementById("tokenName").textContent = name;
+        document.getElementById("tokenSymbol").textContent = symbol;
+        document.getElementById("tokenIcon").textContent = symbol.slice(0,2);
+        document.title = `${name} - Tempo Launch`;
+
+        const priceFormatted = (Number(price) / 1e12).toFixed(6);
+        document.getElementById("tokenPrice").textContent = priceFormatted;
+
+        const raised = Number(ethers.formatUnits(info.raised, 6));
+        const pct = Math.min((raised / 12000) * 100, 100).toFixed(1);
+        document.getElementById("progressFill").style.width = pct + "%";
+        document.getElementById("progressPct").textContent = pct + "%";
+        document.getElementById("raisedAmt").textContent = `$${raised.toFixed(2)} 募集`;
+
+        if (info.graduated) {
+          document.getElementById("graduatedBadge").classList.remove("hidden");
+        }
+      } catch(e) {
+        log("加载失败: " + e.message, "red");
+      }
+    }
+
+    async function connectWallet() {
+      if (!window.ethereum) return log("请安装 MetaMask", "red");
+      try {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        try {
+          await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: TEMPO_CHAIN.chainId }] });
+        } catch(e) {
+          if (e.code === 4902) await window.ethereum.request({ method: "wallet_addEthereumChain", params: [TEMPO_CHAIN] });
+        }
+        provider = new ethers.BrowserProvider(window.ethereum);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+        document.getElementById("connectBtn").textContent = userAddress.slice(0,6) + "..." + userAddress.slice(-4);
+        log("✅ 钱包已连接: " + userAddress, "green");
+        await loadTokenInfo();
+      } catch(e) { log("连接失败: " + e.message, "red"); }
+    }
+
+    async function buyTokens() {
+      if (!signer) return log("❌ 请先连接钱包", "red");
+      const amount = document.getElementById("buyAmount").value;
+      if (!amount || amount <= 0) return log("❌ 请输入数量", "red");
+      try {
+        const usdcAmount = ethers.parseUnits(amount.toString(), 6);
+        const usdc = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
+        const allowance = await usdc.allowance(userAddress, LAUNCH_CONTRACT);
+        if (allowance < usdcAmount) {
+          log("🔓 正在 approve USDC...");
+          await (await usdc.approve(LAUNCH_CONTRACT, usdcAmount)).wait();
+          log("✅ Approve 成功", "green");
+        }
+        log(`💰 买入 ${amount} USDC...`);
+        const tx = await launch.buy(tokenAddress, usdcAmount);
+        log("⏳ 交易: " + tx.hash);
+        await tx.wait();
+        log("✅ 买入成功！", "green");
+        await loadTokenInfo();
+      } catch(e) { log("❌ " + e.message, "red"); }
+    }
+
+    async function sellTokens() {
+      if (!signer) return log("❌ 请先连接钱包", "red");
+      const amount = document.getElementById("sellAmount").value;
+      if (!amount || amount <= 0) return log("❌ 请输入数量", "red");
+      try {
+        const tokenAmount = ethers.parseUnits(amount.toString(), 18);
+        const token = new ethers.Contract(tokenAddress, TOKEN_ABI, signer);
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
+        const allowance = await token.allowance(userAddress, LAUNCH_CONTRACT);
+        if (allowance < tokenAmount) {
+          log("🔓 正在 approve 代币...");
+          await (await token.approve(LAUNCH_CONTRACT, tokenAmount)).wait();
+          log("✅ Approve 成功", "green");
+        }
+        log(`💸 卖出 ${amount} 代币...`);
+        const tx = await launch.sell(tokenAddress, tokenAmount);
+        log("⏳ 交易: " + tx.hash);
+        await tx.wait();
+        log("✅ 卖出成功！", "green");
+        await loadTokenInfo();
+      } catch(e) { log("❌ " + e.message, "red"); }
+    }
+
+    async function updateBuyEstimate() {
+      const amount = document.getElementById("buyAmount").value;
+      if (!amount || !tokenAddress) return;
+      try {
+        const p = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, p);
+        const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, ethers.parseUnits(amount, 6));
+        document.getElementById("buyEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " 代币";
+        document.getElementById("buyFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+      } catch(e) {}
+    }
+
+    async function updateSellEstimate() {
+      const amount = document.getElementById("sellAmount").value;
+      if (!amount || !tokenAddress) return;
+      try {
+        const p = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, p);
+        const [usdcOut, fee] = await launch.estimateSell(tokenAddress, ethers.parseUnits(amount, 18));
+        document.getElementById("sellEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " USDC";
+        document.getElementById("sellFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+      } catch(e) {}
+    }
+
+    function log(msg, color = "gray") {
+      const el = document.getElementById("logArea");
+      const colorMap = { gray: "text-gray-400", green: "text-green-400", red: "text-red-400" };
+      el.innerHTML += `<div class="${colorMap[color] || 'text-gray-400'} mb-1">[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    init();
+  </script>
+</body>
+</html>
