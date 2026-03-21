@@ -30,7 +30,6 @@ abstract contract Ownable {
     function owner() public view returns (address) { return _owner; }
 }
 
-// ===== 内联 ERC20 =====
 interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
@@ -83,15 +82,16 @@ contract TempoUSDCLaunch is Ownable, ReentrancyGuard {
 
     IERC20 public immutable USDC;
 
-    uint256 public constant FEE = 100;
+    uint256 public constant FEE = 100;            // 1%
     uint256 public constant FEE_DENOM = 10000;
-    uint256 public constant TARGET_RAISE = 12_000 * 1e6;
+    uint256 public constant TARGET_RAISE = 12_000 * 1e6; // 12,000 USDC
     uint256 public constant INITIAL_PRICE = 1e12;
 
     struct Launch {
         address token;
         address creator;
-        uint256 raised;
+        uint256 raised;       // 净募集 USDC
+        uint256 tokensSold;   // 已卖出代币数量
         bool graduated;
     }
 
@@ -101,6 +101,7 @@ contract TempoUSDCLaunch is Ownable, ReentrancyGuard {
 
     event LaunchCreated(address indexed token, address indexed creator, string name);
     event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut);
+    event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut);
     event LaunchGraduated(address indexed token);
 
     constructor(address _usdc) {
@@ -115,6 +116,7 @@ contract TempoUSDCLaunch is Ownable, ReentrancyGuard {
             token: tokenAddr,
             creator: msg.sender,
             raised: 0,
+            tokensSold: 0,
             graduated: false
         });
 
@@ -125,10 +127,10 @@ contract TempoUSDCLaunch is Ownable, ReentrancyGuard {
         return tokenAddr;
     }
 
+    // ===== 买入 =====
     function buy(address tokenAddr, uint256 usdcAmount) external nonReentrant {
         require(isLaunch[tokenAddr], "Invalid launch");
         Launch storage l = launches[tokenAddr];
-        require(!l.graduated, "Already graduated");
 
         uint256 fee = (usdcAmount * FEE) / FEE_DENOM;
         uint256 afterFee = usdcAmount - fee;
@@ -139,16 +141,45 @@ contract TempoUSDCLaunch is Ownable, ReentrancyGuard {
         uint256 tokensOut = (afterFee * 1e18) / price;
 
         require(TempoMemeToken(tokenAddr).transfer(msg.sender, tokensOut), "Token transfer failed");
+
         l.raised += afterFee;
+        l.tokensSold += tokensOut;
 
         emit TokenBought(tokenAddr, msg.sender, usdcAmount, tokensOut);
 
-        if (l.raised >= TARGET_RAISE) {
+        if (l.raised >= TARGET_RAISE && !l.graduated) {
             l.graduated = true;
             emit LaunchGraduated(tokenAddr);
         }
     }
 
+    // ===== 卖出 =====
+    function sell(address tokenAddr, uint256 tokenAmount) external nonReentrant {
+        require(isLaunch[tokenAddr], "Invalid launch");
+        Launch storage l = launches[tokenAddr];
+        require(l.raised > 0, "No liquidity");
+
+        // 按当前曲线价格计算返还 USDC
+        uint256 price = getPrice(tokenAddr);
+        uint256 usdcBack = (tokenAmount * price) / 1e18;
+
+        // 收取 1% 手续费
+        uint256 fee = (usdcBack * FEE) / FEE_DENOM;
+        uint256 usdcOut = usdcBack - fee;
+
+        require(usdcOut <= l.raised, "Insufficient liquidity");
+
+        // 用户转入代币，合约转出 USDC
+        require(TempoMemeToken(tokenAddr).transferFrom(msg.sender, address(this), tokenAmount), "Token transfer failed");
+        require(USDC.transfer(msg.sender, usdcOut), "USDC transfer failed");
+
+        l.raised -= usdcOut;
+        l.tokensSold -= tokenAmount;
+
+        emit TokenSold(tokenAddr, msg.sender, tokenAmount, usdcOut);
+    }
+
+    // ===== 曲线价格 =====
     function getPrice(address tokenAddr) public view returns (uint256) {
         uint256 raised = launches[tokenAddr].raised;
         if (raised == 0) return INITIAL_PRICE;
@@ -156,11 +187,35 @@ contract TempoUSDCLaunch is Ownable, ReentrancyGuard {
         return INITIAL_PRICE + (progress * progress) / 7e10;
     }
 
+    // ===== 预估买入 =====
+    function estimateBuy(address tokenAddr, uint256 usdcAmount) external view returns (uint256 tokensOut, uint256 fee) {
+        fee = (usdcAmount * FEE) / FEE_DENOM;
+        uint256 afterFee = usdcAmount - fee;
+        uint256 price = getPrice(tokenAddr);
+        tokensOut = (afterFee * 1e18) / price;
+    }
+
+    // ===== 预估卖出 =====
+    function estimateSell(address tokenAddr, uint256 tokenAmount) external view returns (uint256 usdcOut, uint256 fee) {
+        uint256 price = getPrice(tokenAddr);
+        uint256 usdcBack = (tokenAmount * price) / 1e18;
+        fee = (usdcBack * FEE) / FEE_DENOM;
+        usdcOut = usdcBack - fee;
+    }
+
     function getLaunchCount() external view returns (uint256) {
         return allLaunches.length;
     }
 
     function withdrawFees() external onlyOwner {
-        USDC.transfer(owner(), USDC.balanceOf(address(this)));
+        // 只提取手续费部分，不动流动性
+        uint256 totalRaised = 0;
+        for (uint256 i = 0; i < allLaunches.length; i++) {
+            totalRaised += launches[allLaunches[i]].raised;
+        }
+        uint256 balance = USDC.balanceOf(address(this));
+        if (balance > totalRaised) {
+            USDC.transfer(owner(), balance - totalRaised);
+        }
     }
 }

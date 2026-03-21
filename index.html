@@ -136,6 +136,36 @@
           </div>
         </div>
 
+        <!-- 卖出区 -->
+        <div class="card rounded-3xl p-6">
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <span class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center text-red-400 text-sm">💸</span>
+            卖出代币
+          </h2>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5">代币地址</label>
+              <input id="sellTokenAddr" placeholder="0x..." 
+                     class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm font-mono">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1.5">卖出数量（代币）</label>
+              <input id="sellTokenAmount" type="number" placeholder="0" 
+                     class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm">
+            </div>
+            <div class="bg-slate-900 rounded-xl p-3 text-xs space-y-1">
+              <div class="flex justify-between">
+                <span class="text-gray-400">预计获得</span>
+                <span class="text-green-400" id="sellEstimate">-.-- USDC</span>
+              </div>
+            </div>
+            <button onclick="sellTokens()" 
+                    class="w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl font-bold text-sm transition">
+              卖出代币
+            </button>
+          </div>
+        </div>
+
         <!-- 募集进度 -->
         <div class="card rounded-3xl p-6">
           <h3 class="text-sm font-semibold mb-4">募集进度</h3>
@@ -167,17 +197,27 @@
   <script>
     let provider, signer, userAddress;
     const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
-    const LAUNCH_CONTRACT = "0x6ed41d12DB718972923Fd9E7e3271888a70B9E2c";
+    const LAUNCH_CONTRACT = "0x9C95737F01c6aeD3fadDef5C6C362127562A0340";
     
     const LAUNCH_ABI = [
       "function createLaunch(string name, string symbol) returns (address)",
       "function buy(address tokenAddr, uint256 usdcAmount)",
+      "function sell(address tokenAddr, uint256 tokenAmount)",
       "function getPrice(address tokenAddr) view returns (uint256)",
-      "function launches(address) view returns (address token, address creator, uint256 raised, bool graduated)",
+      "function estimateBuy(address tokenAddr, uint256 usdcAmount) view returns (uint256 tokensOut, uint256 fee)",
+      "function estimateSell(address tokenAddr, uint256 tokenAmount) view returns (uint256 usdcOut, uint256 fee)",
+      "function launches(address) view returns (address token, address creator, uint256 raised, uint256 tokensSold, bool graduated)",
       "function getLaunchCount() view returns (uint256)",
       "event LaunchCreated(address indexed token, address indexed creator, string name)",
       "event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut)",
+      "event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut)",
       "event LaunchGraduated(address indexed token)"
+    ];
+
+    const TOKEN_ABI = [
+      "function approve(address spender, uint256 amount) returns (bool)",
+      "function allowance(address owner, address spender) view returns (uint256)",
+      "function balanceOf(address) view returns (uint256)"
     ];
     
     const USDC_ABI = [
@@ -294,6 +334,37 @@
         await refreshStats();
       } catch(e) {
         log(`❌ 购买失败: ${e.message}`, "red");
+      }
+    }
+
+    async function sellTokens() {
+      const tokenAddr = document.getElementById("sellTokenAddr").value;
+      const amount = document.getElementById("sellTokenAmount").value;
+      if (!tokenAddr) return log("❌ 请填写代币地址", "red");
+      if (!amount || amount <= 0) return log("❌ 请输入卖出数量", "red");
+      if (!userAddress) return log("❌ 请先连接钱包", "red");
+      try {
+        const tokenAmount = ethers.parseUnits(amount.toString(), 18);
+        const token = new ethers.Contract(tokenAddr, TOKEN_ABI, signer);
+        const launch = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
+
+        // 检查代币 allowance
+        const allowance = await token.allowance(userAddress, LAUNCH_CONTRACT);
+        if (allowance < tokenAmount) {
+          log(`🔓 正在 approve 代币...`);
+          const approveTx = await token.approve(LAUNCH_CONTRACT, tokenAmount);
+          await approveTx.wait();
+          log(`✅ Approve 成功`, "green");
+        }
+
+        log(`💸 正在卖出 ${amount} 代币...`);
+        const tx = await launch.sell(tokenAddr, tokenAmount);
+        log(`⏳ 交易已发送: ${tx.hash}`);
+        await tx.wait();
+        log(`✅ 卖出成功！USDC 已返还到你的钱包`, "green");
+        await refreshLaunchInfo(tokenAddr);
+      } catch(e) {
+        log(`❌ 卖出失败: ${e.message}`, "red");
       }
     }
 
