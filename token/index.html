@@ -1008,6 +1008,10 @@
       rpcUrls: ["https://rpc.tempo.xyz"],
       blockExplorerUrls: ["https://explore.mainnet.tempo.xyz"]
     };
+    const HIDDEN_TOKENS = new Set([
+      "0xba439c26d31930cfd5a9b344f5a1c582dc9f422b",
+      "0x1c9d8d0ceaea2c71de15aee11b6314741ef5e92c"
+    ]);
     const SUPPLY_RAW = 1000000000n * 10n ** 18n;
     const SALE_CAP_RAW = 800000000n * 10n ** 18n;
     const PRICE_RATIO_SCALE = 10n ** 18n;
@@ -1024,6 +1028,10 @@
     const params = new URLSearchParams(window.location.search);
     const tokenAddress = params.get("token");
     const blockCache = new Map();
+
+    function isHiddenToken(tokenAddr) {
+      return !!tokenAddr && HIDDEN_TOKENS.has(tokenAddr.toLowerCase());
+    }
 
     function launchCandidates() {
       return [{ address: PRIMARY_LAUNCH_CONTRACT, version: "v2" }];
@@ -1172,6 +1180,10 @@
     async function init() {
       if (!tokenAddress) {
         document.getElementById("tokenName").textContent = "Token not specified";
+        return;
+      }
+      if (isHiddenToken(tokenAddress)) {
+        window.location.replace("/tokens");
         return;
       }
       provider = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");

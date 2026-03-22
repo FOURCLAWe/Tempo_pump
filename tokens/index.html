@@ -358,6 +358,10 @@
     let currentSort = "latest";
     let walletSession;
     const LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
+    const HIDDEN_TOKENS = new Set([
+      "0xba439c26d31930cfd5a9b344f5a1c582dc9f422b",
+      "0x1c9d8d0ceaea2c71de15aee11b6314741ef5e92c"
+    ]);
     const TEMPO_CHAIN = {
       chainId: "0x1079",
       chainName: "Tempo Mainnet",
@@ -374,6 +378,10 @@
       "event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut)",
       "event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut)"
     ];
+
+    function isHiddenToken(tokenAddr) {
+      return !!tokenAddr && HIDDEN_TOKENS.has(tokenAddr.toLowerCase());
+    }
 
     function applyWalletConnected(address) {
       const short = window.TempomemeWallet.formatAddress(address);
@@ -512,6 +520,7 @@
         for (let i = 0; i < count; i++) {
           try {
             const tokenAddr = await launch.allLaunches(i);
+            if (isHiddenToken(tokenAddr)) continue;
             const token = new ethers.Contract(tokenAddr, [
               "function name() view returns (string)",
               "function symbol() view returns (string)",
@@ -567,6 +576,7 @@
           launch.queryFilter(launch.filters.TokenSold(), fromBlock, latestBlock)
         ]);
         const allEvents = [...buyEvents, ...sellEvents]
+          .filter((ev) => !isHiddenToken(ev.args?.[0]))
           .sort((a, b) => b.blockNumber - a.blockNumber)
           .slice(0, 8);
 
