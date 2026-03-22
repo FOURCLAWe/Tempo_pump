@@ -72,14 +72,14 @@ External migration condition:
 
 ## 3. Official Token
 
-The official ecosystem token is `$TME`. Tempomeme describes platform fees as both ecosystem support and operating revenue, with the stated split designed to reinforce the official token while still funding long-term product maintenance and growth.
+The official ecosystem token is `$TME`. Tempomeme describes the exchange fee policy around a `1%` trading fee, with most of that fee routed back into the official token and the remainder reserved for the treasury wallet.
 
 Platform fee policy:
 
-- `50%` of trading fees are allocated to buy back `$TME`.
-- The remaining `50%` is reserved for maintenance and project development.
+- `90%` of the `1%` trading fee is allocated to buy back `$TME` and distribute it through airdrops.
+- The remaining `10%` of the `1%` trading fee flows into the treasury wallet.
 
 This policy is meant to do two things at the same time:
 
-- route part of platform fee value back into the official token
-- keep part of platform fee value available for product upkeep, iteration, and broader ecosystem growth
+- route most fee value back into `$TME` through buybacks and user airdrops
+- keep a treasury reserve available for protocol operations, upkeep, and growth
