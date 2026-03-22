@@ -68,7 +68,7 @@ External migration condition:
 - In other words, the internal curve must be fully filled before the project moves to the external liquidity stage.
 - On a no-sell path, that is about `19,124.58 USDC` gross user spend.
 - After the `1%` trading fee, the contract retains about `18,933.33 USDC` net.
-- At graduation, the remaining `20%` of token supply and `19,124.58 USDC` are intended to be added as liquidity on `Uniswap V2`.
+- At graduation, the remaining `20%` of token supply and `18,933.33 USDC` are intended to be added as liquidity on `Uniswap V2`.
 
 ## 3. Official Token
 
