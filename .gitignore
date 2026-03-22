@@ -10,3 +10,5 @@ contracts/compiled.json
 contracts/deployed.json
 index.html.bak
 规则说明.md
+build_latest/
+out/

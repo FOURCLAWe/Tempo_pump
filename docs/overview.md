@@ -1,8 +1,10 @@
-# Tempomeme Docs
+# Tempomeme on Tempo
+
+Tempomeme is a USDC-native meme launchpad built on Tempo Mainnet. The product combines Tempo's payments-first design with internal curve trading, a clear graduation threshold, and a defined post-curve liquidity path.
 
 ## 1. Chain
 
-Tempomeme is built on Tempo Mainnet and the current frontend is configured around that chain only.
+Tempomeme is built on Tempo Mainnet because the launch flow is expressed in stablecoin terms from start to finish. The current frontend is configured around a single chain and a single settlement asset.
 
 - Network: `Tempo Mainnet`
 - Chain ID: `4217`
@@ -14,12 +16,15 @@ What this means in practice:
 - Wallets need to be connected to Tempo Mainnet.
 - Token creation, buying, and selling all use the same Tempo-side launch contract.
 - USDC is the settlement asset used by the current site flow.
+- This keeps launch pricing, trade flow, and graduation accounting in USD terms.
 
 ## 2. Curve Formula and External Migration
 
+Tempomeme uses a quadratic internal curve for price discovery. Trading stays inside the platform until 80% of supply is sold, and only then does the project graduate toward external liquidity deployment.
+
 Current primary launch contract:
 
-- Launch contract: `0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4`
+- Launch contract: `0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf`
 - Internal sale cap: `800,000,000` tokens
 - This equals `80%` of the total supply
 
@@ -63,10 +68,11 @@ External migration condition:
 - In other words, the internal curve must be fully filled before the project moves to the external liquidity stage.
 - On a no-sell path, that is about `19,124.58 USDC` gross user spend.
 - After the `1%` trading fee, the contract retains about `18,933.33 USDC` net.
+- At graduation, the remaining `20%` of token supply and `19,124.58 USDC` are intended to be added as liquidity on `Uniswap V2`.
 
 ## 3. Official Token
 
-The official ecosystem token is `$TME`.
+The official ecosystem token is `$TME`. Tempomeme describes platform fees as both ecosystem support and operating revenue, with the stated split designed to reinforce the official token while still funding long-term product maintenance and growth.
 
 Platform fee policy:
 

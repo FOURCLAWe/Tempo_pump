@@ -18,7 +18,7 @@ Project documentation lives here:
 - Chain: `Tempo Mainnet`
 - Chain ID: `4217`
 - USDC: `0x20c000000000000000000000b9537d11c60e8b50`
-- Primary launch contract: `0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4`
+- Primary launch contract: `0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf`
 
 ## Frontend Routes
 

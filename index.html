@@ -11,6 +11,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+  <script>
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem("tempomeme-theme");
+        if (savedTheme === "light" || savedTheme === "dark") {
+          document.documentElement.dataset.theme = savedTheme;
+          document.documentElement.style.colorScheme = savedTheme;
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       --bg: #050505;
@@ -272,6 +283,13 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
+    .pill-button {
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
     .ticker-chip.buy {
       color: #ddffc8;
       border-color: rgba(151,255,93,0.18);
@@ -382,33 +400,11 @@
       line-height: 1.9;
     }
 
-    .hero-tags {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 18px;
-      flex-wrap: wrap;
-    }
-
-    .hero-tag {
-      min-height: 34px;
-      padding: 0 12px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.07);
-      color: #dbdfd5;
-      font-size: 12px;
-      font-weight: 700;
-      backdrop-filter: blur(10px);
-    }
-
     .hero-actions {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-top: 22px;
+      margin-top: 18px;
       flex-wrap: wrap;
     }
 
@@ -731,6 +727,8 @@
       .token-media { height: 180px; }
     }
   </style>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260322c">
+  <script src="/assets/theme.js?v=20260322a" defer></script>
 </head>
 <body>
   <div class="app">
@@ -774,6 +772,10 @@
       <div class="sidebar-foot">
         <button onclick="connectWallet()" id="connectBtn" class="wallet-btn">Connect Wallet</button>
         <div id="networkBadge" class="network-badge">Tempo Mainnet</div>
+        <button type="button" class="theme-toggle" data-theme-toggle>
+          <span class="theme-toggle-icon" aria-hidden="true">☀</span>
+          <span class="theme-toggle-label">Light Mode</span>
+        </button>
         <a class="sidebar-link" href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer">X</a>
       </div>
     </aside>
@@ -789,7 +791,7 @@
       <div class="topbar">
         <div class="topbar-title">Launch Market</div>
         <div class="topbar-right">
-          <div class="pill" id="walletPreview">Wallet not connected</div>
+          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Wallet not connected</button>
         </div>
       </div>
 
@@ -797,13 +799,8 @@
         <section id="home-panel" class="section panel hero">
           <div>
             <div class="hero-kicker">Tempomeme</div>
-            <h1 class="hero-title">A sharper launch market for Tempo memes.</h1>
-            <div class="hero-copy">Launch fast, track real on-chain flow, and browse a cleaner market surface built around USDC settlement and curve-driven discovery.</div>
-            <div class="hero-tags">
-              <span class="hero-tag">USDC Settled</span>
-              <span class="hero-tag">80% Internal Curve</span>
-              <span class="hero-tag">Real Trade Feed</span>
-            </div>
+            <h1 class="hero-title">Launch Tempo memes with USDC-native price discovery.</h1>
+            <div class="hero-copy">Built for Tempo's payments-first rails. Create a token, trade through the internal curve, and graduate into external liquidity once 80% of supply is sold.</div>
             <div class="hero-actions">
               <button onclick="window.location.href='/create'" class="hero-btn">Create Token</button>
               <button onclick="window.location.href='/tokens'" class="ghost-btn">View All Tokens</button>
@@ -837,12 +834,14 @@
     </main>
   </div>
 
+  <script src="/assets/wallet.js?v=20260322a"></script>
   <script>
     let provider, signer, userAddress;
     let allCards = [];
     let currentSort = "latest";
+    let walletSession;
 
-    const LAUNCH_CONTRACT = "0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4";
+    const LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
     const TEMPO_CHAIN = {
       chainId: "0x1079",
       chainName: "Tempo Mainnet",
@@ -861,47 +860,60 @@
       "event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut)"
     ];
 
+    function applyWalletConnected(address) {
+      const short = window.TempomemeWallet.formatAddress(address);
+      document.getElementById("connectBtn").textContent = short;
+      document.getElementById("walletPreview").textContent = short;
+      const networkBadge = document.getElementById("networkBadge");
+      networkBadge.textContent = "Tempo Mainnet";
+      networkBadge.classList.add("show");
+    }
+
+    function resetWalletUi(showWrongNetwork = false) {
+      provider = null;
+      signer = null;
+      userAddress = null;
+      document.getElementById("connectBtn").textContent = "Connect Wallet";
+      document.getElementById("walletPreview").textContent = "Wallet not connected";
+      const networkBadge = document.getElementById("networkBadge");
+      if (showWrongNetwork) {
+        networkBadge.textContent = "Switch to Tempo Mainnet";
+        networkBadge.classList.add("show");
+      } else {
+        networkBadge.textContent = "Tempo Mainnet";
+        networkBadge.classList.remove("show");
+      }
+    }
+
     async function autoConnect() {
-      if (!window.ethereum) return;
-      try {
-        await connectWallet(false);
-      } catch (e) {}
+      if (!walletSession) return;
+      await walletSession.init();
     }
 
     async function connectWallet(requestAccess = true) {
-      if (!window.ethereum) return;
-      try {
-        const accounts = await window.ethereum.request({
-          method: requestAccess ? "eth_requestAccounts" : "eth_accounts"
-        });
-        if (!accounts.length) return;
-        const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
-        if (currentChainId !== TEMPO_CHAIN.chainId) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: TEMPO_CHAIN.chainId }]
-            });
-          } catch (switchErr) {
-            if (switchErr.code === 4902) {
-              await window.ethereum.request({
-                method: "wallet_addEthereumChain",
-                params: [TEMPO_CHAIN]
-              });
-            } else {
-              throw switchErr;
-            }
-          }
+      if (!walletSession) return false;
+      return await walletSession.connect(requestAccess, { silent: !requestAccess });
+    }
+
+    function initWallet() {
+      walletSession = window.TempomemeWallet.createSession({
+        chain: TEMPO_CHAIN,
+        onConnect: async ({ address, provider: nextProvider, signer: nextSigner }) => {
+          provider = nextProvider;
+          signer = nextSigner;
+          userAddress = address;
+          applyWalletConnected(address);
+        },
+        onDisconnect: ({ reason }) => {
+          resetWalletUi(reason === "wrongChain");
+        },
+        onWrongChain: () => {
+          resetWalletUi(true);
+        },
+        onError: (message, error) => {
+          console.error("wallet error", error || message);
         }
-        provider = new ethers.BrowserProvider(window.ethereum);
-        signer = await provider.getSigner();
-        userAddress = await signer.getAddress();
-        document.getElementById("connectBtn").textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-        document.getElementById("walletPreview").textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-        document.getElementById("networkBadge").classList.add("show");
-      } catch (e) {
-        console.error(e);
-      }
+      });
     }
 
     function setSort(type) {
@@ -1105,6 +1117,7 @@
     }
 
     window.addEventListener("load", () => {
+      initWallet();
       autoConnect();
       loadTicker();
       loadTokenList();
@@ -1145,19 +1158,6 @@
       return null;
     }
 
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", (accounts) => {
-        if (accounts.length > 0) connectWallet(false);
-        else {
-          userAddress = null;
-          signer = null;
-          document.getElementById("connectBtn").textContent = "Connect Wallet";
-          document.getElementById("walletPreview").textContent = "Wallet not connected";
-          document.getElementById("networkBadge").classList.remove("show");
-        }
-      });
-      window.ethereum.on("chainChanged", () => window.location.reload());
-    }
   </script>
 </body>
 </html>

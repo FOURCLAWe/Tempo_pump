@@ -12,6 +12,17 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
   <script src="https://unpkg.com/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+  <script>
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem("tempomeme-theme");
+        if (savedTheme === "light" || savedTheme === "dark") {
+          document.documentElement.dataset.theme = savedTheme;
+          document.documentElement.style.colorScheme = savedTheme;
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       --bg: #050505;
@@ -193,6 +204,18 @@
       flex-wrap: wrap;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .token-description {
+      margin: 12px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    .token-description[hidden] {
+      display: none !important;
     }
 
     .token-links {
@@ -753,6 +776,9 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260322c">
+  <script src="/assets/theme.js?v=20260322a" defer></script>
+  <script src="/assets/wallet.js?v=20260322a"></script>
 </head>
 <body>
   <main class="page">
@@ -761,6 +787,10 @@
         <a href="/tokens" class="link-btn">← Back to Tokens</a>
       </div>
       <div class="topbar-right">
+        <button type="button" class="theme-toggle compact" data-theme-toggle>
+          <span class="theme-toggle-icon" aria-hidden="true">☀</span>
+          <span class="theme-toggle-label">Light Mode</span>
+        </button>
         <button onclick="connectWallet()" id="connectBtn" class="pill" style="cursor:pointer;">Connect Wallet</button>
       </div>
     </div>
@@ -775,6 +805,7 @@
             <span id="tokenAddr" class="mono"></span>
             <span id="creatorAddr" class="mono"></span>
           </div>
+          <p id="tokenDescription" class="token-description" hidden></p>
           <div id="tokenLinks" class="token-links" hidden></div>
         </div>
         <div class="price-box">
@@ -943,7 +974,7 @@
 
   <script>
     const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
-    const PRIMARY_LAUNCH_CONTRACT = "0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4";
+    const PRIMARY_LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
     const LAUNCH_ABI = [
       "function buy(address tokenAddr, uint256 usdcAmount)",
       "function sell(address tokenAddr, uint256 tokenAmount)",
@@ -985,6 +1016,7 @@
     const PRIMARY_PRICE_DELTA_RAW = 62n * 10n ** 12n;
 
     let provider, signer, userAddress, priceChart, candleSeries, volumeSeries, chartResizeObserver;
+    let walletSession;
     let tradeMode = "buy";
     let chartInterval = "1m";
     let latestTrades = [];
@@ -1153,11 +1185,22 @@
       await autoConnect();
     }
 
+    function applyWalletConnected(address) {
+      document.getElementById("connectBtn").textContent = window.TempomemeWallet.formatAddress(address);
+    }
+
+    function resetWalletUi(showWrongNetwork = false) {
+      signer = null;
+      userAddress = null;
+      provider = new ethers.JsonRpcProvider("https://rpc.tempo.xyz");
+      document.getElementById("connectBtn").textContent = showWrongNetwork ? "Switch to Tempo" : "Connect Wallet";
+      document.getElementById("walletTokenBalance").textContent = "Wallet not connected";
+      document.getElementById("walletUsdcBalance").textContent = "Wallet not connected";
+    }
+
     async function autoConnect() {
-      if (!window.ethereum) return;
-      try {
-        await connectWallet(false);
-      } catch (e) {}
+      if (!walletSession) return;
+      await walletSession.init();
     }
 
     function setTradeStatus(message = "", tone = "muted") {
@@ -1222,6 +1265,14 @@
 
       wrap.innerHTML = links.join("");
       wrap.hidden = false;
+    }
+
+    function renderTokenDescription(meta = {}) {
+      const descriptionEl = document.getElementById("tokenDescription");
+      if (!descriptionEl) return;
+      const description = typeof meta.description === "string" ? meta.description.trim() : "";
+      descriptionEl.textContent = description;
+      descriptionEl.hidden = !description;
     }
 
     function clearPresetActive(rowId) {
@@ -1309,6 +1360,7 @@
         document.getElementById("tokenSymbol").textContent = symbol;
         document.getElementById("tokenAddr").textContent = tokenAddress;
         document.getElementById("creatorAddr").textContent = info[0] ? `Creator ${info[0].slice(0, 6)}...${info[0].slice(-4)}` : "";
+        renderTokenDescription(meta);
         renderTokenLinks(meta);
         if (meta.image) {
           document.getElementById("tokenIcon").innerHTML = `<img src="${meta.image}" class="w-full h-full object-cover" onerror="this.parentElement.textContent='${symbol.slice(0,2).toUpperCase()}'">`;
@@ -1697,34 +1749,35 @@
     }
 
     async function connectWallet(requestAccess = true) {
-      if (!window.ethereum) return;
-      try {
-        const accounts = await window.ethereum.request({
-          method: requestAccess ? "eth_requestAccounts" : "eth_accounts"
-        });
-        if (!accounts.length) return;
-        const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
-        if (currentChainId !== TEMPO_CHAIN.chainId) {
-          try {
-            await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: TEMPO_CHAIN.chainId }] });
-          } catch (e) {
-            if (e.code === 4902) {
-              await window.ethereum.request({ method: "wallet_addEthereumChain", params: [TEMPO_CHAIN] });
-            } else {
-              throw e;
-            }
-          }
+      if (!walletSession) return false;
+      return await walletSession.connect(requestAccess, { silent: !requestAccess });
+    }
+
+    function initWallet() {
+      walletSession = window.TempomemeWallet.createSession({
+        chain: TEMPO_CHAIN,
+        onConnect: async ({ address, provider: nextProvider, signer: nextSigner }) => {
+          provider = nextProvider;
+          signer = nextSigner;
+          userAddress = address;
+          applyWalletConnected(address);
+          await updateWalletBalances();
+          await loadTokenInfo();
+          await updateTradeEstimate();
+        },
+        onDisconnect: ({ reason }) => {
+          resetWalletUi(reason === "wrongChain");
+          updateTradeEstimate();
+        },
+        onWrongChain: () => {
+          resetWalletUi(true);
+          updateTradeEstimate();
+        },
+        onError: (message, error) => {
+          console.error("wallet error", error || message);
+          setTradeStatus(message, "error");
         }
-        provider = new ethers.BrowserProvider(window.ethereum);
-        signer = await provider.getSigner();
-        userAddress = await signer.getAddress();
-        document.getElementById("connectBtn").textContent = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
-        await updateWalletBalances();
-        await loadTokenInfo();
-        await updateTradeEstimate();
-      } catch (e) {
-        console.error(e);
-      }
+      });
     }
 
     async function submitTrade() {
@@ -1835,21 +1888,8 @@
       return null;
     }
 
+    initWallet();
     init();
-
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", (accounts) => {
-        if (accounts.length > 0) connectWallet(false);
-        else {
-          userAddress = null;
-          signer = null;
-          document.getElementById("connectBtn").textContent = "Connect Wallet";
-          document.getElementById("walletTokenBalance").textContent = "Wallet not connected";
-          document.getElementById("walletUsdcBalance").textContent = "Wallet not connected";
-        }
-      });
-      window.ethereum.on("chainChanged", () => window.location.reload());
-    }
   </script>
 </body>
 </html>

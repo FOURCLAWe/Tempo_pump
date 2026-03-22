@@ -9,6 +9,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem("tempomeme-theme");
+        if (savedTheme === "light" || savedTheme === "dark") {
+          document.documentElement.dataset.theme = savedTheme;
+          document.documentElement.style.colorScheme = savedTheme;
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       --bg: #090a0d;
@@ -56,11 +67,10 @@
 
     .docs-app {
       display: grid;
-      grid-template-columns: 280px minmax(0, 1fr) 220px;
+      grid-template-columns: minmax(0, 1fr) 220px;
       min-height: 100vh;
     }
 
-    .sidebar,
     .toc {
       position: sticky;
       top: 0;
@@ -69,135 +79,15 @@
       padding: 20px 18px;
     }
 
-    .sidebar {
-      border-right: 1px solid var(--line);
-      background: rgba(10,11,13,0.8);
-      backdrop-filter: blur(16px);
-    }
-
     .toc {
       border-left: 1px solid var(--line);
       background: rgba(10,11,13,0.5);
       backdrop-filter: blur(16px);
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 44px;
-      margin-bottom: 18px;
-      font-family: "Space Grotesk", sans-serif;
-      font-size: 21px;
-      font-weight: 700;
-    }
-
-    .brand-mark {
-      width: 38px;
-      height: 38px;
-      min-width: 38px;
-      flex: 0 0 38px;
-      border-radius: 12px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border: 1px solid rgba(232,191,82,0.18);
-      background: #050505;
-      box-shadow: 0 14px 30px rgba(232,191,82,0.14);
-    }
-
-    .brand-mark svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .back-link {
-      min-height: 42px;
-      padding: 0 14px;
-      border-radius: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(180deg, rgba(24,27,31,0.96), rgba(14,16,19,0.98));
-      border: 1px solid var(--line);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-
-    .search-shell {
-      margin-top: 18px;
-      min-height: 46px;
-      padding: 0 14px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: linear-gradient(180deg, rgba(18,20,24,0.98), rgba(12,14,17,0.98));
-      border: 1px solid var(--line);
-      color: var(--muted);
-      font-size: 13px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-
-    .search-key {
-      padding: 3px 8px;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06);
-      color: #d7dbe4;
-      font-size: 11px;
-      font-weight: 700;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    }
-
-    .sidebar-group {
-      margin-top: 24px;
-      display: grid;
-      gap: 6px;
-    }
-
-    .sidebar-label {
-      margin-bottom: 8px;
-      color: var(--muted-2);
-      font-size: 11px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-    }
-
-    .sidebar-link {
-      min-height: 42px;
-      padding: 0 14px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      border: 1px solid transparent;
-      color: #dce1ea;
-      font-size: 14px;
-      font-weight: 600;
-      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
-    }
-
-    .sidebar-link:hover {
-      transform: translateX(3px);
-      background: rgba(255,255,255,0.03);
-      border-color: rgba(255,255,255,0.05);
-    }
-
-    .sidebar-link.active {
-      background: linear-gradient(90deg, rgba(232,191,82,0.12), rgba(151,255,93,0.06));
-      border-color: rgba(232,191,82,0.16);
-      color: var(--text);
-    }
-
     .content {
       min-width: 0;
-      padding: 28px 32px 40px;
+      padding: 28px 40px 40px;
     }
 
     .article {
@@ -386,7 +276,7 @@
 
     @media (max-width: 1180px) {
       .docs-app {
-        grid-template-columns: 260px minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr);
       }
 
       .toc {
@@ -395,17 +285,6 @@
     }
 
     @media (max-width: 900px) {
-      .docs-app {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: static;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--line);
-      }
-
       .content {
         padding: 20px 16px 32px;
       }
@@ -415,49 +294,68 @@
         grid-template-columns: 1fr;
       }
     }
+
+    html[data-theme="light"] body {
+      background:
+        radial-gradient(circle at 0% 0%, rgba(151,255,93,0.05), transparent 20%),
+        radial-gradient(circle at 100% 0%, rgba(232,191,82,0.08), transparent 22%),
+        linear-gradient(180deg, #f8f4ec 0%, #efe6d7 50%, #f1ebe0 100%);
+    }
+
+    html[data-theme="light"] .content,
+    html[data-theme="light"] .article {
+      color: #17120b;
+    }
+
+    html[data-theme="light"] .doc-section h2,
+    html[data-theme="light"] .article h1,
+    html[data-theme="light"] .summary-value,
+    html[data-theme="light"] .info-title,
+    html[data-theme="light"] .toc-link {
+      color: #17120b;
+    }
+
+    html[data-theme="light"] .lede,
+    html[data-theme="light"] .doc-text,
+    html[data-theme="light"] .info-copy,
+    html[data-theme="light"] .doc-list,
+    html[data-theme="light"] .toc-label {
+      color: #5f574b;
+    }
+
+    html[data-theme="light"] .summary-card,
+    html[data-theme="light"] .info-card,
+    html[data-theme="light"] .formula-box,
+    html[data-theme="light"] .toc-card {
+      background: linear-gradient(180deg, rgba(248,243,233,0.98), rgba(236,228,214,0.98));
+      border-color: rgba(65,52,23,0.1);
+      box-shadow: 0 16px 34px rgba(87,66,20,0.06), inset 0 1px 0 rgba(255,255,255,0.76);
+    }
+
+    html[data-theme="light"] code {
+      color: #8a5a0a;
+      background: rgba(232,191,82,0.1);
+      border-color: rgba(180,124,16,0.12);
+    }
+
+    html[data-theme="light"] .formula-text {
+      color: #2a2216;
+    }
+
+    html[data-theme="light"] .toc-link:hover {
+      color: #1e7b24;
+    }
   </style>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260322c">
+  <script src="/assets/theme.js?v=20260322a" defer></script>
 </head>
 <body>
   <div class="docs-app">
-    <aside class="sidebar">
-      <a href="/" class="brand">
-        <span class="brand-mark" aria-label="Tempomeme logo">
-          <svg viewBox="0 0 256 256" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="brandGoldDocsRefined" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fff3a0"/>
-                <stop offset="45%" stop-color="#ffd45a"/>
-                <stop offset="100%" stop-color="#b87a12"/>
-              </linearGradient>
-            </defs>
-            <rect width="256" height="256" rx="44" fill="#050505"/>
-            <path fill="url(#brandGoldDocsRefined)" d="M74 78h128l-12 34h-47l-29 105H76l29-105H62z"/>
-          </svg>
-        </span>
-        <span>Tempomeme Docs</span>
-      </a>
-
-      <a href="/" class="back-link">← Back to App</a>
-
-      <div class="search-shell">
-        <span>Search docs</span>
-        <span class="search-key">⌘K</span>
-      </div>
-
-      <div class="sidebar-group">
-        <div class="sidebar-label">Overview</div>
-        <a href="#overview" class="sidebar-link active">Brief Overview</a>
-        <a href="#chain" class="sidebar-link">1. Chain</a>
-        <a href="#curve" class="sidebar-link">2. Curve & Migration</a>
-        <a href="#tme" class="sidebar-link">3. Official Token</a>
-      </div>
-    </aside>
-
     <main class="content">
       <article class="article">
         <p class="eyebrow" id="overview">Tempomeme</p>
-        <h1>Brief Overview of Tempomeme</h1>
-        <p class="lede">Tempomeme is a Tempo Mainnet meme launch platform centered on USDC-settled curve trading, internal sale completion, and a defined platform fee policy around the official token <code>$TME</code>.</p>
+        <h1>Tempomeme on Tempo</h1>
+        <p class="lede">Tempomeme is a USDC-native meme launchpad built on Tempo Mainnet. The product pairs Tempo's payments-first design with internal curve trading, a clear graduation threshold, and a defined post-curve liquidity path.</p>
 
         <div class="summary-grid">
           <div class="summary-card">
@@ -476,7 +374,7 @@
 
         <section class="doc-section" id="chain">
           <h2>1. Chain</h2>
-          <p class="doc-text">Tempomeme is deployed on Tempo Mainnet. The current frontend, wallet connection flow, token creation flow, and trade flow are all designed around this chain only, so users interact with a single network and a single settlement asset.</p>
+          <p class="doc-text">Tempomeme runs on Tempo Mainnet because the launch flow is expressed in stablecoin terms from start to finish. Token creation, price discovery, and graduation are all designed around a single chain and a single settlement asset.</p>
 
           <div class="info-grid">
             <div class="info-card">
@@ -485,25 +383,26 @@
             </div>
             <div class="info-card">
               <div class="info-title">Settlement Asset</div>
-              <p class="info-copy">All current platform trading is settled in USDC on Tempo.<br>USDC: <code>0x20c000000000000000000000b9537d11c60e8b50</code></p>
+              <p class="info-copy">All current platform trading is settled in USDC on Tempo, which keeps launch pricing, trade flow, and graduation accounting in stablecoin terms.<br>USDC: <code>0x20c000000000000000000000b9537d11c60e8b50</code></p>
             </div>
           </div>
 
           <ul class="doc-list">
             <li>Users need an EVM wallet connected to Tempo Mainnet.</li>
-            <li>Token creation, buying, and selling all run on Tempo.</li>
+            <li>Token creation, buying, and selling all run on Tempo without switching to a separate execution environment.</li>
             <li>The current launch flow uses USDC as the settlement token for the internal curve.</li>
+            <li>This makes the entire launch experience easier to reason about in USD terms instead of volatile gas-asset terms.</li>
           </ul>
         </section>
 
         <section class="doc-section" id="curve">
           <h2>2. Price Curve and External Migration</h2>
-          <p class="doc-text">The current primary launch contract uses a quadratic pricing curve across the internal sale cap. Price moves upward as sold supply increases, and the project only moves to the external liquidity stage after the internal curve is completely filled.</p>
+          <p class="doc-text">Tempomeme uses a quadratic internal curve for price discovery. Trading stays inside the platform until 80% of supply is sold, and only then does the project graduate toward external liquidity deployment.</p>
 
           <div class="info-grid">
             <div class="info-card">
               <div class="info-title">Primary Launch Contract</div>
-              <p class="info-copy"><code>0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4</code></p>
+              <p class="info-copy"><code>0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf</code></p>
             </div>
             <div class="info-card">
               <div class="info-title">Internal Sale Cap</div>
@@ -548,12 +447,13 @@ migrate when sold >= 800,000,000</div>
             <li>External migration is triggered only after <code>800,000,000</code> tokens are sold on the internal curve.</li>
             <li>On a no-sell path, completely filling the curve is about <code>19,124.58 USDC</code> gross user spend.</li>
             <li>After the current <code>1%</code> trading fee, the contract retains about <code>18,933.33 USDC</code> net.</li>
+            <li>At graduation, the remaining <code>20%</code> of token supply and <code>19,124.58 USDC</code> are intended to be added as liquidity on <code>Uniswap V2</code>.</li>
           </ul>
         </section>
 
         <section class="doc-section" id="tme">
           <h2>3. Official Token</h2>
-          <p class="doc-text">The official ecosystem token is <code>$TME</code>. In the current platform description, trading fees are treated as both ecosystem support and operating revenue, with the stated split designed to support the token and the platform at the same time.</p>
+          <p class="doc-text">The official ecosystem token is <code>$TME</code>. Tempomeme describes platform fees as both ecosystem support and operating revenue, with the stated split designed to reinforce the official token while still funding long-term product maintenance and growth.</p>
 
           <div class="info-grid">
             <div class="info-card">
@@ -578,7 +478,7 @@ migrate when sold >= 800,000,000</div>
     <aside class="toc">
       <div class="toc-card">
         <div class="toc-label">On this page</div>
-        <a href="#overview" class="toc-link">Brief Overview</a>
+        <a href="#overview" class="toc-link">Tempomeme on Tempo</a>
         <a href="#chain" class="toc-link">1. Chain</a>
         <a href="#curve" class="toc-link">2. Curve & Migration</a>
         <a href="#tme" class="toc-link">3. Official Token</a>

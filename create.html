@@ -11,6 +11,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+  <script>
+    (() => {
+      try {
+        const savedTheme = localStorage.getItem("tempomeme-theme");
+        if (savedTheme === "light" || savedTheme === "dark") {
+          document.documentElement.dataset.theme = savedTheme;
+          document.documentElement.style.colorScheme = savedTheme;
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       --bg: #050505;
@@ -113,35 +124,48 @@
       min-height: 42px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; background: linear-gradient(180deg, rgba(30,33,29,0.95), rgba(18,20,18,0.98));
       border: 1px solid rgba(255,255,255,0.07); color: var(--text); font-size: 13px; font-weight: 700; transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
+    .pill-button {
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: inherit;
+      cursor: pointer;
+    }
     .page { padding: 24px 20px 36px; }
     .create-shell {
       width: min(980px, 100%);
       margin: 0 auto;
       display: grid;
-      gap: 18px;
+      gap: 16px;
     }
     .create-head {
       display: grid;
-      gap: 8px;
+      gap: 6px;
       padding: 0 4px;
     }
     .create-eyebrow {
-      color: var(--text);
-      font-size: 15px;
+      color: #f0ca67;
+      font-size: 12px;
       font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
     }
     .create-subtitle {
       color: var(--text);
-      font-size: 22px;
-      font-weight: 800;
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1;
     }
     .create-copy {
-      color: #9eb0cb;
-      font-size: 15px;
-      line-height: 1.7;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      max-width: 620px;
     }
     .create-card {
-      padding: 24px;
+      padding: 30px;
+    }
+    .required-mark {
+      color: #ff7f61;
     }
     .optional-label {
       color: #99a7bd;
@@ -182,20 +206,29 @@
       display: grid;
       gap: 12px;
       margin-top: 14px;
+      justify-items: center;
+    }
+    .social-surface {
+      width: min(760px, 100%);
+      display: grid;
+      gap: 12px;
     }
     .actions-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
-      justify-content: space-between;
       gap: 14px;
-      flex-wrap: wrap;
       margin-top: 6px;
+      width: min(820px, 100%);
+      margin-inline: auto;
     }
     .actions-copy {
       color: var(--muted);
       font-size: 13px;
       line-height: 1.7;
-      max-width: 460px;
+      min-width: 0;
+      max-width: none;
+      padding-right: 8px;
     }
     #resultBox:empty {
       display: none;
@@ -248,7 +281,29 @@
       display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 999px; background: var(--gold-soft);
       border: 1px solid var(--gold-line); color: var(--gold); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
     }
-    .field-stack { display: grid; gap: 12px; }
+    .field-stack { display: grid; gap: 22px; }
+    .identity-grid {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+    .identity-fields {
+      display: grid;
+      gap: 18px;
+    }
+    .artwork-field {
+      display: grid;
+      gap: 10px;
+    }
+    .field-inline-label {
+      display: block;
+      color: #96a391;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
     .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
     .field label {
       display: block; margin-bottom: 8px; color: #96a391; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 800;
@@ -257,7 +312,118 @@
       width: 100%; border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98)); color: var(--text);
       padding: 13px 14px; font-size: 14px; outline: none; transition: box-shadow 180ms ease, border-color 180ms ease;
     }
-    .textarea { resize: vertical; min-height: 110px; }
+    .textarea { resize: vertical; min-height: 168px; }
+    .artwork-tile {
+      width: 220px;
+      aspect-ratio: 1;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(9,10,9,0.99));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      display: block;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+    .artwork-preview {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .artwork-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+      display: block;
+    }
+    .artwork-placeholder {
+      display: grid;
+      gap: 10px;
+      justify-items: center;
+      text-align: center;
+      color: var(--muted);
+    }
+    .artwork-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #f3d98b;
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .artwork-placeholder-title {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .artwork-placeholder-meta {
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .settings-strip {
+      width: min(820px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .setting-chip {
+      min-height: 76px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(20,22,20,0.96), rgba(11,12,11,0.98));
+      border: 1px solid rgba(255,255,255,0.07);
+      display: grid;
+      align-content: center;
+      gap: 6px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    .setting-chip.primary {
+      border-color: rgba(151,255,93,0.22);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 14px 28px rgba(151,255,93,0.08);
+    }
+    .setting-label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+    .setting-value {
+      color: var(--text);
+      font-size: 19px;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .social-section {
+      display: grid;
+      gap: 12px;
+    }
+    .section-inline-title {
+      width: min(820px, 100%);
+      margin: 0 auto;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .social-grid {
+      width: min(820px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
     .image-box {
       display: grid;
       grid-template-columns: 108px minmax(0, 1fr);
@@ -274,17 +440,25 @@
     }
     .image-controls { display: grid; gap: 12px; min-width: 0; }
     .upload-surface {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      min-height: 108px;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 14px;
+      width: min(520px, 100%);
+      min-height: 168px;
+      margin: 0 auto;
       padding: 18px 20px;
       border-radius: 18px;
       border: 1px dashed rgba(255,255,255,0.12);
       background: linear-gradient(180deg, rgba(21,23,21,0.96), rgba(12,14,12,0.98));
     }
-    .upload-copy { display: grid; gap: 6px; min-width: 0; }
+    .upload-copy {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      text-align: center;
+      justify-items: center;
+    }
     .upload-title {
       font-size: 16px;
       font-weight: 800;
@@ -294,10 +468,10 @@
       color: var(--muted);
       font-size: 13px;
       line-height: 1.7;
-      max-width: 440px;
+      max-width: 320px;
     }
     .upload-btn {
-      min-width: 188px;
+      min-width: 176px;
       min-height: 56px;
       padding: 8px 12px 8px 10px;
       border-radius: 18px;
@@ -364,6 +538,7 @@
     .wallet-btn:hover, .submit-btn:hover, .pill:hover, .upload-btn:hover { transform: translateY(-2px); border-color: rgba(232,191,82,0.16); }
     .wallet-btn:hover, .submit-btn:hover { filter: brightness(1.03); box-shadow: 0 18px 32px rgba(232,191,82,0.18); }
     .preview:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 14px 24px rgba(232,191,82,0.16); }
+    .artwork-tile:hover { transform: translateY(-2px); border-color: rgba(232,191,82,0.16); box-shadow: 0 18px 32px rgba(232,191,82,0.12); }
     .input:focus, .textarea:focus { box-shadow: 0 0 0 4px rgba(232,191,82,0.07); border-color: rgba(232,191,82,0.18); }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -379,6 +554,14 @@
       .page, .topbar { padding-left: 14px; padding-right: 14px; }
       .topbar { width: calc(100% - 28px); }
       .grid-2 { grid-template-columns: 1fr; }
+      .identity-grid { grid-template-columns: 1fr; }
+      .identity-fields { gap: 14px; }
+      .artwork-tile { width: min(220px, 100%); }
+      .artwork-field { justify-items: center; }
+      .field-inline-label { width: 100%; }
+      .settings-strip { grid-template-columns: 1fr; }
+      .social-grid, .section-inline-title { width: 100%; }
+      .social-surface { width: 100%; }
       .image-box { grid-template-columns: 1fr; }
       .preview { width: 96px; height: 96px; }
       .upload-surface {
@@ -386,14 +569,151 @@
         flex-direction: column;
       }
       .create-card { padding: 18px; }
-      .actions-row { align-items: stretch; }
+      .actions-row {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        width: 100%;
+      }
       .submit-btn { width: 100%; }
       .metric-list { grid-template-columns: 1fr; }
       .hero h1 { font-size: 42px; }
       .hero { padding: 24px 18px; }
       .hero-grid { grid-template-columns: 1fr; }
     }
+
+    html[data-theme="light"] .create-card {
+      background: linear-gradient(180deg, rgba(250,246,238,0.98), rgba(241,234,222,0.98));
+    }
+
+    html[data-theme="light"] .field label {
+      color: #7a7469;
+    }
+
+    html[data-theme="light"] .field-inline-label,
+    html[data-theme="light"] .setting-label {
+      color: #7a7469;
+    }
+
+    html[data-theme="light"] .optional-label {
+      color: #8d92a3;
+    }
+
+    html[data-theme="light"] .submit-btn {
+      background: linear-gradient(135deg, #f2c857, #e0a91f);
+      color: #181108;
+      box-shadow: 0 16px 28px rgba(180,124,16,0.16);
+    }
+
+    html[data-theme="light"] .image-box {
+      background: linear-gradient(180deg, rgba(247,242,233,0.98), rgba(238,230,216,0.98));
+      border-color: rgba(65,52,23,0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.68);
+    }
+
+    html[data-theme="light"] .artwork-tile {
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(242,235,223,0.98));
+      border-color: rgba(65,52,23,0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.74);
+    }
+
+    html[data-theme="light"] .artwork-icon {
+      background: rgba(232,191,82,0.1);
+      border-color: rgba(180,124,16,0.12);
+      color: #c38712;
+    }
+
+    html[data-theme="light"] .artwork-placeholder-title,
+    html[data-theme="light"] .section-inline-title {
+      color: #1f180f;
+    }
+
+    html[data-theme="light"] .artwork-placeholder-meta,
+    html[data-theme="light"] .create-copy {
+      color: #6b6255;
+    }
+
+    html[data-theme="light"] .setting-chip {
+      background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(244,238,227,0.92));
+      border-color: rgba(191,164,106,0.18);
+      box-shadow: 0 16px 32px rgba(207,184,144,0.12);
+    }
+
+    html[data-theme="light"] .setting-chip.primary {
+      border-color: rgba(102,184,71,0.22);
+      box-shadow: 0 16px 32px rgba(140,196,118,0.14);
+    }
+
+    html[data-theme="light"] .setting-value {
+      color: #1e170d;
+    }
+
+    html[data-theme="light"] .preview {
+      background: linear-gradient(135deg, #f3ca59, #e3ad20);
+      color: #1a1207;
+      box-shadow: 0 14px 28px rgba(180,124,16,0.16);
+    }
+
+    html[data-theme="light"] .upload-surface {
+      border-color: rgba(65,52,23,0.12);
+      background: linear-gradient(180deg, rgba(243,236,223,0.98), rgba(233,224,208,0.98));
+    }
+
+    html[data-theme="light"] .upload-title {
+      color: #21180d;
+    }
+
+    html[data-theme="light"] .upload-note {
+      color: #6b6255;
+    }
+
+    html[data-theme="light"] .upload-btn {
+      border-color: rgba(180,124,16,0.16);
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(243,236,223,0.98));
+      color: #1d160c;
+      box-shadow: 0 12px 26px rgba(87,66,20,0.08), inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    html[data-theme="light"] .upload-btn-icon {
+      background: rgba(232,191,82,0.12);
+      border-color: rgba(180,124,16,0.12);
+      color: #c38712;
+    }
+
+    html[data-theme="light"] .upload-btn-label {
+      color: #20180d;
+    }
+
+    html[data-theme="light"] .upload-btn-meta {
+      color: #8a7b60;
+    }
+
+    html[data-theme="light"] .optional-block {
+      border-top-color: rgba(65,52,23,0.1);
+    }
+
+    html[data-theme="light"] .optional-block summary {
+      color: #1b160f;
+    }
+
+    html[data-theme="light"] .optional-summary-right {
+      color: #6c6457;
+    }
+
+    html[data-theme="light"] .social-surface {
+      background: linear-gradient(180deg, rgba(255,255,255,0.56), rgba(248,242,230,0.78));
+      border: 1px solid rgba(191,164,106,0.2);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 18px 36px rgba(207, 184, 144, 0.14);
+    }
+
+    html[data-theme="light"] .actions-copy,
+    html[data-theme="light"] .hint {
+      color: #635c50;
+    }
   </style>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260322c">
+  <script src="/assets/theme.js?v=20260322a" defer></script>
 </head>
 <body>
   <div class="app">
@@ -437,6 +757,10 @@
       <div class="sidebar-foot">
         <button onclick="connectWallet()" id="connectBtn" class="wallet-btn">Connect Wallet</button>
         <div id="networkBadge" class="network-badge">Tempo Mainnet</div>
+        <button type="button" class="theme-toggle" data-theme-toggle>
+          <span class="theme-toggle-icon" aria-hidden="true">☀</span>
+          <span class="theme-toggle-label">Light Mode</span>
+        </button>
       </div>
     </aside>
 
@@ -444,28 +768,45 @@
       <div class="topbar">
         <div class="pill">Create</div>
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <div class="pill" id="walletPreview">Wallet not connected</div>
+          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Wallet not connected</button>
         </div>
       </div>
 
       <div class="page">
         <section class="create-shell">
           <div class="create-head">
-            <div class="create-eyebrow">Create new coin</div>
-            <div class="create-subtitle">Coin details</div>
-            <div class="create-copy">Choose carefully, these can't be changed once the coin is created.</div>
+            <div class="create-eyebrow">Create token</div>
+            <div class="create-subtitle">Set the token identity.</div>
+            <div class="create-copy">Keep the form clean and legible. The launch flow stays fixed to Tempomeme: USDC settlement, 80% internal sale, then external liquidity.</div>
           </div>
 
           <section class="panel create-card">
             <div class="field-stack">
-              <div class="grid-2">
-                <div class="field">
-                  <label for="name">Coin name</label>
-                  <input id="name" class="input" placeholder="Name your coin">
+              <div class="identity-grid">
+                <div class="artwork-field">
+                  <label for="imageFile" class="field-inline-label">Token artwork <span class="optional-label">(Optional)</span></label>
+                  <label class="artwork-tile">
+                    <div id="imagePreview" class="artwork-preview">
+                      <div class="artwork-placeholder">
+                        <div class="artwork-icon">+</div>
+                        <div class="artwork-placeholder-title">Upload image</div>
+                        <div class="artwork-placeholder-meta">PNG JPG WEBP</div>
+                      </div>
+                    </div>
+                    <input type="file" id="imageFile" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                  </label>
+                  <input id="image" type="hidden">
                 </div>
-                <div class="field">
-                  <label for="symbol">Ticker</label>
-                  <input id="symbol" class="input" placeholder="Add a coin ticker (e.g. DOGE)">
+
+                <div class="identity-fields">
+                  <div class="field">
+                    <label for="name">Coin name <span class="required-mark">*</span></label>
+                    <input id="name" class="input" placeholder="Name your coin">
+                  </div>
+                  <div class="field">
+                    <label for="symbol">Ticker <span class="required-mark">*</span></label>
+                    <input id="symbol" class="input" placeholder="Add a coin ticker (e.g. DOGE)">
+                  </div>
                 </div>
               </div>
 
@@ -474,51 +815,34 @@
                 <textarea id="description" class="textarea" placeholder="Write a short description"></textarea>
               </div>
 
-              <div class="field">
-                <label>Token artwork <span class="optional-label">(Optional)</span></label>
-                <div class="image-box">
-                  <div id="imagePreview" class="preview">🪙</div>
-                  <div class="image-controls">
-                    <div class="upload-surface">
-                      <div class="upload-copy">
-                        <div class="upload-title">Artwork upload</div>
-                        <div class="upload-note">Use a square image for the cleanest token card.</div>
-                      </div>
-                      <label class="upload-btn">
-                        <span class="upload-btn-icon">+</span>
-                        <span class="upload-btn-copy">
-                          <span id="uploadBtnText" class="upload-btn-label">Choose File</span>
-                          <span id="uploadBtnMeta" class="upload-btn-meta">PNG JPG WEBP</span>
-                        </span>
-                        <input type="file" id="imageFile" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                      </label>
-                    </div>
-                    <input id="image" type="hidden">
-                  </div>
+              <div class="settings-strip">
+                <div class="setting-chip primary">
+                  <div class="setting-label">Settlement token</div>
+                  <div class="setting-value">USDC</div>
+                </div>
+                <div class="setting-chip">
+                  <div class="setting-label">Internal sale cap</div>
+                  <div class="setting-value">80%</div>
+                </div>
+                <div class="setting-chip">
+                  <div class="setting-label">External LP reserve</div>
+                  <div class="setting-value">19,124.58 USDC</div>
                 </div>
               </div>
 
-              <details class="optional-block" open>
-                <summary>
-                  <span class="optional-summary-left">
-                    <span>⛓</span>
-                    <span>Add social links <span class="optional-label">(Optional)</span></span>
-                  </span>
-                  <span class="optional-summary-right">⌃</span>
-                </summary>
-                <div class="optional-body">
-                  <div class="grid-2">
-                    <div class="field">
-                      <label for="website">Website</label>
-                      <input id="website" class="input" placeholder="Add URL">
-                    </div>
-                    <div class="field">
-                      <label for="twitter">X</label>
-                      <input id="twitter" class="input" placeholder="Add URL">
-                    </div>
+              <div class="social-section">
+                <div class="section-inline-title">Social links <span class="optional-label">(Optional)</span></div>
+                <div class="social-grid">
+                  <div class="field">
+                    <label for="website">Website</label>
+                    <input id="website" class="input" placeholder="Add URL">
+                  </div>
+                  <div class="field">
+                    <label for="twitter">X</label>
+                    <input id="twitter" class="input" placeholder="Add URL">
                   </div>
                 </div>
-              </details>
+              </div>
 
               <div class="actions-row">
                 <div class="actions-copy">Creation deploys a new token on-chain and registers it in the Tempomeme launch contract.</div>
@@ -533,9 +857,11 @@
     </main>
   </div>
 
+  <script src="/assets/wallet.js?v=20260322a"></script>
   <script>
     let provider, signer, userAddress;
-    const LAUNCH_CONTRACT = "0x25d8978d45e8987b55e3E16132eb4a65Bf4Dc6C4";
+    let walletSession;
+    const LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
     const LAUNCH_ABI = [
       "function createLaunch(string name, string symbol, string meta) returns (address)",
       "function createToken(string name, string symbol, string meta) returns (address)",
@@ -548,13 +874,6 @@
       rpcUrls: ["https://rpc.tempo.xyz"],
       blockExplorerUrls: ["https://explore.mainnet.tempo.xyz"]
     };
-
-    async function autoConnect() {
-      if (!window.ethereum) return;
-      try {
-        await connectWallet(false);
-      } catch (e) {}
-    }
 
     function handleImageUpload(e) {
       const file = e.target.files[0];
@@ -576,41 +895,63 @@
       reader.readAsDataURL(file);
     }
 
-    async function connectWallet(requestAccess = true) {
-      if (!window.ethereum) return setResult("Please install MetaMask or another EVM wallet.", true);
-      try {
-        const accounts = await window.ethereum.request({
-          method: requestAccess ? "eth_requestAccounts" : "eth_accounts"
-        });
-        if (!accounts.length) return;
-        const currentChainId = await window.ethereum.request({ method: "eth_chainId" });
-        if (currentChainId !== TEMPO_CHAIN.chainId) {
-          try {
-            await window.ethereum.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: TEMPO_CHAIN.chainId }]
-            });
-          } catch (switchErr) {
-            if (switchErr.code === 4902) {
-              await window.ethereum.request({
-                method: "wallet_addEthereumChain",
-                params: [TEMPO_CHAIN]
-              });
-            } else {
-              throw switchErr;
-            }
-          }
-        }
-        provider = new ethers.BrowserProvider(window.ethereum);
-        signer = await provider.getSigner();
-        userAddress = await signer.getAddress();
-        document.getElementById("connectBtn").textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-        document.getElementById("walletPreview").textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-        document.getElementById("networkBadge").classList.add("show");
-        setResult(`Wallet connected: ${userAddress}`);
-      } catch (e) {
-        setResult(`Connection failed: ${e.message}`, true);
+    function applyWalletConnected(address, announce = false) {
+      const short = window.TempomemeWallet.formatAddress(address);
+      document.getElementById("connectBtn").textContent = short;
+      document.getElementById("walletPreview").textContent = short;
+      const networkBadge = document.getElementById("networkBadge");
+      networkBadge.textContent = "Tempo Mainnet";
+      networkBadge.classList.add("show");
+      if (announce) {
+        setResult(`Wallet connected: ${address}`);
       }
+    }
+
+    function resetWalletUi(showWrongNetwork = false) {
+      provider = null;
+      signer = null;
+      userAddress = null;
+      document.getElementById("connectBtn").textContent = "Connect Wallet";
+      document.getElementById("walletPreview").textContent = "Wallet not connected";
+      const networkBadge = document.getElementById("networkBadge");
+      if (showWrongNetwork) {
+        networkBadge.textContent = "Switch to Tempo Mainnet";
+        networkBadge.classList.add("show");
+      } else {
+        networkBadge.textContent = "Tempo Mainnet";
+        networkBadge.classList.remove("show");
+      }
+    }
+
+    async function autoConnect() {
+      if (!walletSession) return;
+      await walletSession.init();
+    }
+
+    async function connectWallet(requestAccess = true) {
+      if (!walletSession) return false;
+      return await walletSession.connect(requestAccess, { silent: !requestAccess });
+    }
+
+    function initWallet() {
+      walletSession = window.TempomemeWallet.createSession({
+        chain: TEMPO_CHAIN,
+        onConnect: async ({ address, provider: nextProvider, signer: nextSigner, requestAccess }) => {
+          provider = nextProvider;
+          signer = nextSigner;
+          userAddress = address;
+          applyWalletConnected(address, requestAccess);
+        },
+        onDisconnect: ({ reason }) => {
+          resetWalletUi(reason === "wrongChain");
+        },
+        onWrongChain: () => {
+          resetWalletUi(true);
+        },
+        onError: (message) => {
+          setResult(`Connection failed: ${message}`, true);
+        }
+      });
     }
 
     async function createLaunch() {
@@ -663,21 +1004,10 @@
       box.style.borderColor = isError ? "rgba(255,140,120,0.16)" : "rgba(141,255,85,0.18)";
     }
 
-    window.addEventListener("load", autoConnect);
-
-    if (window.ethereum) {
-      window.ethereum.on("accountsChanged", (accounts) => {
-        if (accounts.length > 0) connectWallet(false);
-        else {
-          userAddress = null;
-          signer = null;
-          document.getElementById("connectBtn").textContent = "Connect Wallet";
-          document.getElementById("walletPreview").textContent = "Wallet not connected";
-          document.getElementById("networkBadge").classList.remove("show");
-        }
-      });
-      window.ethereum.on("chainChanged", () => window.location.reload());
-    }
+    window.addEventListener("load", () => {
+      initWallet();
+      autoConnect();
+    });
   </script>
 </body>
 </html>

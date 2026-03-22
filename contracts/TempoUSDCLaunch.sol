@@ -76,6 +76,7 @@ contract TempoUSDCLaunch {
     event TokenBought(address indexed token, address indexed buyer, uint256 usdcIn, uint256 tokensOut);
     event TokenSold(address indexed token, address indexed seller, uint256 tokensIn, uint256 usdcOut);
     event Graduated(address indexed token);
+    event ManualGraduation(address indexed token, address indexed admin);
     event LaunchUsdcWithdrawn(address indexed token, address indexed to, uint256 amount);
     event LaunchTokensWithdrawn(address indexed token, address indexed to, uint256 amount);
 
@@ -200,7 +201,17 @@ contract TempoUSDCLaunch {
         return allLaunches.length;
     }
 
+    function manualGraduate(address t) public onlyLaunchAdmin(t) {
+        require(isLaunch[t]);
+        Launch storage l = launches[t];
+        require(!l.graduated);
+        l.graduated = true;
+        emit ManualGraduation(t, msg.sender);
+        emit Graduated(t);
+    }
+
     function withdrawLaunchUSDC(address t, address to, uint256 amount) external onlyLaunchAdmin(t) {
+        require(isLaunch[t]);
         Launch storage l = launches[t];
         require(l.graduated);
         require(amount <= l.raised);
@@ -210,6 +221,7 @@ contract TempoUSDCLaunch {
     }
 
     function withdrawLaunchTokens(address t, address to, uint256 amount) external onlyLaunchAdmin(t) {
+        require(isLaunch[t]);
         Launch storage l = launches[t];
         require(l.graduated);
         require(TempoMemeToken(t).transfer(to, amount));
