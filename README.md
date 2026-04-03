@@ -1,9 +1,9 @@
-# Tempomeme
+# TempoBoard
 
-Tempomeme is a meme launchpad built on Tempo Mainnet.
+TempoBoard is a meme launchpad built on Tempo Mainnet.
 
 It combines:
-- a `TempoUSDCLaunch` contract for token creation, curve trading, fees, and graduation
+- a launch contract for token creation, curve trading, fees, and graduation
 - a static multi-page frontend for market browsing, token creation, token detail, and docs
 - Vercel rewrites for clean routes like `/token?token=...`
 
@@ -17,8 +17,8 @@ Project documentation lives here:
 
 - Chain: `Tempo Mainnet`
 - Chain ID: `4217`
-- USDC: `0x20c000000000000000000000b9537d11c60e8b50`
-- Primary launch contract: `0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf`
+- pathUSD: `0x20c0000000000000000000000000000000000000`
+- Primary launch contract: `0x5866914946e4B7c7B2C789cc5EE259b73CBa2274`
 
 ## Frontend Routes
 

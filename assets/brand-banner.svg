@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" role="img" aria-label="TempoBoard brand banner">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="40" x2="1420" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="55%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#070d16"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="1030" y1="146" x2="1310" y2="410" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#82ffd8"/>
+      <stop offset="52%" stop-color="#68ddff"/>
+      <stop offset="100%" stop-color="#6c89ff"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="1242" y1="132" x2="1350" y2="216" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fff4ad"/>
+      <stop offset="100%" stop-color="#f6c86c"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#82ffd8"/>
+      <stop offset="50%" stop-color="#68ddff"/>
+      <stop offset="100%" stop-color="#6c89ff"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="28" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0.85  0 0 1 0 1  0 0 0 0.22 0"/>
+    </filter>
+  </defs>
+
+  <rect width="1500" height="500" fill="#070d16"/>
+  <rect width="1500" height="500" fill="url(#bg)"/>
+
+  <circle cx="1230" cy="116" r="118" fill="#7e87ff" opacity="0.12" filter="url(#glow)"/>
+  <circle cx="1368" cy="372" r="126" fill="#8ef3b1" opacity="0.07" filter="url(#glow)"/>
+  <path d="M0 432h1500" stroke="#182234" stroke-width="1"/>
+  <path d="M0 84h1500" stroke="#131d2b" stroke-width="1"/>
+
+  <g transform="translate(108 120)">
+    <text x="0" y="92" fill="#f4f7fb" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="108" font-weight="800" letter-spacing="-3">
+      TempoBoard
+    </text>
+    <text x="3" y="152" fill="#8f98a8" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="32" font-weight="500">
+      The launch board on Tempo.
+    </text>
+    <path d="M0 206h380" stroke="url(#line)" stroke-width="8" stroke-linecap="round"/>
+    <text x="0" y="266" fill="#d3dae6" font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="24" font-weight="500">
+      pathUSD-native launches, curve trading, and graduation into external liquidity.
+    </text>
+  </g>
+
+  <g transform="translate(950 88)" opacity="0.94">
+    <path d="M230 70c24 0 44 20 44 44v4c0 24-20 44-44 44h-46v106c0 29-24 53-53 53h-2c-29 0-53-24-53-53V162H66c-24 0-44-20-44-44v-4c0-24 20-44 44-44z"
+          fill="#070d16" opacity="0.34" transform="translate(12 12)"/>
+    <path d="M230 70c24 0 44 20 44 44v4c0 24-20 44-44 44h-46v106c0 29-24 53-53 53h-2c-29 0-53-24-53-53V162H66c-24 0-44-20-44-44v-4c0-24 20-44 44-44z"
+          fill="url(#mark)"/>
+    <path d="M171 164l52 52" stroke="#07101a" stroke-width="18" stroke-linecap="round" opacity="0.24"/>
+    <path d="M188 110c12-22 31-37 54-37 15 0 29 6 40 18" fill="none" stroke="#8ef3b1" stroke-opacity="0.44" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="278" cy="108" r="25" fill="url(#accent)"/>
+    <circle cx="278" cy="108" r="9" fill="#fffdf4" opacity="0.82"/>
+  </g>
+</svg>

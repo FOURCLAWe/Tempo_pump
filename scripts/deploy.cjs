@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 
 async function main() {
-  const USDC = "0x20c000000000000000000000b9537d11c60e8b50";
+  const SETTLEMENT_TOKEN = "0x20c0000000000000000000000000000000000000";
 
   console.log("正在部署 TempoUSDCLaunch...");
   
@@ -12,7 +12,7 @@ async function main() {
   console.log("账户余额:", ethers.formatEther(balance));
 
   const Launch = await ethers.getContractFactory("TempoUSDCLaunch");
-  const launch = await Launch.deploy(USDC);
+  const launch = await Launch.deploy(SETTLEMENT_TOKEN);
   await launch.waitForDeployment();
 
   console.log("✅ 合约地址:", await launch.getAddress());

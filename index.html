@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tempomeme</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-  <link rel="apple-touch-icon" href="/assets/logo.svg">
+  <title>TempoBoard</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=20260403logo2">
+  <link rel="apple-touch-icon" href="/assets/logo.svg?v=20260403logo2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,12 +14,10 @@
   <script>
     (() => {
       try {
-        const savedTheme = localStorage.getItem("tempomeme-theme");
-        if (savedTheme === "light" || savedTheme === "dark") {
-          document.documentElement.dataset.theme = savedTheme;
-          document.documentElement.style.colorScheme = savedTheme;
-        }
+        localStorage.setItem("tempomeme-theme", "dark");
       } catch (e) {}
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
     })();
   </script>
   <style>
@@ -727,27 +725,17 @@
       .token-media { height: 180px; }
     }
   </style>
-  <link rel="stylesheet" href="/assets/theme.css?v=20260330c">
-  <script src="/assets/theme.js?v=20260322a" defer></script>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260403f">
+  <script src="/assets/theme.js?v=20260330d" defer></script>
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-mark" aria-label="Tempomeme logo">
-          <svg viewBox="0 0 256 256" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="brandGoldIndex" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fff3a0"/>
-                <stop offset="45%" stop-color="#ffd45a"/>
-                <stop offset="100%" stop-color="#b87a12"/>
-              </linearGradient>
-            </defs>
-            <rect width="256" height="256" rx="44" fill="#050505"/>
-            <path fill="url(#brandGoldIndex)" d="M74 78h128l-12 34h-47l-29 105H76l29-105H62z"/>
-          </svg>
+        <span class="brand-mark" aria-label="TempoBoard logo">
+          <img src="/assets/logo.svg?v=20260403logo2" alt="TempoBoard logo">
         </span>
-        <span>Tempomeme</span>
+        <span>TempoBoard</span>
       </div>
 
       <nav class="nav">
@@ -767,17 +755,11 @@
           <span class="nav-icon">◫</span>
           <span class="nav-label">Docs</span>
         </a>
+        <a href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer" class="nav-item">
+          <span class="nav-icon">↗</span>
+          <span class="nav-label">X</span>
+        </a>
       </nav>
-
-      <div class="sidebar-foot">
-        <button onclick="connectWallet()" id="connectBtn" class="wallet-btn">Connect Wallet</button>
-        <div id="networkBadge" class="network-badge">Tempo Mainnet</div>
-        <button type="button" class="theme-toggle" data-theme-toggle>
-          <span class="theme-toggle-icon" aria-hidden="true">☀</span>
-          <span class="theme-toggle-label">Light Mode</span>
-        </button>
-        <a class="sidebar-link" href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer">X</a>
-      </div>
     </aside>
 
     <main class="main">
@@ -789,43 +771,56 @@
       </div>
 
       <div class="topbar">
-        <div class="topbar-title">Launch Market</div>
         <div class="topbar-right">
-          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Wallet not connected</button>
+          <button onclick="window.location.href='/create'" class="pill pill-button">Create</button>
+          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Connect Wallet</button>
         </div>
       </div>
 
       <div class="page">
-        <section id="home-panel" class="section panel hero">
-          <div>
-            <div class="hero-kicker">Tempomeme</div>
-            <h1 class="hero-title">Launch Tempo memes with USDC-native price discovery.</h1>
-            <div class="hero-copy">Built for Tempo's payments-first rails. Create a token, trade through the internal curve, and graduate into external liquidity once 80% of supply is sold.</div>
+        <section id="home-panel" class="section panel hero home-hero">
+          <div class="hero-main">
+            <div class="hero-kicker">TempoBoard</div>
+            <h1 class="hero-title">Launch cleaner Tempo memes.</h1>
+            <div class="hero-copy">Create a token, trade with pathUSD on the internal curve, and move into external liquidity once 80% of supply is sold. The flow stays simple, stablecoin-settled, and easy to follow.</div>
             <div class="hero-actions">
               <button onclick="window.location.href='/create'" class="hero-btn">Create Token</button>
-              <button onclick="window.open('https://relay.link/bridge/tempo?fromChainId=792703809', '_blank', 'noopener,noreferrer')" class="ghost-btn">Bridge USDC</button>
+              <button onclick="window.open('https://relay.link/bridge/tempo?fromChainId=792703809', '_blank', 'noopener,noreferrer')" class="ghost-btn">Bridge pathUSD</button>
               <button onclick="window.location.href='/tokens'" class="ghost-btn">View All Tokens</button>
+            </div>
+          </div>
+          <div class="hero-side">
+            <div class="hero-stat-card">
+              <div class="hero-stat-label">Settlement</div>
+              <div class="hero-stat-value">pathUSD</div>
+            </div>
+            <div class="hero-stat-card">
+              <div class="hero-stat-label">Curve Sale Cap</div>
+              <div class="hero-stat-value">80%</div>
+            </div>
+            <div class="hero-stat-card">
+              <div class="hero-stat-label">External LP Reserve</div>
+              <div class="hero-stat-value">18,933.33</div>
             </div>
           </div>
         </section>
 
-        <section class="section toolbar">
-          <div class="toolbar-left">
-            <div class="search-wrap">
-              <input id="marketSearch" class="search-input" placeholder="Search by name, symbol, or address" oninput="filterTokenList()">
-              <button class="search-btn" onclick="filterTokenList()">Search</button>
-            </div>
+        <section class="section filter-row">
+          <div class="chip-row">
+            <button class="pill pill-button filter-chip is-active" id="sortLatestBtn" onclick="setSort('latest')">Latest</button>
+            <button class="pill pill-button filter-chip" id="sortMarketBtn" onclick="setSort('marketcap')">Market Cap</button>
+            <a href="/tokens" class="pill">All Tokens</a>
+            <a href="/docs" class="pill">How It Works</a>
           </div>
-          <div class="toolbar-right">
-            <button class="sort-btn" id="sortLatestBtn" onclick="setSort('latest')">Latest</button>
-            <button class="sort-btn" id="sortMarketBtn" onclick="setSort('marketcap')">Market Cap</button>
-          </div>
+          <button onclick="loadTokenList()" class="sort-btn">Refresh Feed</button>
         </section>
 
         <section class="section panel token-panel">
           <div class="section-head">
-            <div class="section-title">Created Tokens</div>
-            <button onclick="loadTokenList()" class="sort-btn">Refresh</button>
+            <div>
+              <div class="section-title">Created Tokens</div>
+              <div class="section-copy">The newest launches on the live pathUSD curve.</div>
+            </div>
           </div>
           <div id="tokenList" class="token-grid">
             <div class="empty-state">No tokens yet.</div>
@@ -842,7 +837,7 @@
     let currentSort = "latest";
     let walletSession;
 
-    const LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
+    const LAUNCH_CONTRACT = "0x5866914946e4B7c7B2C789cc5EE259b73CBa2274";
     const HIDDEN_TOKENS = new Set([
       "0xba439c26d31930cfd5a9b344f5a1c582dc9f422b",
       "0x1c9d8d0ceaea2c71de15aee11b6314741ef5e92c"
@@ -871,26 +866,32 @@
 
     function applyWalletConnected(address) {
       const short = window.TempomemeWallet.formatAddress(address);
-      document.getElementById("connectBtn").textContent = short;
+      const connectBtn = document.getElementById("connectBtn");
+      if (connectBtn) connectBtn.textContent = short;
       document.getElementById("walletPreview").textContent = short;
       const networkBadge = document.getElementById("networkBadge");
-      networkBadge.textContent = "Tempo Mainnet";
-      networkBadge.classList.add("show");
+      if (networkBadge) {
+        networkBadge.textContent = "Tempo Mainnet";
+        networkBadge.classList.add("show");
+      }
     }
 
     function resetWalletUi(showWrongNetwork = false) {
       provider = null;
       signer = null;
       userAddress = null;
-      document.getElementById("connectBtn").textContent = "Connect Wallet";
-      document.getElementById("walletPreview").textContent = "Wallet not connected";
+      const connectBtn = document.getElementById("connectBtn");
+      if (connectBtn) connectBtn.textContent = "Connect Wallet";
+      document.getElementById("walletPreview").textContent = "Connect Wallet";
       const networkBadge = document.getElementById("networkBadge");
-      if (showWrongNetwork) {
-        networkBadge.textContent = "Switch to Tempo Mainnet";
-        networkBadge.classList.add("show");
-      } else {
-        networkBadge.textContent = "Tempo Mainnet";
-        networkBadge.classList.remove("show");
+      if (networkBadge) {
+        if (showWrongNetwork) {
+          networkBadge.textContent = "Switch to Tempo Mainnet";
+          networkBadge.classList.add("show");
+        } else {
+          networkBadge.textContent = "Tempo Mainnet";
+          networkBadge.classList.remove("show");
+        }
       }
     }
 
@@ -927,8 +928,8 @@
 
     function setSort(type) {
       currentSort = type;
-      document.getElementById("sortLatestBtn").style.borderColor = type === "latest" ? "rgba(141,255,85,0.18)" : "";
-      document.getElementById("sortMarketBtn").style.borderColor = type === "marketcap" ? "rgba(141,255,85,0.18)" : "";
+      document.getElementById("sortLatestBtn").classList.toggle("is-active", type === "latest");
+      document.getElementById("sortMarketBtn").classList.toggle("is-active", type === "marketcap");
       filterTokenList();
     }
 
@@ -967,7 +968,7 @@
               </div>
               <div class="token-meta-list">
                 <div class="metric-row"><span>Creator</span><span class="mono">${c.creatorShort}</span></div>
-                <div class="metric-row"><span>Price</span><span>${c.priceFormatted} USDC</span></div>
+                <div class="metric-row"><span>Price</span><span>${c.priceFormatted} pathUSD</span></div>
               </div>
               <div class="token-progress">
                 <div class="progress-track"><div class="progress-fill" style="width:${c.progress}%"></div></div>
@@ -983,7 +984,8 @@
     }
 
     function filterTokenList() {
-      const q = (document.getElementById("marketSearch").value || "").trim().toLowerCase();
+      const searchEl = document.getElementById("marketSearch");
+      const q = ((searchEl && searchEl.value) || "").trim().toLowerCase();
       let cards = [...allCards];
       if (q) {
         cards = cards.filter((c) =>
@@ -1114,7 +1116,7 @@
             ? Number(ethers.formatUnits(ev.args[2], 6))
             : Number(ethers.formatUnits(ev.args[3], 6));
           const symbol = symbolCache[ev.args[0]] || "TOKEN";
-          return `<span class="ticker-chip ${isBuy ? "buy" : "sell"}">${wallet} ${isBuy ? "bought" : "sold"} ${formatTickerAmount(usdcValue)} USDC ${symbol}</span>`;
+          return `<span class="ticker-chip ${isBuy ? "buy" : "sell"}">${wallet} ${isBuy ? "bought" : "sold"} ${formatTickerAmount(usdcValue)} pathUSD ${symbol}</span>`;
         });
 
         const html = items.join("");

@@ -321,7 +321,7 @@
         <div class="tm-wallet-modal" role="dialog" aria-modal="true" aria-label="Choose wallet">
           <div class="tm-wallet-head">
             <h3 class="tm-wallet-title">Choose a wallet</h3>
-            <p class="tm-wallet-copy">Select one of the detected EVM wallets to connect to Tempomeme.</p>
+            <p class="tm-wallet-copy">Select one of the detected EVM wallets to connect to TempoBoard.</p>
           </div>
           <div class="tm-wallet-list">
             ${wallets.map((wallet) => `

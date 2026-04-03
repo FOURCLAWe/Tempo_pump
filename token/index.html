@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Token - Tempomeme</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-  <link rel="apple-touch-icon" href="/assets/logo.svg">
+  <title>Token - TempoBoard</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=20260403logo2">
+  <link rel="apple-touch-icon" href="/assets/logo.svg?v=20260403logo2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,12 +15,10 @@
   <script>
     (() => {
       try {
-        const savedTheme = localStorage.getItem("tempomeme-theme");
-        if (savedTheme === "light" || savedTheme === "dark") {
-          document.documentElement.dataset.theme = savedTheme;
-          document.documentElement.style.colorScheme = savedTheme;
-        }
+        localStorage.setItem("tempomeme-theme", "dark");
       } catch (e) {}
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
     })();
   </script>
   <style>
@@ -839,8 +837,8 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="/assets/theme.css?v=20260330c">
-  <script src="/assets/theme.js?v=20260322a" defer></script>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260403f">
+  <script src="/assets/theme.js?v=20260330d" defer></script>
   <script src="/assets/wallet.js?v=20260322b"></script>
 </head>
 <body>
@@ -939,7 +937,7 @@
                 <tr>
                   <th>Wallet</th>
                   <th>Side</th>
-                  <th>USDC</th>
+                  <th>pathUSD</th>
                   <th>Tokens</th>
                   <th>Block</th>
                 </tr>
@@ -985,12 +983,12 @@
 
           <div class="field-stack">
             <div class="metric-list">
-              <div class="metric-row"><span>USDC Balance</span><span id="walletUsdcBalance">-</span></div>
+              <div class="metric-row"><span>pathUSD Balance</span><span id="walletUsdcBalance">-</span></div>
               <div class="metric-row"><span>Your Balance</span><span id="walletTokenBalance">-</span></div>
             </div>
 
             <div class="field">
-              <label id="amountLabel" for="tradeAmount">Buy Amount (USDC)</label>
+              <label id="amountLabel" for="tradeAmount">Buy Amount (pathUSD)</label>
               <input id="tradeAmount" class="input" type="number" min="0" step="any" value="100" oninput="handleTradeAmountInput()">
             </div>
 
@@ -1055,8 +1053,8 @@
   </main>
 
   <script>
-    const USDC_ADDRESS = "0x20c000000000000000000000b9537d11c60e8b50";
-    const PRIMARY_LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
+    const USDC_ADDRESS = "0x20c0000000000000000000000000000000000000";
+    const PRIMARY_LAUNCH_CONTRACT = "0x5866914946e4B7c7B2C789cc5EE259b73CBa2274";
     const LAUNCH_ABI = [
       "function buy(address tokenAddr, uint256 usdcAmount)",
       "function sell(address tokenAddr, uint256 tokenAmount)",
@@ -1490,7 +1488,7 @@
       panel.classList.toggle("trade-mode-sell", mode === "sell");
       document.getElementById("buyTab").classList.toggle("active", mode === "buy");
       document.getElementById("sellTab").classList.toggle("active", mode === "sell");
-      document.getElementById("amountLabel").textContent = mode === "buy" ? "Buy Amount (USDC)" : "Sell Amount (Tokens)";
+      document.getElementById("amountLabel").textContent = mode === "buy" ? "Buy Amount (pathUSD)" : "Sell Amount (Tokens)";
       document.getElementById("estimateLabel").textContent = mode === "buy" ? "You Receive" : "You Receive";
       document.getElementById("buyPresetRow").style.display = mode === "buy" ? "grid" : "none";
       document.getElementById("sellPercentRow").style.display = mode === "sell" ? "grid" : "none";
@@ -1568,8 +1566,8 @@
         const totalSupplyValue = Number(ethers.formatUnits(totalSupply, 18));
         const marketCap = priceValue * totalSupplyValue;
 
-        document.getElementById("tokenPrice").textContent = priceValue.toFixed(8) + " USDC";
-        document.getElementById("currentPrice").textContent = priceValue.toFixed(8) + " USDC";
+        document.getElementById("tokenPrice").textContent = priceValue.toFixed(8) + " pathUSD";
+        document.getElementById("currentPrice").textContent = priceValue.toFixed(8) + " pathUSD";
         document.getElementById("priceChange").textContent = info[3] ? "Graduated" : "Live Price";
         document.getElementById("marketCap").textContent = "$" + marketCap.toLocaleString(undefined, { maximumFractionDigits: 0 });
         document.getElementById("curveProgressTop").textContent = pct + "%";
@@ -1619,7 +1617,7 @@
       try {
         const usdc = new ethers.Contract(USDC_ADDRESS, USDC_ABI, provider);
         const balance = await usdc.balanceOf(userAddress);
-        el.textContent = Number(ethers.formatUnits(balance, 6)).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " USDC";
+        el.textContent = Number(ethers.formatUnits(balance, 6)).toLocaleString(undefined, { maximumFractionDigits: 2 }) + " pathUSD";
       } catch (e) {
         el.textContent = "-";
       }
@@ -1842,7 +1840,7 @@
       const delta = close - open;
       const deltaPct = open ? (delta / open) * 100 : 0;
 
-      document.getElementById("chartPrice").textContent = close.toFixed(8) + " USDC";
+      document.getElementById("chartPrice").textContent = close.toFixed(8) + " pathUSD";
       document.getElementById("ohlcBar").innerHTML = `
         <span>O <strong>${open.toFixed(8)}</strong></span>
         <span>H <strong>${high.toFixed(8)}</strong></span>
@@ -1919,13 +1917,13 @@
             document.getElementById("tradeEstimate").textContent = "-.--";
             clearTradeQuote();
             document.getElementById("tradeFee").textContent = "-.--";
-            setTradeStatus("Enter a valid USDC amount.", "error");
+            setTradeStatus("Enter a valid pathUSD amount.", "error");
             return;
           }
           const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, parsedAmount);
           document.getElementById("tradeEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " tokens";
           captureTradeQuote("buy", parsedAmount, tokensOut, 18, "tokens");
-          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " pathUSD";
           setTradeStatus(tokensOut > 0n ? "" : "Amount too small for this trade.", tokensOut > 0n ? "muted" : "error");
         } else {
           const parsedAmount = parseTradeAmount(amount, 18);
@@ -1937,9 +1935,9 @@
             return;
           }
           const [usdcOut, fee] = await launch.estimateSell(tokenAddress, parsedAmount);
-          document.getElementById("tradeEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " USDC";
-          captureTradeQuote("sell", parsedAmount, usdcOut, 6, "USDC");
-          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " USDC";
+          document.getElementById("tradeEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " pathUSD";
+          captureTradeQuote("sell", parsedAmount, usdcOut, 6, "pathUSD");
+          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " pathUSD";
           setTradeStatus(usdcOut > 0n ? "" : "Sell amount is too small. Increase the amount and try again.", usdcOut > 0n ? "muted" : "error");
         }
       } catch (e) {
@@ -1993,7 +1991,7 @@
         const { address: launchAddress } = await getLaunchContext();
         const usdcAmount = parseTradeAmount(amount, 6);
         if (!usdcAmount || usdcAmount <= 0n) {
-          setTradeStatus("Enter a valid USDC amount.", "error");
+          setTradeStatus("Enter a valid pathUSD amount.", "error");
           return;
         }
         const usdc = new ethers.Contract(USDC_ADDRESS, USDC_ABI, signer);

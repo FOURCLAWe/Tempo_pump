@@ -1,11 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Tempomeme favicon">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TempoBoard favicon">
   <defs>
-    <linearGradient id="gold-favicon" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fff2a1"/>
-      <stop offset="45%" stop-color="#ffd557"/>
-      <stop offset="100%" stop-color="#b87910"/>
+    <linearGradient id="bg" x1="8" y1="6" x2="58" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#151c27"/>
+      <stop offset="100%" stop-color="#0b1017"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="14" y1="14" x2="45" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#82ffd8"/>
+      <stop offset="50%" stop-color="#68ddff"/>
+      <stop offset="100%" stop-color="#6c89ff"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="40" y1="12" x2="52" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fff4ad"/>
+      <stop offset="100%" stop-color="#f6c86c"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#050505"/>
-  <path fill="url(#gold-favicon)" d="M17 18h34l-3.2 9H35.4L27.8 49H18.6l7.6-22H14z"/>
+
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="11.5" fill="none" stroke="#253142"/>
+  <path d="M43 13c4.4 0 8 3.6 8 8v1c0 4.4-3.6 8-8 8h-8v19c0 5.2-4.2 9.5-9.5 9.5S16 54.2 16 49V30h-2c-4.4 0-8-3.6-8-8v-1c0-4.4 3.6-8 8-8z"
+        fill="#0a0f16" opacity="0.42" transform="translate(2 2)"/>
+  <path d="M43 13c4.4 0 8 3.6 8 8v1c0 4.4-3.6 8-8 8h-8v19c0 5.2-4.2 9.5-9.5 9.5S16 54.2 16 49V30h-2c-4.4 0-8-3.6-8-8v-1c0-4.4 3.6-8 8-8z"
+        fill="url(#mark)"/>
+  <path d="M36.5 20.5c2.2-3.3 5.2-5.5 8.8-5.5 2.5 0 4.7 0.9 6.2 2.8" fill="none" stroke="#8ef3b1" stroke-opacity="0.5" stroke-width="2.6" stroke-linecap="round"/>
+  <circle cx="49.5" cy="20.5" r="4.2" fill="url(#accent)"/>
 </svg>

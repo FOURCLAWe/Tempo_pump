@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Docs - Tempomeme</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-  <link rel="apple-touch-icon" href="/assets/logo.svg">
+  <title>Docs - TempoBoard</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=20260403logo2">
+  <link rel="apple-touch-icon" href="/assets/logo.svg?v=20260403logo2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     (() => {
       try {
-        const savedTheme = localStorage.getItem("tempomeme-theme");
-        if (savedTheme === "light" || savedTheme === "dark") {
-          document.documentElement.dataset.theme = savedTheme;
-          document.documentElement.style.colorScheme = savedTheme;
-        }
+        localStorage.setItem("tempomeme-theme", "dark");
       } catch (e) {}
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
     })();
   </script>
   <style>
@@ -346,16 +344,16 @@
       color: #1e7b24;
     }
   </style>
-  <link rel="stylesheet" href="/assets/theme.css?v=20260330c">
-  <script src="/assets/theme.js?v=20260322a" defer></script>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260403f">
+  <script src="/assets/theme.js?v=20260330d" defer></script>
 </head>
 <body>
   <div class="docs-app">
     <main class="content">
       <article class="article">
-        <p class="eyebrow" id="overview">Tempomeme</p>
-        <h1>Tempomeme on Tempo</h1>
-        <p class="lede">Tempomeme is a USDC-native meme launchpad built on Tempo Mainnet. The product pairs Tempo's payments-first design with internal curve trading, a clear graduation threshold, and a defined post-curve liquidity path.</p>
+        <p class="eyebrow" id="overview">TempoBoard</p>
+        <h1>TempoBoard on Tempo</h1>
+        <p class="lede">TempoBoard is a pathUSD-native meme launchpad built on Tempo Mainnet. The product pairs Tempo's payments-first design with internal curve trading, a clear graduation threshold, and a defined post-curve liquidity path.</p>
 
         <div class="summary-grid">
           <div class="summary-card">
@@ -374,7 +372,7 @@
 
         <section class="doc-section" id="chain">
           <h2>1. Chain</h2>
-          <p class="doc-text">Tempomeme runs on Tempo Mainnet because the launch flow is expressed in stablecoin terms from start to finish. Token creation, price discovery, and graduation are all designed around a single chain and a single settlement asset.</p>
+          <p class="doc-text">TempoBoard runs on Tempo Mainnet because the launch flow is expressed in stablecoin terms from start to finish. Token creation, price discovery, and graduation are all designed around a single chain and a single settlement asset.</p>
 
           <div class="info-grid">
             <div class="info-card">
@@ -383,26 +381,26 @@
             </div>
             <div class="info-card">
               <div class="info-title">Settlement Asset</div>
-              <p class="info-copy">All current platform trading is settled in USDC on Tempo, which keeps launch pricing, trade flow, and graduation accounting in stablecoin terms.<br>USDC: <code>0x20c000000000000000000000b9537d11c60e8b50</code></p>
+              <p class="info-copy">All current platform trading is settled in pathUSD on Tempo, which keeps launch pricing, trade flow, and graduation accounting in stablecoin terms.<br>pathUSD: <code>0x20c0000000000000000000000000000000000000</code></p>
             </div>
           </div>
 
           <ul class="doc-list">
             <li>Users need an EVM wallet connected to Tempo Mainnet.</li>
             <li>Token creation, buying, and selling all run on Tempo without switching to a separate execution environment.</li>
-            <li>The current launch flow uses USDC as the settlement token for the internal curve.</li>
+            <li>The current launch flow uses pathUSD as the settlement token for the internal curve.</li>
             <li>This makes the entire launch experience easier to reason about in USD terms instead of volatile gas-asset terms.</li>
           </ul>
         </section>
 
         <section class="doc-section" id="curve">
           <h2>2. Price Curve and External Migration</h2>
-          <p class="doc-text">Tempomeme uses a quadratic internal curve for price discovery. Trading stays inside the platform until 80% of supply is sold, and only then does the project graduate toward external liquidity deployment.</p>
+          <p class="doc-text">TempoBoard uses a quadratic internal curve for price discovery. Trading stays inside the platform until 80% of supply is sold, and only then does the project graduate toward external liquidity deployment.</p>
 
           <div class="info-grid">
             <div class="info-card">
               <div class="info-title">Primary Launch Contract</div>
-              <p class="info-copy"><code>0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf</code></p>
+              <p class="info-copy"><code>0x5866914946e4B7c7B2C789cc5EE259b73CBa2274</code></p>
             </div>
             <div class="info-card">
               <div class="info-title">Internal Sale Cap</div>
@@ -425,35 +423,35 @@ Then:
 price(sold) = 0.000003 + 0.000062 * r^2
 
 Buy side:
-buyFee = usdcIn * 1%
-netUsdc = usdcIn - buyFee
-tokensOut = netUsdc / price(sold)
+buyFee = pathUsdIn * 1%
+netPathUsd = pathUsdIn - buyFee
+tokensOut = netPathUsd / price(sold)
 
 Sell side:
-grossUsdcBack = tokensIn * price(sold)
-sellFee = grossUsdcBack * 1%
-usdcOut = grossUsdcBack - sellFee
+grossPathUsdBack = tokensIn * price(sold)
+sellFee = grossPathUsdBack * 1%
+pathUsdOut = grossPathUsdBack - sellFee
 
 Migration condition:
 migrate when sold >= 800,000,000</div>
           </div>
 
           <ul class="doc-list">
-            <li>The curve starts near <code>0.00000300 USDC</code>.</li>
+            <li>The curve starts near <code>0.00000300 pathUSD</code>.</li>
             <li>Because the pricing model is quadratic, the price accelerates more aggressively later in the sale than at the beginning.</li>
             <li>The simplified ratio form is <code>r = sold / 800,000,000</code>, so all price movement is driven by sold supply progress on the internal curve.</li>
-            <li>For buys, the 1% fee is removed first, then the remaining USDC is converted at the current curve price.</li>
-            <li>For sells, the token amount is first converted back into gross USDC at the current curve price, then the 1% fee is deducted.</li>
+            <li>For buys, the 1% fee is removed first, then the remaining pathUSD is converted at the current curve price.</li>
+            <li>For sells, the token amount is first converted back into gross pathUSD at the current curve price, then the 1% fee is deducted.</li>
             <li>External migration is triggered only after <code>800,000,000</code> tokens are sold on the internal curve.</li>
-            <li>On a no-sell path, completely filling the curve is about <code>19,124.58 USDC</code> gross user spend.</li>
-            <li>After the current <code>1%</code> trading fee, the contract retains about <code>18,933.33 USDC</code> net.</li>
-            <li>At graduation, the remaining <code>20%</code> of token supply and <code>18,933.33 USDC</code> are intended to be added as liquidity on <code>Uniswap V2</code>.</li>
+            <li>On a no-sell path, completely filling the curve is about <code>19,124.58 pathUSD</code> gross user spend.</li>
+            <li>After the current <code>1%</code> trading fee, the contract retains about <code>18,933.33 pathUSD</code> net.</li>
+            <li>At graduation, the remaining <code>20%</code> of token supply and <code>18,933.33 pathUSD</code> are intended to be added as liquidity on <code>Uniswap V2</code>.</li>
           </ul>
         </section>
 
         <section class="doc-section" id="tme">
           <h2>3. Official Token</h2>
-          <p class="doc-text">The official ecosystem token is <code>$TME</code>. Tempomeme describes the exchange fee policy around a <code>1%</code> trading fee, with most of that fee routed back into the official token and the remainder reserved for the treasury wallet.</p>
+          <p class="doc-text">The official ecosystem token is <code>$TME</code>. TempoBoard describes the exchange fee policy around a <code>1%</code> trading fee, with most of that fee routed back into the official token and the remainder reserved for the treasury wallet.</p>
 
           <div class="info-grid">
             <div class="info-card">
@@ -479,7 +477,7 @@ migrate when sold >= 800,000,000</div>
     <aside class="toc">
       <div class="toc-card">
         <div class="toc-label">On this page</div>
-        <a href="#overview" class="toc-link">Tempomeme on Tempo</a>
+        <a href="#overview" class="toc-link">TempoBoard on Tempo</a>
         <a href="#chain" class="toc-link">1. Chain</a>
         <a href="#curve" class="toc-link">2. Curve & Migration</a>
         <a href="#tme" class="toc-link">3. Official Token</a>

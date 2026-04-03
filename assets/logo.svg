@@ -1,11 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Tempo logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="TempoBoard logo">
   <defs>
-    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fff3a0"/>
-      <stop offset="45%" stop-color="#ffd45a"/>
-      <stop offset="100%" stop-color="#b87a12"/>
+    <linearGradient id="tm-bg" x1="24" y1="20" x2="220" y2="232" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#161d28"/>
+      <stop offset="55%" stop-color="#0f151e"/>
+      <stop offset="100%" stop-color="#0b1017"/>
     </linearGradient>
+    <linearGradient id="tm-mark" x1="56" y1="58" x2="176" y2="204" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#82ffd8"/>
+      <stop offset="52%" stop-color="#68ddff"/>
+      <stop offset="100%" stop-color="#6c89ff"/>
+    </linearGradient>
+    <linearGradient id="tm-accent" x1="166" y1="50" x2="214" y2="98" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fff4ad"/>
+      <stop offset="100%" stop-color="#f6c86c"/>
+    </linearGradient>
+    <filter id="tm-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0.9  0 0 1 0 1  0 0 0 0.22 0"/>
+    </filter>
   </defs>
-  <rect width="256" height="256" rx="44" fill="#050505"/>
-  <path fill="url(#gold)" d="M74 78h128l-12 34h-47l-29 105H76l29-105H62z"/>
+
+  <rect width="256" height="256" fill="url(#tm-bg)"/>
+  <circle cx="184" cy="74" r="46" fill="#7e87ff" opacity="0.12" filter="url(#tm-glow)"/>
+
+  <path d="M174 58c16 0 29 13 29 29v2c0 16-13 29-29 29h-30v70c0 19-15 34-34 34h-2c-19 0-34-15-34-34v-70H64c-16 0-29-13-29-29v-2c0-16 13-29 29-29z"
+        fill="#090e15" opacity="0.46" transform="translate(8 8)"/>
+
+  <path d="M174 58c16 0 29 13 29 29v2c0 16-13 29-29 29h-30v70c0 19-15 34-34 34h-2c-19 0-34-15-34-34v-70H64c-16 0-29-13-29-29v-2c0-16 13-29 29-29z"
+        fill="url(#tm-mark)"/>
+
+  <path d="M136 120l34 34" stroke="#0b1017" stroke-width="12" stroke-linecap="round" opacity="0.3"/>
+  <path d="M148 82c8-14 20-23 35-23 10 0 19 4 25 12" fill="none" stroke="#8ef3b1" stroke-opacity="0.46" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="210" cy="75" r="15" fill="url(#tm-accent)"/>
+  <circle cx="210" cy="75" r="6" fill="#fffdf4" opacity="0.82"/>
 </svg>

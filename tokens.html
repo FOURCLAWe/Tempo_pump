@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tokens - Tempomeme</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-  <link rel="apple-touch-icon" href="/assets/logo.svg">
+  <title>Tokens - TempoBoard</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=20260403logo2">
+  <link rel="apple-touch-icon" href="/assets/logo.svg?v=20260403logo2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,12 +14,10 @@
   <script>
     (() => {
       try {
-        const savedTheme = localStorage.getItem("tempomeme-theme");
-        if (savedTheme === "light" || savedTheme === "dark") {
-          document.documentElement.dataset.theme = savedTheme;
-          document.documentElement.style.colorScheme = savedTheme;
-        }
+        localStorage.setItem("tempomeme-theme", "dark");
       } catch (e) {}
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
     })();
   </script>
   <style>
@@ -166,28 +164,29 @@
     }
     .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .search-wrap {
-      display: grid; grid-template-columns: minmax(0, 1fr) 96px; width: min(520px, 100%); border-radius: 16px; overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(180deg, rgba(25,27,25,0.95), rgba(16,18,16,0.98)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-      transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
+      display: flex; align-items: center; gap: 12px; width: min(720px, 100%); min-height: 60px; padding: 0 14px 0 18px;
+      border-radius: 18px; border: 1px solid #252b35; background: linear-gradient(180deg, rgba(31,34,39,0.98), rgba(24,27,31,0.98));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+      transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+    .search-inline-icon {
+      color: #eef3fb; font-size: 20px; line-height: 1; opacity: 0.92;
     }
     .search-input {
-      min-height: 54px; border: none; background: transparent; color: var(--text); padding: 0 18px; font-size: 15px; outline: none;
+      flex: 1; min-width: 0; min-height: 58px; border: none; background: transparent; color: var(--text); padding: 0;
+      font-size: 16px; outline: none;
     }
-    .search-input::placeholder { color: #9aa393; }
-    .search-btn, .sort-btn {
+    .search-input::placeholder { color: #98a2b3; }
+    .sort-btn {
       min-height: 46px; padding: 0 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.07); background: linear-gradient(180deg, rgba(28,30,28,0.96), rgba(17,18,17,0.98));
       color: var(--text); font-size: 14px; font-weight: 800; cursor: pointer; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
-    .search-btn {
-      border: none; border-left: 1px solid rgba(255,255,255,0.07); border-radius: 0; background: linear-gradient(135deg, rgba(232,191,82,0.16), rgba(151,255,93,0.08));
-    }
     .search-wrap:focus-within {
-      border-color: rgba(232,191,82,0.22);
-      background: #171a16;
+      border-color: rgba(141,243,177,0.22);
+      background: linear-gradient(180deg, rgba(34,37,43,0.98), rgba(25,28,33,0.98));
       box-shadow:
-        0 0 0 4px rgba(232,191,82,0.08),
+        0 0 0 4px rgba(141,243,177,0.08),
         0 18px 34px rgba(0,0,0,0.22);
-      transform: translateY(-1px);
     }
     .token-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
     .token-card {
@@ -229,7 +228,7 @@
       justify-content: center; color: var(--muted); font-size: 14px;
     }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-    .wallet-btn:hover, .search-btn:hover, .sort-btn:hover, .pill:hover { transform: translateY(-2px); border-color: rgba(232,191,82,0.16); }
+    .wallet-btn:hover, .sort-btn:hover, .pill:hover { transform: translateY(-2px); border-color: rgba(232,191,82,0.16); }
     .wallet-btn:hover { filter: brightness(1.03); box-shadow: 0 18px 32px rgba(232,191,82,0.18); }
     .search-input:focus { box-shadow: none; }
     @media (prefers-reduced-motion: reduce) {
@@ -246,8 +245,7 @@
       .page, .topbar { padding-left: 14px; padding-right: 14px; }
       .toolbar { align-items: stretch; }
       .toolbar-left, .toolbar-right { width: 100%; }
-      .search-wrap { width: 100%; grid-template-columns: 1fr; }
-      .search-btn { border-left: none; border-top: 1px solid var(--line); }
+      .search-wrap { width: 100%; }
       .token-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .token-media { height: 150px; }
     }
@@ -256,27 +254,17 @@
       .token-media { height: 180px; }
     }
   </style>
-  <link rel="stylesheet" href="/assets/theme.css?v=20260330c">
-  <script src="/assets/theme.js?v=20260322a" defer></script>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260403f">
+  <script src="/assets/theme.js?v=20260330d" defer></script>
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-mark" aria-label="Tempomeme logo">
-          <svg viewBox="0 0 256 256" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="brandGoldTokens" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fff3a0"/>
-                <stop offset="45%" stop-color="#ffd45a"/>
-                <stop offset="100%" stop-color="#b87a12"/>
-              </linearGradient>
-            </defs>
-            <rect width="256" height="256" rx="44" fill="#050505"/>
-            <path fill="url(#brandGoldTokens)" d="M74 78h128l-12 34h-47l-29 105H76l29-105H62z"/>
-          </svg>
+        <span class="brand-mark" aria-label="TempoBoard logo">
+          <img src="/assets/logo.svg?v=20260403logo2" alt="TempoBoard logo">
         </span>
-        <span>Tempomeme</span>
+        <span>TempoBoard</span>
       </div>
 
       <nav class="nav">
@@ -296,16 +284,11 @@
           <span class="nav-icon">◫</span>
           <span class="nav-label">Docs</span>
         </a>
+        <a href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer" class="nav-item">
+          <span class="nav-icon">↗</span>
+          <span class="nav-label">X</span>
+        </a>
       </nav>
-
-      <div class="sidebar-foot">
-        <button onclick="connectWallet()" id="connectBtn" class="wallet-btn">Connect Wallet</button>
-        <div id="networkBadge" class="network-badge">Tempo Mainnet</div>
-        <button type="button" class="theme-toggle" data-theme-toggle>
-          <span class="theme-toggle-icon" aria-hidden="true">☀</span>
-          <span class="theme-toggle-label">Light Mode</span>
-        </button>
-      </div>
     </aside>
 
     <main class="main">
@@ -317,29 +300,30 @@
       </div>
 
       <div class="topbar">
-        <div class="pill">Market</div>
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Wallet not connected</button>
+        <div class="search-wrap search-wrap-wide top-search">
+          <span class="search-inline-icon">⌕</span>
+          <input id="marketSearch" class="search-input" placeholder="Search for coins..." oninput="filterTokenList()" onkeydown="if(event.key==='Enter'){filterTokenList()}">
+        </div>
+        <div class="topbar-right">
+          <button onclick="window.location.href='/create'" class="pill pill-button">Create</button>
+          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Connect Wallet</button>
         </div>
       </div>
 
       <div class="page">
         <section class="panel token-panel">
           <div class="section-head">
-            <div class="section-title">Created Tokens</div>
+            <div>
+              <div class="section-title">Created Tokens</div>
+              <div class="section-copy">Browse all live launches, sorted by time or market cap.</div>
+            </div>
             <button onclick="loadTokenList()" class="sort-btn">Refresh</button>
           </div>
 
-          <div class="toolbar">
-            <div class="toolbar-left">
-              <div class="search-wrap">
-                <input id="marketSearch" class="search-input" placeholder="Search by name, symbol, or address" oninput="filterTokenList()">
-                <button class="search-btn" onclick="filterTokenList()">Search</button>
-              </div>
-            </div>
-            <div class="toolbar-right">
-              <button class="sort-btn" id="sortLatestBtn" onclick="setSort('latest')">Latest</button>
-              <button class="sort-btn" id="sortMarketBtn" onclick="setSort('marketcap')">Market Cap</button>
+          <div class="filter-row">
+            <div class="chip-row">
+              <button class="pill pill-button filter-chip is-active" id="sortLatestBtn" onclick="setSort('latest')">Latest</button>
+              <button class="pill pill-button filter-chip" id="sortMarketBtn" onclick="setSort('marketcap')">Market Cap</button>
             </div>
           </div>
 
@@ -357,7 +341,7 @@
     let allCards = [];
     let currentSort = "latest";
     let walletSession;
-    const LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
+    const LAUNCH_CONTRACT = "0x5866914946e4B7c7B2C789cc5EE259b73CBa2274";
     const HIDDEN_TOKENS = new Set([
       "0xba439c26d31930cfd5a9b344f5a1c582dc9f422b",
       "0x1c9d8d0ceaea2c71de15aee11b6314741ef5e92c"
@@ -385,26 +369,32 @@
 
     function applyWalletConnected(address) {
       const short = window.TempomemeWallet.formatAddress(address);
-      document.getElementById("connectBtn").textContent = short;
+      const connectBtn = document.getElementById("connectBtn");
+      if (connectBtn) connectBtn.textContent = short;
       document.getElementById("walletPreview").textContent = short;
       const networkBadge = document.getElementById("networkBadge");
-      networkBadge.textContent = "Tempo Mainnet";
-      networkBadge.classList.add("show");
+      if (networkBadge) {
+        networkBadge.textContent = "Tempo Mainnet";
+        networkBadge.classList.add("show");
+      }
     }
 
     function resetWalletUi(showWrongNetwork = false) {
       provider = null;
       signer = null;
       userAddress = null;
-      document.getElementById("connectBtn").textContent = "Connect Wallet";
-      document.getElementById("walletPreview").textContent = "Wallet not connected";
+      const connectBtn = document.getElementById("connectBtn");
+      if (connectBtn) connectBtn.textContent = "Connect Wallet";
+      document.getElementById("walletPreview").textContent = "Connect Wallet";
       const networkBadge = document.getElementById("networkBadge");
-      if (showWrongNetwork) {
-        networkBadge.textContent = "Switch to Tempo Mainnet";
-        networkBadge.classList.add("show");
-      } else {
-        networkBadge.textContent = "Tempo Mainnet";
-        networkBadge.classList.remove("show");
+      if (networkBadge) {
+        if (showWrongNetwork) {
+          networkBadge.textContent = "Switch to Tempo Mainnet";
+          networkBadge.classList.add("show");
+        } else {
+          networkBadge.textContent = "Tempo Mainnet";
+          networkBadge.classList.remove("show");
+        }
       }
     }
 
@@ -441,8 +431,8 @@
 
     function setSort(type) {
       currentSort = type;
-      document.getElementById("sortLatestBtn").style.borderColor = type === "latest" ? "rgba(141,255,85,0.18)" : "";
-      document.getElementById("sortMarketBtn").style.borderColor = type === "marketcap" ? "rgba(141,255,85,0.18)" : "";
+      document.getElementById("sortLatestBtn").classList.toggle("is-active", type === "latest");
+      document.getElementById("sortMarketBtn").classList.toggle("is-active", type === "marketcap");
       filterTokenList();
     }
 
@@ -477,7 +467,7 @@
               </div>
               <div class="token-meta-list">
                 <div class="metric-row"><span>Creator</span><span class="mono">${c.creatorShort}</span></div>
-                <div class="metric-row"><span>Price</span><span>${c.priceFormatted} USDC</span></div>
+                <div class="metric-row"><span>Price</span><span>${c.priceFormatted} pathUSD</span></div>
               </div>
               <div class="token-progress">
                 <div class="progress-track"><div class="progress-fill" style="width:${c.progress}%"></div></div>
@@ -618,7 +608,7 @@
             ? Number(ethers.formatUnits(ev.args[2], 6))
             : Number(ethers.formatUnits(ev.args[3], 6));
           const symbol = symbolCache[ev.args[0]] || "TOKEN";
-          return `<span class="ticker-chip ${isBuy ? "buy" : "sell"}">${wallet} ${isBuy ? "bought" : "sold"} ${formatTickerAmount(usdcValue)} USDC ${symbol}</span>`;
+          return `<span class="ticker-chip ${isBuy ? "buy" : "sell"}">${wallet} ${isBuy ? "bought" : "sold"} ${formatTickerAmount(usdcValue)} pathUSD ${symbol}</span>`;
         });
 
         const html = items.join("");

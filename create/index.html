@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Token - Tempomeme</title>
-  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-  <link rel="apple-touch-icon" href="/assets/logo.svg">
+  <title>Create Token - TempoBoard</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg?v=20260403logo2">
+  <link rel="apple-touch-icon" href="/assets/logo.svg?v=20260403logo2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,12 +14,10 @@
   <script>
     (() => {
       try {
-        const savedTheme = localStorage.getItem("tempomeme-theme");
-        if (savedTheme === "light" || savedTheme === "dark") {
-          document.documentElement.dataset.theme = savedTheme;
-          document.documentElement.style.colorScheme = savedTheme;
-        }
+        localStorage.setItem("tempomeme-theme", "dark");
       } catch (e) {}
+      document.documentElement.dataset.theme = "dark";
+      document.documentElement.style.colorScheme = "dark";
     })();
   </script>
   <style>
@@ -712,27 +710,17 @@
       color: #635c50;
     }
   </style>
-  <link rel="stylesheet" href="/assets/theme.css?v=20260330c">
-  <script src="/assets/theme.js?v=20260322a" defer></script>
+  <link rel="stylesheet" href="/assets/theme.css?v=20260403f">
+  <script src="/assets/theme.js?v=20260330d" defer></script>
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-mark" aria-label="Tempomeme logo">
-          <svg viewBox="0 0 256 256" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="brandGoldCreate" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fff3a0"/>
-                <stop offset="45%" stop-color="#ffd45a"/>
-                <stop offset="100%" stop-color="#b87a12"/>
-              </linearGradient>
-            </defs>
-            <rect width="256" height="256" rx="44" fill="#050505"/>
-            <path fill="url(#brandGoldCreate)" d="M74 78h128l-12 34h-47l-29 105H76l29-105H62z"/>
-          </svg>
+        <span class="brand-mark" aria-label="TempoBoard logo">
+          <img src="/assets/logo.svg?v=20260403logo2" alt="TempoBoard logo">
         </span>
-        <span>Tempomeme</span>
+        <span>TempoBoard</span>
       </div>
 
       <nav class="nav">
@@ -752,23 +740,21 @@
           <span class="nav-icon">◫</span>
           <span class="nav-label">Docs</span>
         </a>
+        <a href="https://x.com/Tempomemecoin" target="_blank" rel="noreferrer" class="nav-item">
+          <span class="nav-icon">↗</span>
+          <span class="nav-label">X</span>
+        </a>
       </nav>
-
-      <div class="sidebar-foot">
-        <button onclick="connectWallet()" id="connectBtn" class="wallet-btn">Connect Wallet</button>
-        <div id="networkBadge" class="network-badge">Tempo Mainnet</div>
-        <button type="button" class="theme-toggle" data-theme-toggle>
-          <span class="theme-toggle-icon" aria-hidden="true">☀</span>
-          <span class="theme-toggle-label">Light Mode</span>
-        </button>
-      </div>
     </aside>
 
     <main class="main">
       <div class="topbar">
-        <div class="pill">Create</div>
-        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Wallet not connected</button>
+        <div class="topbar-left">
+          <div class="topbar-title">Create Token</div>
+          <div class="section-copy">Deploy a new pathUSD-native launch on Tempo.</div>
+        </div>
+        <div class="topbar-right">
+          <button type="button" onclick="connectWallet()" class="pill pill-button" id="walletPreview">Connect Wallet</button>
         </div>
       </div>
 
@@ -776,8 +762,8 @@
         <section class="create-shell">
           <div class="create-head">
             <div class="create-eyebrow">Create token</div>
-            <div class="create-subtitle">Set the token identity.</div>
-            <div class="create-copy">Keep the form clean and legible. The launch flow stays fixed to Tempomeme: USDC settlement, 80% internal sale, then external liquidity.</div>
+            <div class="create-subtitle">Set the token identity and go live.</div>
+            <div class="create-copy">Everything launches against the same pathUSD curve: fixed settlement, 80% internal sale, then external liquidity.</div>
           </div>
 
           <section class="panel create-card">
@@ -818,7 +804,7 @@
               <div class="settings-strip">
                 <div class="setting-chip primary">
                   <div class="setting-label">Settlement token</div>
-                  <div class="setting-value">USDC</div>
+                  <div class="setting-value">pathUSD</div>
                 </div>
                 <div class="setting-chip">
                   <div class="setting-label">Internal sale cap</div>
@@ -826,7 +812,7 @@
                 </div>
                 <div class="setting-chip">
                   <div class="setting-label">External LP reserve</div>
-                  <div class="setting-value">19,124.58 USDC</div>
+                  <div class="setting-value">19,124.58 pathUSD</div>
                 </div>
               </div>
 
@@ -845,7 +831,7 @@
               </div>
 
               <div class="actions-row">
-                <div class="actions-copy">Creation deploys a new token on-chain and registers it in the Tempomeme launch contract.</div>
+                <div class="actions-copy">Creation deploys a new token on-chain and registers it in the TempoBoard launch contract.</div>
                 <button onclick="createLaunch()" class="submit-btn">Create Launch</button>
               </div>
 
@@ -861,7 +847,7 @@
   <script>
     let provider, signer, userAddress;
     let walletSession;
-    const LAUNCH_CONTRACT = "0x37B8Cce1b4aeD401A26f01B8f19f87d352Cb3ABf";
+    const LAUNCH_CONTRACT = "0x5866914946e4B7c7B2C789cc5EE259b73CBa2274";
     const LAUNCH_ABI = [
       "function createLaunch(string name, string symbol, string meta) returns (address)",
       "function createToken(string name, string symbol, string meta) returns (address)",
@@ -897,11 +883,14 @@
 
     function applyWalletConnected(address, announce = false) {
       const short = window.TempomemeWallet.formatAddress(address);
-      document.getElementById("connectBtn").textContent = short;
+      const connectBtn = document.getElementById("connectBtn");
+      if (connectBtn) connectBtn.textContent = short;
       document.getElementById("walletPreview").textContent = short;
       const networkBadge = document.getElementById("networkBadge");
-      networkBadge.textContent = "Tempo Mainnet";
-      networkBadge.classList.add("show");
+      if (networkBadge) {
+        networkBadge.textContent = "Tempo Mainnet";
+        networkBadge.classList.add("show");
+      }
       if (announce) {
         setResult(`Wallet connected: ${address}`);
       }
@@ -911,15 +900,18 @@
       provider = null;
       signer = null;
       userAddress = null;
-      document.getElementById("connectBtn").textContent = "Connect Wallet";
-      document.getElementById("walletPreview").textContent = "Wallet not connected";
+      const connectBtn = document.getElementById("connectBtn");
+      if (connectBtn) connectBtn.textContent = "Connect Wallet";
+      document.getElementById("walletPreview").textContent = "Connect Wallet";
       const networkBadge = document.getElementById("networkBadge");
-      if (showWrongNetwork) {
-        networkBadge.textContent = "Switch to Tempo Mainnet";
-        networkBadge.classList.add("show");
-      } else {
-        networkBadge.textContent = "Tempo Mainnet";
-        networkBadge.classList.remove("show");
+      if (networkBadge) {
+        if (showWrongNetwork) {
+          networkBadge.textContent = "Switch to Tempo Mainnet";
+          networkBadge.classList.add("show");
+        } else {
+          networkBadge.textContent = "Tempo Mainnet";
+          networkBadge.classList.remove("show");
+        }
       }
     }
 
