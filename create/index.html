@@ -294,6 +294,13 @@
       display: grid;
       gap: 10px;
     }
+    .field {
+      padding: 10px 12px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.04);
+      background: linear-gradient(180deg, rgba(18,22,30,0.54), rgba(12,15,21,0.4));
+      transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
     .field-inline-label {
       display: block;
       color: #96a391;
@@ -537,7 +544,18 @@
     .wallet-btn:hover, .submit-btn:hover { filter: brightness(1.03); box-shadow: 0 18px 32px rgba(232,191,82,0.18); }
     .preview:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 14px 24px rgba(232,191,82,0.16); }
     .artwork-tile:hover { transform: translateY(-2px); border-color: rgba(232,191,82,0.16); box-shadow: 0 18px 32px rgba(232,191,82,0.12); }
-    .input:focus, .textarea:focus { box-shadow: 0 0 0 4px rgba(232,191,82,0.07); border-color: rgba(232,191,82,0.18); }
+    .field:focus-within {
+      border-color: rgba(104,221,255,0.14);
+      background: linear-gradient(180deg, rgba(20,28,38,0.68), rgba(12,17,26,0.56));
+      box-shadow: 0 0 0 3px rgba(104,221,255,0.05);
+    }
+    .field:focus-within label {
+      color: #b9cce3;
+    }
+    .input:focus, .textarea:focus {
+      box-shadow: 0 0 0 3px rgba(104,221,255,0.05);
+      border-color: rgba(104,221,255,0.14);
+    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation: none !important;
