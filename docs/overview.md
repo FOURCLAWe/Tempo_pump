@@ -72,14 +72,14 @@ External migration condition:
 
 ## 3. Official Token
 
-The official ecosystem token is `$TME`. TempoBoard describes the exchange fee policy around a `1%` trading fee, with most of that fee routed back into the official token and the remainder reserved for the treasury wallet.
+The official ecosystem token is `$TEB`. TempoBoard describes the exchange fee policy around a `1%` trading fee, with most of that fee routed back into the official token and the remainder reserved for the treasury wallet.
 
 Platform fee policy:
 
-- `90%` of the `1%` trading fee is allocated to buy back `$TME` and distribute it through airdrops.
+- `90%` of the `1%` trading fee is allocated to buy back `$TEB` and distribute it through airdrops.
 - The remaining `10%` of the `1%` trading fee flows into the treasury wallet.
 
 This policy is meant to do two things at the same time:
 
-- route most fee value back into `$TME` through buybacks and user airdrops
+- route most fee value back into `$TEB` through buybacks and user airdrops
 - keep a treasury reserve available for protocol operations, upkeep, and growth
