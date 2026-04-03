@@ -61,7 +61,7 @@
       position: fixed;
       pointer-events: none;
       z-index: 0;
-      border-radius: 999px;
+      border-radius: 12px;
       filter: blur(90px);
       opacity: 0.38;
     }
@@ -144,7 +144,7 @@
       overflow: hidden;
       background: linear-gradient(180deg, rgba(22,24,21,0.92), rgba(12,13,12,0.98));
       border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 24px;
+      border-radius: 16px;
       box-shadow: var(--shadow);
       animation: riseIn 420ms ease both;
     }
@@ -176,7 +176,7 @@
     .token-icon {
       width: 92px;
       height: 92px;
-      border-radius: 20px;
+      border-radius: 14px;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -231,7 +231,7 @@
     .token-link {
       min-height: 34px;
       padding: 0 14px;
-      border-radius: 999px;
+      border-radius: 10px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -288,7 +288,7 @@
 
     .stat-box {
       padding: 16px;
-      border-radius: 18px;
+      border-radius: 12px;
       background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98));
       border: 1px solid rgba(255,255,255,0.07);
       transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
@@ -339,7 +339,7 @@
     }
 
     .chart-shell {
-      border-radius: 18px;
+      border-radius: 12px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.07);
       background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98));
@@ -426,7 +426,7 @@
 
     .tab-btn {
       min-height: 46px;
-      border-radius: 14px;
+      border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.08);
       background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98));
       color: var(--text);
@@ -457,7 +457,7 @@
     .input {
       width: 100%;
       border: 1px solid var(--line);
-      border-radius: 12px;
+      border-radius: 10px;
       background: var(--bg-soft);
       color: var(--text);
       padding: 13px 14px;
@@ -476,7 +476,7 @@
       display: grid;
       gap: 8px;
       padding: 12px 14px;
-      border-radius: 14px;
+      border-radius: 10px;
       background: rgba(255,255,255,0.02);
       border: 1px solid rgba(255,255,255,0.05);
     }
@@ -537,7 +537,7 @@
 
     .preset-btn {
       min-height: 38px;
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid rgba(255,255,255,0.07);
       background: linear-gradient(180deg, rgba(28,30,28,0.96), rgba(17,18,17,0.98));
       color: var(--text);
@@ -559,7 +559,7 @@
       min-height: 42px;
       padding: 0 14px;
       align-items: center;
-      border-radius: 14px;
+      border-radius: 10px;
       background: var(--panel-3);
       color: var(--muted);
       font-size: 13px;
@@ -575,7 +575,7 @@
       width: 100%;
       min-height: 48px;
       border: none;
-      border-radius: 14px;
+      border-radius: 10px;
       font-size: 15px;
       font-weight: 900;
       cursor: pointer;
@@ -698,7 +698,7 @@
 
     .progress-wrap {
       padding: 16px;
-      border-radius: 18px;
+      border-radius: 12px;
       background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98));
       border: 1px solid rgba(255,255,255,0.07);
     }
@@ -721,7 +721,7 @@
 
     .table-wrap {
       overflow: auto;
-      border-radius: 18px;
+      border-radius: 12px;
       border: 1px solid rgba(255,255,255,0.07);
       background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98));
     }
@@ -799,7 +799,7 @@
       font-size: 14px;
       background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98));
       border: 1px dashed rgba(255,255,255,0.1);
-      border-radius: 18px;
+      border-radius: 12px;
     }
 
     @media (max-width: 1180px) {
@@ -1026,7 +1026,6 @@
               <div class="metric-row"><span>Current Price</span><span id="currentPrice">-.--</span></div>
               <div class="metric-row"><span id="estimateLabel">You Receive</span><span id="tradeEstimate">-.--</span></div>
               <div class="metric-row"><span>Minimum Received</span><span id="minimumReceived">-.--</span></div>
-              <div class="metric-row"><span>Fee</span><span id="tradeFee">-.--</span></div>
             </div>
 
             <button id="tradeActionBtn" onclick="submitTrade()" class="trade-action buy">Buy</button>
@@ -1909,6 +1908,7 @@
         setTradeStatus("");
         return;
       }
+      const feeEl = document.getElementById("tradeFee");
       try {
         const { launch } = await getLaunchContext();
         if (tradeMode === "buy") {
@@ -1916,28 +1916,28 @@
           if (!parsedAmount || parsedAmount <= 0n) {
             document.getElementById("tradeEstimate").textContent = "-.--";
             clearTradeQuote();
-            document.getElementById("tradeFee").textContent = "-.--";
+            if (feeEl) feeEl.textContent = "-.--";
             setTradeStatus("Enter a valid pathUSD amount.", "error");
             return;
           }
           const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, parsedAmount);
           document.getElementById("tradeEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " tokens";
           captureTradeQuote("buy", parsedAmount, tokensOut, 18, "tokens");
-          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " pathUSD";
+          if (feeEl) feeEl.textContent = ethers.formatUnits(fee, 6) + " pathUSD";
           setTradeStatus(tokensOut > 0n ? "" : "Amount too small for this trade.", tokensOut > 0n ? "muted" : "error");
         } else {
           const parsedAmount = parseTradeAmount(amount, 18);
           if (!parsedAmount || parsedAmount <= 0n) {
             document.getElementById("tradeEstimate").textContent = "-.--";
             clearTradeQuote();
-            document.getElementById("tradeFee").textContent = "-.--";
+            if (feeEl) feeEl.textContent = "-.--";
             setTradeStatus("Enter a valid token amount.", "error");
             return;
           }
           const [usdcOut, fee] = await launch.estimateSell(tokenAddress, parsedAmount);
           document.getElementById("tradeEstimate").textContent = ethers.formatUnits(usdcOut, 6) + " pathUSD";
           captureTradeQuote("sell", parsedAmount, usdcOut, 6, "pathUSD");
-          document.getElementById("tradeFee").textContent = ethers.formatUnits(fee, 6) + " pathUSD";
+          if (feeEl) feeEl.textContent = ethers.formatUnits(fee, 6) + " pathUSD";
           setTradeStatus(usdcOut > 0n ? "" : "Sell amount is too small. Increase the amount and try again.", usdcOut > 0n ? "muted" : "error");
         }
       } catch (e) {

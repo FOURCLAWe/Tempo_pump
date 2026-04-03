@@ -91,7 +91,7 @@
       font-size: 22px; font-weight: 700; min-width: 0;
     }
     .brand-mark {
-      width: 38px; height: 38px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center;
       min-width: 38px; flex: 0 0 38px; line-height: 0;
       background: #050505; color: #071005; overflow: hidden; padding: 0; border: 1px solid rgba(232,191,82,0.18); box-shadow: 0 14px 30px rgba(232,191,82,0.16);
     }
@@ -99,7 +99,7 @@
     .brand-mark svg { width: 100%; height: 100%; display: block; object-fit: cover; }
     .nav { display: grid; gap: 6px; }
     .nav-item {
-      display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-radius: 14px;
+      display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-radius: 10px;
       color: #d9dfd5; border: 1px solid transparent;
     }
     .nav-item.active { background: linear-gradient(90deg, rgba(232,191,82,0.14), rgba(151,255,93,0.08)); color: var(--text); border-color: rgba(232,191,82,0.18); }
@@ -107,10 +107,10 @@
     .nav-icon { width: 18px; text-align: center; }
     .nav-label { font-size: 15px; font-weight: 600; }
     .sidebar-foot {
-      margin-top: auto; padding: 14px; border-radius: 18px; background: linear-gradient(180deg, rgba(24,26,23,0.9), rgba(14,15,14,0.98)); border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+      margin-top: auto; padding: 14px; border-radius: 12px; background: linear-gradient(180deg, rgba(24,26,23,0.9), rgba(14,15,14,0.98)); border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
     .wallet-btn {
-      width: 100%; min-height: 46px; border: none; border-radius: 14px; background: linear-gradient(135deg, #f1ca64, #d7a528);
+      width: 100%; min-height: 46px; border: none; border-radius: 10px; background: linear-gradient(135deg, #f1ca64, #d7a528);
       color: #151106; font-size: 14px; font-weight: 900; cursor: pointer; transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease; box-shadow: 0 16px 28px rgba(232,191,82,0.2);
     }
     .network-badge {
@@ -125,14 +125,14 @@
     }
     #tickerTrack { display: flex; align-items: center; gap: 12px; min-width: max-content; padding: 0 14px; white-space: nowrap; }
     .ticker-chip {
-      display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: 999px; background: linear-gradient(180deg, rgba(28,30,28,0.95), rgba(18,19,18,0.98));
+      display: inline-flex; align-items: center; min-height: 24px; padding: 0 9px; border-radius: 10px; background: linear-gradient(180deg, rgba(28,30,28,0.95), rgba(18,19,18,0.98));
       border: 1px solid rgba(255,255,255,0.07); color: #edf2e9; font-size: 11px; font-weight: 700; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
     .ticker-chip.buy { color: #dfffd0; border-color: rgba(151,255,93,0.18); background: linear-gradient(180deg, rgba(24,32,22,0.95), rgba(16,20,16,0.98)); }
     .ticker-chip.sell { color: #f3e6b8; border-color: rgba(232,191,82,0.18); background: linear-gradient(180deg, rgba(34,28,18,0.94), rgba(19,17,13,0.98)); }
     .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px 0; }
     .pill {
-      min-height: 42px; padding: 0 16px; border-radius: 999px; display: inline-flex; align-items: center; background: linear-gradient(180deg, rgba(30,33,29,0.95), rgba(18,20,18,0.98));
+      min-height: 42px; padding: 0 16px; border-radius: 10px; display: inline-flex; align-items: center; background: linear-gradient(180deg, rgba(30,33,29,0.95), rgba(18,20,18,0.98));
       border: 1px solid rgba(255,255,255,0.07); color: var(--text); font-size: 13px; font-weight: 700; transition: transform 180ms ease, border-color 180ms ease, background 180ms ease; box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
     .pill-button {
@@ -143,7 +143,7 @@
     }
     .page { padding: 18px 20px 28px; }
     .panel {
-      position: relative; overflow: hidden; background: linear-gradient(180deg, rgba(22,24,21,0.92), rgba(12,13,12,0.98)); border: 1px solid rgba(255,255,255,0.07); border-radius: 24px; box-shadow: var(--shadow); animation: riseIn 420ms ease both;
+      position: relative; overflow: hidden; background: linear-gradient(180deg, rgba(22,24,21,0.92), rgba(12,13,12,0.98)); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; box-shadow: var(--shadow); animation: riseIn 420ms ease both;
     }
     .panel::before {
       content: "";
@@ -165,7 +165,7 @@
     .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .search-wrap {
       display: flex; align-items: center; gap: 12px; width: min(720px, 100%); min-height: 60px; padding: 0 14px 0 18px;
-      border-radius: 18px; border: 1px solid #252b35; background: linear-gradient(180deg, rgba(31,34,39,0.98), rgba(24,27,31,0.98));
+      border-radius: 12px; border: 1px solid #252b35; background: linear-gradient(180deg, rgba(31,34,39,0.98), rgba(24,27,31,0.98));
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
       transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
     }
@@ -178,7 +178,7 @@
     }
     .search-input::placeholder { color: #98a2b3; }
     .sort-btn {
-      min-height: 46px; padding: 0 16px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.07); background: linear-gradient(180deg, rgba(28,30,28,0.96), rgba(17,18,17,0.98));
+      min-height: 46px; padding: 0 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); background: linear-gradient(180deg, rgba(28,30,28,0.96), rgba(17,18,17,0.98));
       color: var(--text); font-size: 14px; font-weight: 800; cursor: pointer; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
     }
     .search-wrap:focus-within {
@@ -190,14 +190,14 @@
     }
     .token-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
     .token-card {
-      display: block; padding: 14px; border-radius: 18px; background: linear-gradient(180deg, rgba(17,19,17,0.96), rgba(10,11,10,0.98)); border: 1px solid rgba(255,255,255,0.07);
+      display: block; padding: 14px; border-radius: 12px; background: linear-gradient(180deg, rgba(17,19,17,0.96), rgba(10,11,10,0.98)); border: 1px solid rgba(255,255,255,0.07);
       transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
     .token-card:hover { transform: translateY(-4px); border-color: rgba(232,191,82,0.16); box-shadow: 0 26px 40px rgba(0,0,0,0.34); }
     .token-body { display: grid; grid-template-columns: 1fr; gap: 10px; }
     .token-media {
-      width: 100%; height: 148px; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center;
+      width: 100%; height: 148px; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center;
       background: radial-gradient(circle at top, rgba(232,191,82,0.12), transparent 45%), linear-gradient(135deg, #191a17, #0d0f0d); border: 1px solid rgba(255,255,255,0.07); color: var(--gold); font-size: 28px; font-weight: 900;
     }
     .token-media img { transition: transform 240ms ease, filter 240ms ease; }
@@ -206,7 +206,7 @@
     .token-title { font-size: 18px; font-weight: 800; line-height: 1.2; }
     .token-sub { margin-top: 3px; color: var(--muted); font-size: 12px; font-weight: 700; }
     .rank-pill {
-      display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 999px; background: var(--gold-soft);
+      display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 10px; background: var(--gold-soft);
       border: 1px solid var(--gold-line); color: var(--gold); font-size: 12px; font-weight: 800; white-space: nowrap;
     }
     .token-meta-list { display: grid; gap: 6px; margin-top: 8px; }
@@ -224,7 +224,7 @@
       display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; color: var(--green); font-size: 11px; font-weight: 800;
     }
     .empty-state {
-      min-height: 220px; border-radius: 18px; border: 1px dashed rgba(255,255,255,0.1); background: linear-gradient(180deg, rgba(16,18,16,0.94), rgba(10,11,10,0.98)); display: flex; align-items: center;
+      min-height: 220px; border-radius: 12px; border: 1px dashed rgba(255,255,255,0.1); background: linear-gradient(180deg, rgba(16,18,16,0.94), rgba(10,11,10,0.98)); display: flex; align-items: center;
       justify-content: center; color: var(--muted); font-size: 14px;
     }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
