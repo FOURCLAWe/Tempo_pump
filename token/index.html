@@ -1083,7 +1083,6 @@
             </div>
 
             <div class="metric-list">
-              <div class="metric-row"><span>Current Price</span><span id="currentPrice">-.--</span></div>
               <div class="metric-row"><span id="estimateLabel">You Receive</span><span id="tradeEstimate">-.--</span></div>
               <div class="metric-row"><span>Minimum Received</span><span id="minimumReceived">-.--</span></div>
             </div>
@@ -1394,6 +1393,12 @@
       return `${Number(value).toFixed(1).replace(/\.0$/, "")}%`;
     }
 
+    function getCurrentTokenTicker() {
+      const symbol = document.getElementById("tokenSymbol")?.textContent?.trim();
+      if (!symbol || symbol === "-") return "tokens";
+      return symbol;
+    }
+
     function clampSlippagePercent(value) {
       if (!Number.isFinite(value)) return null;
       return Math.min(50, Math.max(0.1, value));
@@ -1630,7 +1635,6 @@
         const marketCap = priceValue * totalSupplyValue;
 
         document.getElementById("tokenPrice").textContent = priceValue.toFixed(8) + " pathUSD";
-        document.getElementById("currentPrice").textContent = priceValue.toFixed(8) + " pathUSD";
         document.getElementById("priceChange").textContent = info[3] ? "Graduated" : "Live Price";
         document.getElementById("marketCap").textContent = "$" + marketCap.toLocaleString(undefined, { maximumFractionDigits: 0 });
         document.getElementById("curveProgressTop").textContent = pct + "%";
@@ -2009,8 +2013,9 @@
             return;
           }
           const [tokensOut, fee] = await launch.estimateBuy(tokenAddress, parsedAmount);
-          document.getElementById("tradeEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " tokens";
-          captureTradeQuote("buy", parsedAmount, tokensOut, 18, "tokens");
+          const tokenTicker = getCurrentTokenTicker();
+          document.getElementById("tradeEstimate").textContent = Number(ethers.formatUnits(tokensOut, 18)).toLocaleString() + " " + tokenTicker;
+          captureTradeQuote("buy", parsedAmount, tokensOut, 18, tokenTicker);
           if (feeEl) feeEl.textContent = ethers.formatUnits(fee, 6) + " pathUSD";
           setTradeStatus(tokensOut > 0n ? "" : "Amount too small for this trade.", tokensOut > 0n ? "muted" : "error");
         } else {

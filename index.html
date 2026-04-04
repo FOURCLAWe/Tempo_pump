@@ -182,7 +182,22 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
-    .nav-icon { width: 18px; text-align: center; }
+    .nav-icon {
+      width: 16px;
+      flex: 0 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .nav-icon svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
     .nav-label { font-size: 15px; font-weight: 600; }
 
     .sidebar-foot {
@@ -756,8 +771,12 @@
           <span class="nav-label">Docs</span>
         </a>
         <a href="https://x.com/tempoboard?s=21" target="_blank" rel="noreferrer" class="nav-item">
-          <span class="nav-icon">↗</span>
-          <span class="nav-label">X</span>
+          <span class="nav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 5.924a8.828 8.828 0 0 1-2.357.646 4.078 4.078 0 0 0 1.804-2.254 8.138 8.138 0 0 1-2.606.995A4.084 4.084 0 0 0 11.86 8.1a11.59 11.59 0 0 1-8.42-4.27 4.087 4.087 0 0 0 1.263 5.453A4.03 4.03 0 0 1 2.85 8.77v.052a4.09 4.09 0 0 0 3.276 4.006 4.112 4.112 0 0 1-1.844.07 4.089 4.089 0 0 0 3.815 2.837A8.195 8.195 0 0 1 2 17.433 11.548 11.548 0 0 0 8.26 19.27c7.547 0 11.674-6.252 11.674-11.674 0-.178-.004-.355-.012-.53A8.263 8.263 0 0 0 22 5.924Z" fill="#1D9BF0"/>
+            </svg>
+          </span>
+          <span class="nav-label">Twitter</span>
         </a>
       </nav>
     </aside>
