@@ -2338,7 +2338,82 @@ table td,
     grid-template-columns: 1fr !important;
   }
 
-  .docs-app {
+    .docs-app {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* Tighter radius system */
+.brand-mark,
+.nav-item,
+.sidebar-link,
+.wallet-btn,
+.wallet-state,
+.network-badge,
+.link-btn,
+.pill,
+.sort-btn,
+.hero-btn,
+.ghost-btn,
+.search-wrap,
+.search-shell,
+.search-btn,
+.tab-btn,
+.preset-btn,
+.input,
+.textarea,
+.interactive-trade .input,
+.slippage-wrap,
+.metric-row,
+.trade-action,
+.trade-status,
+.token-link,
+.rank-pill,
+.setting-chip,
+.mini-chip,
+.upload-btn,
+.preview,
+.hint,
+.topbar-title,
+.topbar-action,
+.filter-chip,
+.chart-tool {
+  border-radius: 8px !important;
+}
+
+.panel,
+.hero,
+.token-hero,
+.sidebar-foot,
+.token-card,
+.token-media,
+.stat-box,
+.chart-shell,
+.table-wrap,
+.summary-card,
+.info-card,
+.toc-card,
+.hero-stat,
+.field,
+.upload-shell,
+.upload-card,
+.upload-surface,
+.artwork-tile,
+.image-box,
+.optional-block,
+.empty-state,
+.formula-box,
+.article,
+.create-shell,
+.identity-card,
+.progress-wrap {
+  border-radius: 10px !important;
+}
+
+.sidebar,
+.toc,
+.docs-app,
+.section-card,
+.trade-panel {
+  border-radius: 12px !important;
 }
