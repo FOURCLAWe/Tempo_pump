@@ -12,6 +12,7 @@ It combines:
 Project documentation lives here:
 
 - [docs/overview.md](/Users/xiaoyu/Documents/New%20project/Tempo_pump/docs/overview.md)
+- [docs/whitepaper.md](/Users/xiaoyu/Documents/New%20project/Tempo_pump/docs/whitepaper.md)
 
 ## Current Network
 

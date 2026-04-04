@@ -365,8 +365,8 @@
             <div class="summary-value">4217</div>
           </div>
           <div class="summary-card">
-            <div class="summary-label">Official Token</div>
-            <div class="summary-value">$TEB</div>
+            <div class="summary-label">Trading Tax</div>
+            <div class="summary-value">1%</div>
           </div>
         </div>
 
@@ -449,26 +449,46 @@ migrate when sold >= 800,000,000</div>
           </ul>
         </section>
 
-        <section class="doc-section" id="tme">
-          <h2>3. Official Token</h2>
-          <p class="doc-text">The official ecosystem token is <code>$TEB</code>. TempoBoard describes the exchange fee policy around a <code>1%</code> trading fee, with most of that fee routed back into the official token and the remainder reserved for the treasury wallet.</p>
+        <section class="doc-section" id="fees">
+          <h2>3. Fee Policy</h2>
+          <p class="doc-text">TempoBoard does not use an official platform token in the current fee model. The protocol applies a <code>1%</code> trading tax and routes that fee into token buybacks, partner distribution, and staking rewards.</p>
 
           <div class="info-grid">
             <div class="info-card">
-              <div class="info-title">Buyback + Airdrop</div>
-              <p class="info-copy"><code>90%</code> of the <code>1%</code> trading fee is allocated to buy back <code>$TEB</code> and distribute it through airdrops.</p>
+              <div class="info-title">Buyback + Burn</div>
+              <p class="info-copy"><code>50%</code> of the <code>1%</code> trading tax is used to buy back and burn the best-performing token from the past <code>24h</code>.</p>
             </div>
             <div class="info-card">
-              <div class="info-title">Treasury Allocation</div>
-              <p class="info-copy"><code>10%</code> of the <code>1%</code> trading fee flows into the treasury wallet.</p>
+              <div class="info-title">Partner Allocation</div>
+              <p class="info-copy"><code>20%</code> of the <code>1%</code> trading tax is used to buy back the best-performing token from the past <code>24h</code> for partner distribution.</p>
             </div>
           </div>
 
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-title">Staking Allocation</div>
+              <p class="info-copy"><code>30%</code> of the <code>1%</code> trading tax is allocated to staking rewards and distributed every <code>24h</code>.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-title">Reward Formula</div>
+              <p class="info-copy"><code>reward(i, e) = stakingPool(e) * stake(i, e) / totalStaked(e)</code></p>
+            </div>
+          </div>
+
+          <div class="formula-box">
+            <div class="formula-label">24h Staking Reward Formula</div>
+            <div class="formula-text">For each reward epoch e:
+taxPool(e) = totalTradingVolume(e) * 1%
+stakingPool(e) = taxPool(e) * 30%
+
+For staker i:
+reward(i, e) = stakingPool(e) * stake(i, e) / totalStaked(e)</div>
+          </div>
+
           <ul class="doc-list">
-            <li>The buyback portion is intended to create recurring market demand for <code>$TEB</code>.</li>
-            <li>The airdrop component is intended to route part of exchange activity back to users through <code>$TEB</code> distribution.</li>
-            <li>The treasury portion is reserved for long-term protocol operations and maintenance.</li>
-            <li>This section describes the platform fee policy around <code>$TEB</code>.</li>
+            <li><code>50%</code> of fee value is used to buy back and burn the strongest token on the board over the past <code>24 hours</code>.</li>
+            <li><code>20%</code> of fee value is used to buy back the strongest token on the board over the past <code>24 hours</code> for partner distribution.</li>
+            <li><code>30%</code> of the fee pool is distributed to stakers every <code>24 hours</code>, proportional to stake share.</li>
           </ul>
         </section>
       </article>
@@ -480,7 +500,7 @@ migrate when sold >= 800,000,000</div>
         <a href="#overview" class="toc-link">TempoBoard on Tempo</a>
         <a href="#chain" class="toc-link">1. Chain</a>
         <a href="#curve" class="toc-link">2. Curve & Migration</a>
-        <a href="#tme" class="toc-link">3. Official Token</a>
+        <a href="#fees" class="toc-link">3. Fee Policy</a>
       </div>
     </aside>
   </div>

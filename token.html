@@ -339,21 +339,21 @@
     }
 
     .chart-shell {
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,0.07);
-      background: linear-gradient(180deg, rgba(16,18,16,0.96), rgba(11,12,11,0.98));
+      background: linear-gradient(180deg, rgba(21,23,27,0.98), rgba(17,19,23,1));
     }
 
     .chart-toolbar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-start;
       gap: 12px;
-      min-height: 54px;
-      padding: 0 16px;
-      border-bottom: 1px solid var(--line);
-      background: #1b1d21;
+      min-height: 46px;
+      padding: 0 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: #202124;
     }
 
     .toolbar-group {
@@ -366,14 +366,14 @@
     .interval-group { gap: 6px; }
 
     .chart-tool {
-      min-height: 32px;
-      padding: 0 10px;
-      border-radius: 8px;
+      min-height: 28px;
+      padding: 0 8px;
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      color: #b4bac4;
-      font-size: 13px;
+      color: #d5d8de;
+      font-size: 12px;
       font-weight: 700;
       border: 1px solid transparent;
       background: transparent;
@@ -383,26 +383,26 @@
 
     .chart-tool.active {
       color: #5d85ff;
-      background: rgba(93,133,255,0.08);
-      border-color: rgba(93,133,255,0.16);
+      background: transparent;
+      border-color: transparent;
     }
 
     .ohlc-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
-      min-height: 42px;
-      padding: 0 16px;
+      gap: 10px;
+      min-height: 38px;
+      padding: 0 14px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
-      color: #c6cbd4;
-      font-size: 12px;
+      color: #cfd5df;
+      font-size: 11px;
       font-weight: 700;
       flex-wrap: wrap;
-      background: #181a1f;
+      background: #1d1f23;
     }
 
     .ohlc-bar strong {
-      color: #eef2f7;
+      color: #f0f3f8;
       font-weight: 800;
     }
 
@@ -422,7 +422,7 @@
       position: relative;
       height: 420px;
       padding: 0;
-      background: #181a1f;
+      background: #1b1d21;
     }
 
     #priceChart {
@@ -431,20 +431,31 @@
       display: block;
     }
 
+    .chart-volume-readout {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      color: #33cfd0;
+      font-size: 11px;
+      font-weight: 800;
+      pointer-events: none;
+      z-index: 2;
+    }
+
     .chart-statusbar {
-      min-height: 46px;
-      padding: 0 16px;
+      min-height: 38px;
+      padding: 0 14px;
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 12px;
+      gap: 10px;
       border-top: 1px solid rgba(255,255,255,0.05);
-      background: #17191d;
+      background: #1a1c20;
     }
 
     .chart-status-meta {
-      color: #c2c8d2;
-      font-size: 12px;
+      color: #c6ccd5;
+      font-size: 11px;
       font-weight: 700;
     }
 
@@ -975,6 +986,7 @@
             </div>
             <div class="chart-canvas-wrap">
               <div id="priceChart"></div>
+              <div id="chartVolumeReadout" class="chart-volume-readout">--</div>
             </div>
             <div class="chart-statusbar">
               <div class="toolbar-group chart-status-meta">
@@ -1224,26 +1236,26 @@
       container.innerHTML = "";
       priceChart = LightweightCharts.createChart(container, {
         layout: {
-          background: { color: "#181a1f" },
-          textColor: "#c9ced7",
+          background: { color: "#1b1d21" },
+          textColor: "#d2d8e1",
           fontFamily: "Manrope, sans-serif"
         },
         grid: {
-          vertLines: { color: "rgba(255,255,255,0.08)" },
-          horzLines: { color: "rgba(255,255,255,0.08)" }
+          vertLines: { color: "rgba(255,255,255,0.06)" },
+          horzLines: { color: "rgba(255,255,255,0.06)" }
         },
         rightPriceScale: {
           borderColor: "rgba(255,255,255,0.12)",
           scaleMargins: {
-            top: 0.12,
-            bottom: 0.22
+            top: 0.10,
+            bottom: 0.12
           }
         },
         timeScale: {
           borderColor: "rgba(255,255,255,0.12)",
           timeVisible: true,
           secondsVisible: false,
-          barSpacing: 14,
+          barSpacing: 12,
           rightOffset: 6
         },
         crosshair: {
@@ -1275,20 +1287,6 @@
           type: "price",
           precision: 8,
           minMove: 0.00000001
-        }
-      });
-
-      volumeSeries = priceChart.addHistogramSeries({
-        priceFormat: { type: "volume" },
-        priceScaleId: "volume",
-        lastValueVisible: false,
-        priceLineVisible: false
-      });
-
-      priceChart.priceScale("volume").applyOptions({
-        scaleMargins: {
-          top: 0.8,
-          bottom: 0.02
         }
       });
 
@@ -1896,8 +1894,8 @@
       if (!grouped.length) {
         document.getElementById("ohlcBar").innerHTML = "<span>No chart data</span>";
         document.getElementById("chartPrice").textContent = "-.--";
+        document.getElementById("chartVolumeReadout").textContent = "--";
         if (candleSeries) candleSeries.setData([]);
-        if (volumeSeries) volumeSeries.setData([]);
         return;
       }
 
@@ -1909,17 +1907,10 @@
         close: item.close
       }));
       candleSeries.setData(candles);
-      if (volumeSeries) {
-        volumeSeries.setData(grouped.map((item) => ({
-          time: Math.floor(item.timestamp),
-          value: item.volume,
-          color: item.close >= item.open ? "rgba(141,255,85,0.36)" : "rgba(255,143,128,0.36)"
-        })));
-      }
       priceChart.timeScale().fitContent();
       priceChart.applyOptions({
         timeScale: {
-          barSpacing: grouped.length < 12 ? 26 : grouped.length < 24 ? 20 : 14
+          barSpacing: grouped.length < 12 ? 22 : grouped.length < 24 ? 16 : 12
         }
       });
 
@@ -1927,10 +1918,12 @@
       const high = Math.max(...grouped.map((item) => item.high));
       const low = Math.min(...grouped.map((item) => item.low));
       const close = grouped[grouped.length - 1].close;
+      const lastVolume = grouped[grouped.length - 1].volume;
       const delta = close - open;
       const deltaPct = open ? (delta / open) * 100 : 0;
 
       document.getElementById("chartPrice").textContent = close.toFixed(8) + " pathUSD";
+      document.getElementById("chartVolumeReadout").textContent = Number(lastVolume).toLocaleString(undefined, { maximumFractionDigits: 8 });
       document.getElementById("ohlcBar").innerHTML = `
         <span class="ohlc-dot"></span>
         <span>O=<strong>${open.toFixed(8)}</strong></span>

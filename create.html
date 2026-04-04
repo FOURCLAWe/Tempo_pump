@@ -98,6 +98,16 @@
     }
     .nav-item.active { background: linear-gradient(90deg, rgba(232,191,82,0.14), rgba(151,255,93,0.08)); color: var(--text); border-color: rgba(232,191,82,0.18); }
     .nav-item:hover { background: rgba(255,255,255,0.04); transform: translateX(4px); border-color: rgba(255,255,255,0.05); }
+    .nav-item-disabled {
+      position: relative;
+      opacity: 0.82;
+      cursor: default;
+    }
+    .nav-item-disabled:hover {
+      background: rgba(255,255,255,0.025);
+      border-color: rgba(255,255,255,0.04);
+      transform: none;
+    }
     .nav-icon {
       width: 16px;
       flex: 0 0 16px;
@@ -115,6 +125,21 @@
       display: block;
     }
     .nav-label { font-size: 15px; font-weight: 600; }
+    .soon-badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(217, 223, 213, 0.58);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateY(2px);
+      transition: opacity 140ms ease, transform 140ms ease;
+      pointer-events: none;
+    }
+    .nav-item-disabled:hover .soon-badge {
+      opacity: 1;
+      transform: translateY(0);
+    }
     .sidebar-foot {
       margin-top: auto; padding: 14px; border-radius: 12px; background: linear-gradient(180deg, rgba(24,26,23,0.9), rgba(14,15,14,0.98)); border: 1px solid rgba(255,255,255,0.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
@@ -773,6 +798,11 @@
           <span class="nav-icon">◫</span>
           <span class="nav-label">Docs</span>
         </a>
+        <div class="nav-item nav-item-disabled" aria-disabled="true">
+          <span class="nav-icon">◌</span>
+          <span class="nav-label">Stake</span>
+          <span class="soon-badge">soon</span>
+        </div>
         <a href="https://x.com/tempoboard?s=21" target="_blank" rel="noreferrer" class="nav-item">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -897,25 +927,109 @@
       rpcUrls: ["https://rpc.tempo.xyz"],
       blockExplorerUrls: ["https://explore.mainnet.tempo.xyz"]
     };
+    const MAX_IMAGE_META_BYTES = 12000;
 
-    function handleImageUpload(e) {
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(String(event.target?.result || ""));
+        reader.onerror = () => reject(new Error("Failed to read image file."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function loadImageElement(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("Failed to decode image."));
+        img.src = src;
+      });
+    }
+
+    async function buildCompressedImageDataUrl(file) {
+      const originalDataUrl = await readFileAsDataUrl(file);
+      const image = await loadImageElement(originalDataUrl);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d", { alpha: true });
+      if (!ctx) throw new Error("Canvas is not available in this browser.");
+
+      let targetMaxSide = 220;
+      let quality = 0.82;
+      let bestDataUrl = "";
+
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        const scale = Math.min(1, targetMaxSide / Math.max(image.naturalWidth, image.naturalHeight));
+        const width = Math.max(1, Math.round(image.naturalWidth * scale));
+        const height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.drawImage(image, 0, 0, width, height);
+
+        const mimeType = attempt < 7 ? "image/webp" : "image/jpeg";
+        const dataUrl = canvas.toDataURL(mimeType, quality);
+        bestDataUrl = dataUrl;
+
+        if (new TextEncoder().encode(dataUrl).length <= MAX_IMAGE_META_BYTES) {
+          return dataUrl;
+        }
+
+        if (quality > 0.46) {
+          quality -= 0.08;
+        } else {
+          targetMaxSide = Math.max(96, Math.round(targetMaxSide * 0.82));
+        }
+      }
+
+      if (new TextEncoder().encode(bestDataUrl).length > MAX_IMAGE_META_BYTES) {
+        throw new Error("Image is too large for on-chain metadata. Try a simpler square image.");
+      }
+
+      return bestDataUrl;
+    }
+
+    async function handleImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        setResult("Please upload a valid image file.", true);
+        e.target.value = "";
+        return;
+      }
       const uploadBtnText = document.getElementById("uploadBtnText");
       const uploadBtnMeta = document.getElementById("uploadBtnMeta");
       if (uploadBtnText) {
         uploadBtnText.textContent = file.name.length > 22 ? `${file.name.slice(0, 19)}...` : file.name;
       }
       if (uploadBtnMeta) {
-        uploadBtnMeta.textContent = "Selected file";
+        uploadBtnMeta.textContent = "Optimizing image...";
       }
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const base64 = ev.target.result;
-        document.getElementById("image").value = base64;
-        document.getElementById("imagePreview").innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
-      };
-      reader.readAsDataURL(file);
+      setResult("Optimizing image for launch metadata...");
+      try {
+        const compressedDataUrl = await buildCompressedImageDataUrl(file);
+        document.getElementById("image").value = compressedDataUrl;
+        document.getElementById("imagePreview").innerHTML = `<img src="${compressedDataUrl}" class="w-full h-full object-cover">`;
+        if (uploadBtnMeta) {
+          uploadBtnMeta.textContent = "Ready to launch";
+        }
+        setResult("Image ready.");
+      } catch (error) {
+        document.getElementById("image").value = "";
+        document.getElementById("imagePreview").innerHTML = `
+          <div class="artwork-placeholder">
+            <div class="artwork-icon">+</div>
+            <div class="artwork-placeholder-title">Upload image</div>
+            <div class="artwork-placeholder-meta">PNG JPG WEBP</div>
+          </div>
+        `;
+        if (uploadBtnMeta) {
+          uploadBtnMeta.textContent = "Upload failed";
+        }
+        e.target.value = "";
+        setResult(error.message || "Image upload failed.", true);
+      }
     }
 
     function applyWalletConnected(address, announce = false) {
@@ -994,6 +1108,10 @@
       if (!userAddress) return setResult("Please connect your wallet first.", true);
       try {
         const meta = JSON.stringify({ description, image, twitter, website });
+        const metaBytes = new TextEncoder().encode(meta).length;
+        if (metaBytes > MAX_IMAGE_META_BYTES + 8000) {
+          return setResult("Metadata is still too large. Use a smaller image or shorter text.", true);
+        }
         setResult(`Creating ${name} (${symbol})...`);
         const contract = new ethers.Contract(LAUNCH_CONTRACT, LAUNCH_ABI, signer);
         let tx;

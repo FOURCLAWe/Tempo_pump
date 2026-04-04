@@ -175,6 +175,18 @@
       transform: translateX(4px);
     }
 
+    .nav-item-disabled {
+      position: relative;
+      opacity: 0.82;
+      cursor: default;
+    }
+
+    .nav-item-disabled:hover {
+      background: rgba(255,255,255,0.025);
+      border-color: rgba(255,255,255,0.04);
+      transform: none;
+    }
+
     .nav-item.active {
       background: linear-gradient(90deg, rgba(232,191,82,0.14), rgba(151,255,93,0.08));
       color: var(--text);
@@ -199,6 +211,23 @@
       display: block;
     }
     .nav-label { font-size: 15px; font-weight: 600; }
+
+    .soon-badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(217, 223, 213, 0.58);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      transform: translateY(2px);
+      transition: opacity 140ms ease, transform 140ms ease;
+      pointer-events: none;
+    }
+
+    .nav-item-disabled:hover .soon-badge {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     .sidebar-foot {
       margin-top: auto;
@@ -770,6 +799,11 @@
           <span class="nav-icon">◫</span>
           <span class="nav-label">Docs</span>
         </a>
+        <div class="nav-item nav-item-disabled" aria-disabled="true">
+          <span class="nav-icon">◌</span>
+          <span class="nav-label">Stake</span>
+          <span class="soon-badge">soon</span>
+        </div>
         <a href="https://x.com/tempoboard?s=21" target="_blank" rel="noreferrer" class="nav-item">
           <span class="nav-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
