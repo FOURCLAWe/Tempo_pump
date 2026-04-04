@@ -1333,13 +1333,14 @@
       updateChartClock();
       if (chartClockTimer) clearInterval(chartClockTimer);
       chartClockTimer = window.setInterval(updateChartClock, 1000);
-      await Promise.all([
+      const walletRestorePromise = autoConnect();
+      const initialDataPromise = Promise.all([
         loadTokenInfo(),
         loadActivity(),
         loadHolders()
       ]);
+      await Promise.allSettled([walletRestorePromise, initialDataPromise]);
       setInterval(loadTokenInfo, 10000);
-      await autoConnect();
     }
 
     function applyWalletConnected(address) {
@@ -2041,13 +2042,11 @@
     function initWallet() {
       walletSession = window.TempomemeWallet.createSession({
         chain: TEMPO_CHAIN,
-        onConnect: async ({ address, provider: nextProvider, signer: nextSigner }) => {
-          provider = nextProvider;
+        onConnect: async ({ address, signer: nextSigner }) => {
           signer = nextSigner;
           userAddress = address;
           applyWalletConnected(address);
           await updateWalletBalances();
-          await loadTokenInfo();
           await updateTradeEstimate();
         },
         onDisconnect: ({ reason }) => {
