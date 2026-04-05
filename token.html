@@ -929,6 +929,7 @@
             <span id="tokenSymbol">-</span>
             <span id="tokenAddr" class="mono"></span>
             <span id="creatorAddr" class="mono"></span>
+            <span id="createdTime"></span>
           </div>
           <p id="tokenDescription" class="token-description" hidden></p>
           <div id="tokenLinks" class="token-links" hidden></div>
@@ -1207,6 +1208,16 @@
       return Number(ethers.formatUnits(priceRaw, 18));
     }
 
+    function formatRelativeTime(timestamp) {
+      if (!timestamp) return "-";
+      const diff = Math.max(0, Math.floor(Date.now() / 1000) - Number(timestamp));
+      if (diff < 60) return "Just now";
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+      return `${Math.floor(diff / 604800)}w ago`;
+    }
+
     async function queryFilterChunked(contract, filter, fromBlock, toBlock, chunkSize = 4000) {
       const results = [];
       for (let start = fromBlock; start <= toBlock; start += chunkSize) {
@@ -1221,11 +1232,15 @@
       if (launchContextPromise) return launchContextPromise;
       launchContextPromise = (async () => {
         const latestBlock = await provider.getBlockNumber();
+        const launch = new ethers.Contract(PRIMARY_LAUNCH_CONTRACT, LAUNCH_ABI, provider);
+        const launchRecord = await findLaunchMeta(launch, provider, tokenAddress);
         return {
           address: PRIMARY_LAUNCH_CONTRACT,
           version: "v2",
-          launch: new ethers.Contract(PRIMARY_LAUNCH_CONTRACT, LAUNCH_ABI, provider),
-          createdBlock: Math.max(0, latestBlock - 20000)
+          launch,
+          createdBlock: launchRecord?.blockNumber ?? Math.max(0, latestBlock - 20000),
+          createdAt: launchRecord?.timestamp ?? null,
+          launchRecord
         };
       })();
       return launchContextPromise;
@@ -1610,14 +1625,15 @@
           token.totalSupply()
         ]);
 
-        const eventMeta = await findLaunchMeta(launch, provider, tokenAddress);
+        const launchRecord = context.launchRecord || await findLaunchMeta(launch, provider, tokenAddress);
         const localMeta = getLocalMeta(tokenAddress);
-        const meta = eventMeta || localMeta || {};
+        const meta = launchRecord?.meta || localMeta || {};
 
         document.getElementById("tokenName").textContent = name;
         document.getElementById("tokenSymbol").textContent = symbol;
         document.getElementById("tokenAddr").textContent = tokenAddress;
         document.getElementById("creatorAddr").textContent = info[0] ? `Creator ${info[0].slice(0, 6)}...${info[0].slice(-4)}` : "";
+        document.getElementById("createdTime").textContent = context.createdAt ? `Created ${formatRelativeTime(context.createdAt)}` : "";
         renderTokenDescription(meta);
         renderTokenLinks(meta);
         if (meta.image) {
@@ -2156,13 +2172,20 @@
           const fromBlock = Math.max(0, toBlock - chunkSize + 1);
           const events = await launch.queryFilter(filter, fromBlock, toBlock);
           if (events.length > 0) {
-            const metaText = events[events.length - 1].args.meta;
-            if (!metaText) return null;
+            const launchEvent = events[events.length - 1];
+            const metaText = launchEvent.args.meta;
+            let meta = null;
             try {
-              return JSON.parse(metaText);
+              meta = metaText ? JSON.parse(metaText) : null;
             } catch (e) {
-              return null;
+              meta = null;
             }
+            const block = await getBlockCached(launchEvent.blockNumber);
+            return {
+              meta,
+              blockNumber: launchEvent.blockNumber,
+              timestamp: Number(block?.timestamp || 0)
+            };
           }
           if (fromBlock === startBlock) break;
         }

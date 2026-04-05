@@ -386,6 +386,7 @@
     let allCards = [];
     let currentSort = "latest";
     let walletSession;
+    const blockTimestampCache = new Map();
     const LAUNCH_CONTRACT = "0x5866914946e4B7c7B2C789cc5EE259b73CBa2274";
     const HIDDEN_TOKENS = new Set([
       "0xba439c26d31930cfd5a9b344f5a1c582dc9f422b",
@@ -410,6 +411,24 @@
 
     function isHiddenToken(tokenAddr) {
       return !!tokenAddr && HIDDEN_TOKENS.has(tokenAddr.toLowerCase());
+    }
+
+    async function getBlockTimestamp(provider, blockNumber) {
+      if (!blockTimestampCache.has(blockNumber)) {
+        const block = await provider.getBlock(blockNumber);
+        blockTimestampCache.set(blockNumber, Number(block?.timestamp || 0));
+      }
+      return blockTimestampCache.get(blockNumber);
+    }
+
+    function formatRelativeTime(timestamp) {
+      if (!timestamp) return "-";
+      const diff = Math.max(0, Math.floor(Date.now() / 1000) - Number(timestamp));
+      if (diff < 60) return "Just now";
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
+      return `${Math.floor(diff / 604800)}w ago`;
     }
 
     function applyWalletConnected(address) {
@@ -512,6 +531,7 @@
               </div>
               <div class="token-meta-list">
                 <div class="metric-row"><span>Creator</span><span class="mono">${c.creatorShort}</span></div>
+                <div class="metric-row"><span>Created</span><span>${formatRelativeTime(c.createdAt)}</span></div>
                 <div class="metric-row"><span>Price</span><span>${c.priceFormatted} pathUSD</span></div>
               </div>
               <div class="token-progress">
@@ -568,9 +588,9 @@
               launch.getPrice(tokenAddr),
               token.totalSupply()
             ]);
-            const eventMeta = await findLaunchMeta(launch, p, tokenAddr);
+            const launchRecord = await findLaunchMeta(launch, p, tokenAddr);
             const localMeta = getLocalMeta(tokenAddr);
-            const meta = eventMeta || localMeta || {};
+            const meta = launchRecord?.meta || localMeta || {};
             const raised = Number(ethers.formatUnits(info[1], 6));
             const sold = Number(ethers.formatUnits(info[2], 18));
             const priceValue = Number(ethers.formatUnits(price, 18));
@@ -586,7 +606,8 @@
               creatorShort: info[0].slice(0, 4) + "..." + info[0].slice(-6),
               marketCapValue,
               marketCapLabel: "$" + marketCapValue.toLocaleString(undefined, { maximumFractionDigits: 0 }),
-              createdBlock: i + 1,
+              createdBlock: launchRecord?.blockNumber ?? i + 1,
+              createdAt: launchRecord?.timestamp ?? null,
               meta
             });
           } catch (e) {
@@ -692,13 +713,19 @@
           const fromBlock = Math.max(0, toBlock - chunkSize + 1);
           const events = await launch.queryFilter(filter, fromBlock, toBlock);
           if (events.length > 0) {
-            const metaText = events[events.length - 1].args.meta;
-            if (!metaText) return null;
+            const launchEvent = events[events.length - 1];
+            const metaText = launchEvent.args.meta;
+            let meta = null;
             try {
-              return JSON.parse(metaText);
+              meta = metaText ? JSON.parse(metaText) : null;
             } catch (e) {
-              return null;
+              meta = null;
             }
+            return {
+              meta,
+              blockNumber: launchEvent.blockNumber,
+              timestamp: await getBlockTimestamp(provider, launchEvent.blockNumber)
+            };
           }
           if (fromBlock === 0) break;
         }
